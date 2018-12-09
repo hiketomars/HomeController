@@ -122,6 +122,13 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="model\Door.cs" />
+    <Compile Include="model\HouseController.cs" />
+    <Compile Include="model\LEDController.cs" />
+    <Compile Include="model\LedFlashPattern.cs" />
+    <Compile Include="model\RgbLed.cs" />
+    <Compile Include="model\RGBLEDPeriod.cs" />
+    <Compile Include="model\RGBValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +162,7 @@
       <Version>6.2.2</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
