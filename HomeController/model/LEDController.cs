@@ -16,21 +16,21 @@ namespace HomeController.model
 
         private readonly RgbLed rgbLed;
         private LedFlashPattern ledFlashPattern;
-        private readonly MainPage.VisualizeLed drawLed;
+        private readonly MainPage.VisualizeLed visualizeLed;
         private DispatcherTimer timer;
 
         public LEDController(RgbLed regbLed, MainPage.VisualizeLed drawLed) : this(regbLed, null, drawLed) { }
 
-        public LEDController(RgbLed regbLed, LedFlashPattern ledFlashPattern, MainPage.VisualizeLed drawLed)
+        public LEDController(RgbLed regbLed, LedFlashPattern ledFlashPattern, MainPage.VisualizeLed visualizeLed)
         {
             this.rgbLed = regbLed;
             this.ledFlashPattern = ledFlashPattern;
-            this.drawLed = drawLed;
+            this.visualizeLed = visualizeLed;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(0);
             timer.Tick += Timer_Tick;
 
-            rgbLed.SetVisualizeLedDelegate(drawLed);
+            rgbLed.SetVisualizeLedDelegate(visualizeLed);
         }
 
         public void StartLedPattern(LedFlashPattern ledFlashPattern)
@@ -55,6 +55,8 @@ namespace HomeController.model
         }
 
         private int currentPos;
+        private int currentCycle;
+
         private void Timer_Tick(object sender, object e)
         {
             //ChangeLed();
@@ -62,6 +64,13 @@ namespace HomeController.model
             {
                 // Time to start from the beginning in the pattern.
                 currentPos = 0;
+                currentCycle++;
+                // Coontinue for ever if it is an eternal cycle, otherwise just do the correct amount of cycles.
+                if((currentCycle >= ledFlashPattern.Cycles) && !ledFlashPattern.EternalCycles)
+                {
+                    timer.Stop();
+                    //visualizeLed()
+                }
             }
             RGBLEDPeriod rgbLedPeriod = ledFlashPattern.RGBLEDPeriods[currentPos++];
             RGBValue rgbValue = rgbLedPeriod.RGBValue;

@@ -12,12 +12,20 @@ namespace HomeController.model
         //private readonly int patternChangeRateMs;
         public readonly List<RGBLEDPeriod> RGBLEDPeriods;
 
+        public int Cycles { get; }
+        public bool EternalCycles
+        {
+            get {
+                return Cycles == -1;
+            }
+        }
+
         public LedFlashPattern()
         {
             // Empty list.
             this.RGBLEDPeriods = new List<RGBLEDPeriod>();
         }
-        public LedFlashPattern(int [] rgbAntPeriodArray)
+        public LedFlashPattern(int [] rgbAntPeriodArray, int cycles = -1)
         {
             int pos = 0;
             this.RGBLEDPeriods = new List<RGBLEDPeriod>();
@@ -25,6 +33,8 @@ namespace HomeController.model
             {
                 RGBLEDPeriods.Add(new RGBLEDPeriod(new RGBValue((byte)rgbAntPeriodArray[pos], (byte)rgbAntPeriodArray[pos + 1], (byte)rgbAntPeriodArray[pos + 2]), rgbAntPeriodArray[pos + 3]));
             }
+
+            Cycles = cycles;
         }
         public LedFlashPattern(List<RGBLEDPeriod> rgbLEDPeriods)
         {

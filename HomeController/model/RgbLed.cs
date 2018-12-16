@@ -7,6 +7,7 @@ using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
 using static HomeController.model.Door;
 using Windows.Devices.Gpio;
+using SocketComm;
 
 namespace HomeController.model
 {
@@ -122,7 +123,7 @@ namespace HomeController.model
             }
             if (!colorHasBeenSet)
             {
-                visualizeLed(MainPage.LEDGraphColor.Gray, "Grå");
+                visualizeLed(MainPage.LEDGraphColor.Gray, Class1.ColorGray);
             }
         }
 
