@@ -12,10 +12,12 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using HomeController.utils;
+using HomeController.view;
 
 namespace HomeController
 {
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, IMainView
     {
         // The number of the GPIO pin on Raspberry Pi 3 model B.
 
@@ -36,45 +38,45 @@ namespace HomeController
         private SolidColorBrush yellowBrush = new SolidColorBrush(Windows.UI.Colors.Yellow);
         private Door door;
         private HouseController houseController; // Representerar andra RPi vid andra dörrar.
-
+        private MainPresenter mainPresenter;
         public MainPage()
         {
             InitializeComponent();
-
+            mainPresenter = new MainPresenter(this);
             //timer = new DispatcherTimer();
             //timer.Interval = TimeSpan.FromMilliseconds(100);
             //timer.Tick += Timer_Tick;
             //InitGPIO();
             //RgbLed.InitGPIO();
-            InitModels();
             LED.Fill = redBrush;
 
             PerforStartSequence();
+            
             //if (pinRedLED != null)
             //{
             //    timer.Start();
             //}        
         }
 
-        public delegate void VisualizeLed(LEDGraphColor color, string message = "");
-        public enum LEDGraphColor { Red, Green, Blue, Gray }
-        public void VisualizeLedInColor(LEDGraphColor color, string message)
+        public delegate void VisualizeLed(Definition.LEDGraphColor color, string message = "");
+        
+        public void VisualizeLedInColor(Definition.LEDGraphColor color, string message)
         {
             switch (color)
             {
-                case LEDGraphColor.Red:
+                case Definition.LEDGraphColor.Red:
                     LED.Fill = redBrush;
                     break;
 
-                case LEDGraphColor.Green:
+                case Definition.LEDGraphColor.Green:
                     LED.Fill = greenBrush;
                     break;
 
-                case LEDGraphColor.Blue:
+                case Definition.LEDGraphColor.Blue:
                     LED.Fill = blueBrush;
                     break;
 
-                case LEDGraphColor.Gray:
+                case Definition.LEDGraphColor.Gray:
                     LED.Fill = grayBrush;
                     break;
 
@@ -86,13 +88,6 @@ namespace HomeController
 
             GpioStatus.Text = message;
 
-        }
-
-
-        private void InitModels()
-        {
-            door = new Door();
-            houseController = new HouseController();
         }
 
         private void PerforStartSequence()
@@ -184,6 +179,49 @@ namespace HomeController
         private void GpioStatus_SelectionChanged(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void InfoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            //LoggInGui("Info about the House Controller;");
+            //LoggInGui(houseController.GetInfo());
+            mainPresenter.InfoBtn_Click(sender, e);
+
+        }
+
+        private void StopBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.StopApplication();
+        }
+
+        private void ListenOnPort_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// From IMainView.
+        /// Loggs text in a listbox in the GUI.
+        /// </summary>
+        /// <param name="text"></param>
+        public void Logg(string text)
+        {
+            this.loggListBox.Items.Add(text);
+        }
+
+        // Called from the presenter to set all logg items in this view.
+        public void SetLoggingItems(List<string> loggings)
+        {
+            this.loggListBox.Items.Clear();
+            foreach (var logging in loggings)
+            {
+                this.loggListBox.Items.Add(logging);
+            }
+        }
+
+        public void SetColorForBackdoorLED(Definition.LEDGraphColor color)
+        {
+            
         }
 
         //private void Sleep(int delay)

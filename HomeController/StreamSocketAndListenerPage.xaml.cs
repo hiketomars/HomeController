@@ -34,8 +34,9 @@ namespace HomeController
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.StartServer();
-            this.StartClient();
+            // Detta använder jag inte nu. Istället finns Clienten i LocalCentralUnit-klassen.
+            //this.StartServer();
+            //this.StartClient();
         }
 
         private async void StartServer()
@@ -47,7 +48,7 @@ namespace HomeController
                 // The ConnectionReceived event is raised when connections are received.
                 streamSocketListener.ConnectionReceived += this.StreamSocketListener_ConnectionReceived;
 
-                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
+                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
                 await streamSocketListener.BindServiceNameAsync(StreamSocketAndListenerPage.PortNumber);
 
                 this.serverListBox.Items.Add("server is listening...");

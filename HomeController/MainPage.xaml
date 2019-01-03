@@ -7,12 +7,29 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="Beige" >
+            <Button x:Name="StopBtn"  Content="Stop" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopBtn_Click" />
+
+            <TextBlock x:Name="HouseControllerHeading" Text="House Controler." Margin="10" TextAlignment="Center" FontSize="30" />
+            <ListBox x:Name="houseControllerListBox" Grid.Row="1" Margin="9.6"/>
+        </StackPanel>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Ellipse x:Name="LED" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
+            <TextBlock x:Name="LocalCentralUnitHeading" Text="LCU" Margin="10" TextAlignment="Center" FontSize="26.667" />
+            <Button x:Name="InfoBtn"  Content="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Click="InfoBtn_Click" />
+            <CheckBox x:Name="ListenOnPort" Content="Listen on Port" HorizontalAlignment="Left" Checked="ListenOnPort_Checked"></CheckBox>
+            <CheckBox x:Name="xyz" Content="xyz" HorizontalAlignment="Left"></CheckBox>            <Ellipse x:Name="LED" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
             <TextBlock x:Name="DelayText" Text="" Margin="10" TextAlignment="Center" FontSize="26.667" />
             <TextBlock x:Name="GpioStatus" Text="Waiting to initialize the GPIO..." Margin="10,50,10,10" TextAlignment="Center" FontSize="26.667" SelectionChanged="GpioStatus_SelectionChanged" />
+
+            <TextBlock Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="client"/>
+            <ListBox x:Name="loggListBox" Grid.Row="1" Margin="9.6"/>
+            <TextBlock Grid.Column="1" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="server"/>
+            <ListBox x:Name="serverListBox" Grid.Column="1" Grid.Row="1" Margin="9.6"/>
+            
+
         </StackPanel>
     </Grid>
+    
+    
 </Page>
