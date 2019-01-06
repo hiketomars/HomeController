@@ -59,17 +59,18 @@ namespace HomeController.utils
             {
                 try
                 {
-                    Task.Delay(1).Wait();
                     // C:\Users\makl\AppData\Local\Packages\9c6bbe75-87fc-407f-9ad3-a5035f3268a0_n0repxk218c66\LocalState
-                    await Task.Run(() => File.AppendAllText(Path.Combine(path, "rpi.txt"),
-                        now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
+                    //await Task.Run(() => File.AppendAllText(Path.Combine(path, "rpi.txt"),
+                        //now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
+
+                    File.AppendAllText(Path.Combine(path, "rpi.txt"),
+                        now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n");
                     break;
                 }
-                catch (Exception ex)
+                catch (IOException ex)
                 {
                     int a = 0;
                     Task.Delay(1).Wait();
-
                 }
                 count++;
                 countString = " [" + count + "]";

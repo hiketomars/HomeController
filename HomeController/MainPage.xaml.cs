@@ -187,6 +187,7 @@ namespace HomeController
         public async void SetLoggingItems(List<string> loggings)
         {
             // Since this method might be called from another thread other than the GUI-thread we need to use the Dispatcher.
+            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
             await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
             //this.loggListBox.Items.Clear();
             foreach (var logging in loggings)
