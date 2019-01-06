@@ -10,10 +10,6 @@ namespace HomeController.model
     // Represents a specific RGB Value (color) for a specified amont of time, e.g. as part of a flash pattern.
     public class RGBLEDPeriod
     {
-        //public RGBLEDPeriod(RGBValue rgbValue)
-        //{
-        //    RGBValue = rgbValue;
-        //}
         private int holdValueMs;
         public RGBLEDPeriod(RGBValue rgbValue, int holdValueMs)
         {

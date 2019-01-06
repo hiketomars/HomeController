@@ -10,7 +10,6 @@ namespace HomeController.model
     // LedFlashPattern håller en lista med RGBPeriod med vars hjälp det går att bestämma hur LED:en ska blinka.
     public class LedFlashPattern
     {
-        //private readonly int patternChangeRateMs;
         public readonly List<RGBLEDPeriod> RGBLEDPeriods;
 
         public int Cycles { get; }
@@ -62,6 +61,5 @@ namespace HomeController.model
             return new LedFlashPattern(new int[] {  255, 0, 0, 1000,
                                                     0, 0, 0, 1000, });
         }
-
     }
 }

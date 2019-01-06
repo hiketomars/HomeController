@@ -7,7 +7,7 @@ using HomeController.model;
 
 namespace HomeController.utils
 {
-    
+    // Holds some global definitions. Perhaps "Utils" and global definitions "BOD" should be kept separate...
     public class Definition
     {
         public delegate void LoggInGui(string text);

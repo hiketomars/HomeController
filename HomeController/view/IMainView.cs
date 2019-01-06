@@ -7,11 +7,13 @@ using HomeController.utils;
 
 namespace HomeController.view
 {
+    /// <summary>
+    /// This is a View interface in the MVP-architecture.
+    /// </summary>
     public interface IMainView : IView
     {
         void Logg(string text);
         void SetLoggingItems(List<string> loggings);
-        void SetColorForBackdoorLED(Definition.LEDGraphColor color);
         void SetColorForBackdoorLED(RGBValue rgbValue);
     }
 }

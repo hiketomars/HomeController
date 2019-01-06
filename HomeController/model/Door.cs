@@ -29,7 +29,6 @@ namespace HomeController.model
         private LEDController doorLedController;
         public Door()
         {
-            //doorLedController = new LEDController(new RgbLed());
         }
 
         public RgbLed DoorLed { get; set; }

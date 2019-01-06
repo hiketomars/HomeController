@@ -29,7 +29,6 @@ namespace HomeController.model
 
         private LocalCentralUnit BackdoorLocalCentralUnit;
 
-        //private Definition.LoggInGui loggInGui;
         /// <summary>
         /// Constructs the one and only HouseController which is the model in the MVP.
         /// </summary>
@@ -80,7 +79,6 @@ namespace HomeController.model
         {
             return "Currently only LCU with name " + BackdoorLocalCentralUnit.Name + " is present.";
         }
-
 
         private List<string> loggings = new List<string>();
 

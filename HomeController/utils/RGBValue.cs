@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace HomeController.utils
 {
+    /// <summary>
+    /// RGBValue holds a value between 0 and 255 for each of the three colors red, green and blue.
+    /// </summary>
     public class RGBValue
     {
         public RGBValue(byte redPart, byte greenPart, byte bluePart)

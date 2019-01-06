@@ -12,9 +12,6 @@ namespace HomeController.model
     // En LEDController kan sköta en LED. Bland annat kan den få den att blinka enligt ett visst mönster.
     public class LEDController
     {
-        //public delegate void ChangeLedDelegate();
-        //private ChangeLedDelegate ChangeLed;
-
         private readonly RgbLed rgbLed;
         private LedFlashPattern ledFlashPattern;
         private DispatcherTimer timer;
@@ -56,17 +53,15 @@ namespace HomeController.model
 
         private void Timer_Tick(object sender, object e)
         {
-            //ChangeLed();
             if(currentPos >= ledFlashPattern.RGBLEDPeriods.Count)
             {
                 // Time to start from the beginning in the pattern.
                 currentPos = 0;
                 currentCycle++;
-                // Coontinue for ever if it is an eternal cycle, otherwise just do the correct amount of cycles.
+                // Continue for ever if it is an eternal cycle, otherwise just do the correct amount of cycles.
                 if((currentCycle >= ledFlashPattern.Cycles) && !ledFlashPattern.EternalCycles)
                 {
                     timer.Stop();
-                    //visualizeLed()
                 }
             }
             RGBLEDPeriod rgbLedPeriod = ledFlashPattern.RGBLEDPeriods[currentPos++];
@@ -82,7 +77,7 @@ namespace HomeController.model
             else
             {
                 timer.Interval = TimeSpan.FromMilliseconds(rgbLedPeriod.HoldValueMs);
-                Logger.Logg("Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
+                //Logger.Logg("Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
             }
         }
     }

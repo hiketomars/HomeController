@@ -139,10 +139,6 @@ namespace HomeController.comm {
 
         }
 
-        
-
-        //private Definition.LoggInGui doLoggInGui;
-
         /// <summary>
         /// Sets a delegate function to use for logging information into the GUI for the LCU
         /// </summary>
@@ -211,14 +207,10 @@ namespace HomeController.comm {
                     // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
                     var hostName = new Windows.Networking.HostName("localhost");
 
-                    //this.clientListBox.Items.Add("client is trying to connect...");
-                    //doLoggInGui("Client is trying to connect...");
                     AddLogging("The client is trying to connect...");
 
                     await streamSocket.ConnectAsync(hostName, "1337"); // Portnummer hårdkodat nu.
 
-                    //this.clientListBox.Items.Add("client connected");
-                    //doLoggInGui("Client connected");
                     AddLogging("The client connected");
 
                     // Send a request to the echo server.
@@ -232,9 +224,6 @@ namespace HomeController.comm {
                         }
                     }
 
-                    //this.clientListBox.Items.Add(string.Format("client sent the request: \"{0}\"", request));
-                    //doLoggInGui(string.Format("client sent the request: \"{0}\"", request));
-
                     // Read data from the echo server.
                     string response;
                     using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
@@ -245,20 +234,13 @@ namespace HomeController.comm {
                         }
                     }
 
-                    //this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
-                    // doLoggInGui(string.Format("client received the response: \"{0}\" ", response));
                     AddLogging(string.Format("client received the response: \"{0}\" ", response));
                 }
-
-                //this.clientListBox.Items.Add("client closed its socket");
-                //doLoggInGui("client closed its socket");
                 AddLogging("The client closed its socket");
             }
             catch (Exception ex)
             {
                 Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                //this.clientListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-                //doLoggInGui(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
                 AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
             }
         }
@@ -276,17 +258,14 @@ namespace HomeController.comm {
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
                 await streamSocketListener.BindServiceNameAsync(Definition.PortNumber);
                 
-                //this.serverListBox.Items.Add("server is listening...");
                 AddLogging("The server is listening...");
             }
             catch (Exception ex)
             {
                 Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                //this.serverListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
                 AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
             }
         }
-
 
         private async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
@@ -320,8 +299,6 @@ namespace HomeController.comm {
             AddLogging("The server closed its socket");
         }
 
-
-
         //void CheckStatus()
         //{
         //    // Code from https://blogs.msdn.microsoft.com/benwilli/2016/06/30/asynchronous-infinite-loops-instead-of-timers/
@@ -344,7 +321,6 @@ namespace HomeController.comm {
         {
 
         }
-
 
         private void PerformStartUpLEDFlash()
         {
@@ -391,7 +367,6 @@ namespace HomeController.comm {
                 }));
             ledController.StartLedPattern();
         }
-
     }
 }
 

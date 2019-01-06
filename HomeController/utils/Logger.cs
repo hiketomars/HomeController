@@ -76,6 +76,5 @@ namespace HomeController.utils
                 countString = " [" + count + "]";
             }
         }
-
     }
 }

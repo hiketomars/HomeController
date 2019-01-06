@@ -9,6 +9,9 @@ using HomeController.utils;
 
 namespace HomeController.view
 {
+    /// <summary>
+    /// This is a presenter in the MVP-architecture.
+    /// </summary>
     public class MainPresenter
     {
         private IMainView mainView;
@@ -22,7 +25,6 @@ namespace HomeController.view
             houseModel.ModelHasChanged += new Definition.VoidEventHandler(ModelEventHandler_ModelHasChanged);
             houseModel.LCULedHasChanged += new Definition.LEDChangedEventHandler(ModelEventHandler_LCULedHasChanged);
         }
-
 
         // This is the handler method for the event ModelHasChanged that comes from the model.
         public void ModelEventHandler_ModelHasChanged()
@@ -39,7 +41,6 @@ namespace HomeController.view
 
         internal void StopApplication()
         {
-            //LoggInGui("Stop clicked.");
             mainView.Logg("Stop clicked.");
             Application.Current.Exit();
         }
@@ -47,7 +48,6 @@ namespace HomeController.view
         internal void InfoBtn_Click(object sender, RoutedEventArgs e)
         {
             mainView.Logg("Info button clicked.");
-            
         }
     }
 }
