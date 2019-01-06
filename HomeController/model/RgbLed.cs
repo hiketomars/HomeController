@@ -7,12 +7,20 @@ using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
 using static HomeController.model.Door;
 using Windows.Devices.Gpio;
+using HomeController.utils;
 using SocketComm;
 
 namespace HomeController.model
 {
+    /// <summary>
+    /// Represents a LED with the possibility to show three colors, red, green and blue.
+    /// Currently there is no support for showing combinations of these colors at different intensity.
+    /// That is, each of these three colors are either on or off at any given point in time.
+    /// </summary>
     public class RgbLed
     {
+        public event Definition.LEDChangedEventHandler LEDHasChanged;
+
         private GpioPin redPin;
         private GpioPin greenPin;
         private GpioPin bluePin;
@@ -26,6 +34,8 @@ namespace HomeController.model
 
         private GpioController gpio;
 
+        // This constructor uses default pins on the hardware to control the LED.
+        // If the LED is connected on different pins the other constructor must be used.
         public RgbLed() : this(5, 6 , 13)
         {
         }
@@ -42,6 +52,14 @@ namespace HomeController.model
             //visualizeLed(MainPage.LEDGraphColor.Gray, initGpioResult);
         }
 
+        public void OnLEDHasChanged(RGBValue rgbValue)
+        {
+            if (LEDHasChanged != null)
+            {
+                LEDHasChanged(rgbValue);
+            }
+        }
+
         //private MainPage.VisualizeLed visualizeLed;
         //internal void SetVisualizeLedDelegate(MainPage.VisualizeLed visualizeLed)
         //{
@@ -49,6 +67,7 @@ namespace HomeController.model
         //}
 
         // Sets red, green and blue parts to the same specified value.
+
         public void SetRGBValue(byte rgbValueAllLeds)
         {
             SetRGBValue(new RGBValue(rgbValueAllLeds, rgbValueAllLeds, rgbValueAllLeds));
@@ -59,7 +78,7 @@ namespace HomeController.model
         // Currently any value for Red greater than 0 means that that pin is set high. The same for Green and Blue.
         public void SetRGBValue(RGBValue rgbValue)
         {
-            bool colorHasBeenSet = false;
+            bool atLeastOneColorTurnedOn = false;
             //var colorMix = GetColorMix(rgbValue);
             //List<MainPage.LEDGraphColor> colors = new List<MainPage.LEDGraphColor>();
             if (rgbValue.RedPart > 0)
@@ -67,7 +86,7 @@ namespace HomeController.model
                 SetHigh(redPin);
                 //colors.Add(MainPage.LEDGraphColor.Red);
                 // todo visualizeLed(MainPage.LEDGraphColor.Red, "Röd");
-                colorHasBeenSet = true;
+                atLeastOneColorTurnedOn = true;
             }
             else
             {
@@ -79,7 +98,7 @@ namespace HomeController.model
                 SetHigh(greenPin);
                 //colors.Add(MainPage.LEDGraphColor.Green);
                 //todo visualizeLed(MainPage.LEDGraphColor.Green, "Grön");
-                colorHasBeenSet = true;
+                atLeastOneColorTurnedOn = true;
             }
             else
             {
@@ -91,16 +110,18 @@ namespace HomeController.model
                 SetHigh(bluePin);
                 //colors.Add(MainPage.LEDGraphColor.Blue);
                 //todo visualizeLed(MainPage.LEDGraphColor.Blue, "Blå");
-                colorHasBeenSet = true;
+                atLeastOneColorTurnedOn = true;
             }
             else
             {
                 SetLow(bluePin);
             }
-            if (!colorHasBeenSet)
+            if (!atLeastOneColorTurnedOn)
             {
                 //todo visualizeLed(MainPage.LEDGraphColor.Gray, Class1.ColorGray);
             }
+
+            OnLEDHasChanged(rgbValue);
         }
 
 

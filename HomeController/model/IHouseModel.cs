@@ -10,6 +10,8 @@ namespace HomeController.model
     public interface IHouseModel
     {
         event Definition.VoidEventHandler ModelHasChanged;
+        event Definition.LEDChangedEventHandler LCULedHasChanged;
         List<string> GetLoggings();
+        void GetColorForBackdoorLED();
     }
 }

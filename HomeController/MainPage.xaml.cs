@@ -205,9 +205,10 @@ namespace HomeController
 
         }
 
+        // Keeps clear and add of items together in a synchronous call.
         private void ClearAndUpdateLoggItems(List<string> loggings)
         {
-            lock (this)
+            lock (this) // Don't know if this is needed...
             {
                 this.loggListBox.Items.Clear();
                 foreach (var logging in loggings)
@@ -217,6 +218,24 @@ namespace HomeController
             }
         }
 
+        // Called from presenter to set the GUI color of the backdoor LED.
+        // From IMainView.
+        public void SetColorForBackdoorLED(RGBValue rgbValue)
+        {
+            if (rgbValue.HasRedPart)
+            {
+                LED.Fill = redBrush;
+            }else if (rgbValue.HasGreenPart)
+            {
+                LED.Fill = greenBrush;
+            }
+            else if (rgbValue.HasBluePart)
+            {
+                LED.Fill = blueBrush;
+            }
+        }
+
+        // Not used right now since I'm having another method that takes RGBValue as an argument instead.
         // Called from presenter to set the GUI color of the backdoor LED.
         // From IMainView.
         public void SetColorForBackdoorLED(Definition.LEDGraphColor color)

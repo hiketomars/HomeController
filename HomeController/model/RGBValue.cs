@@ -6,21 +6,23 @@ using System.Threading.Tasks;
 
 namespace HomeController.model
 {
-    public class RGBValue
-    {
-        public RGBValue(byte redPart, byte greenPart, byte bluePart)
-        {
-            RedPart = redPart;
-            GreenPart = greenPart;
-            BluePart = bluePart;
-        }
+    // Moved to utils to be accessible also from the view.
 
-        public static RGBValue Red => new RGBValue(255, 0, 0);
-        public static RGBValue Green => new RGBValue(0, 255, 0);
-        public static RGBValue Blue => new RGBValue(0, 0, 255);
+    //public class RGBValue
+    //{
+    //    public RGBValue(byte redPart, byte greenPart, byte bluePart)
+    //    {
+    //        RedPart = redPart;
+    //        GreenPart = greenPart;
+    //        BluePart = bluePart;
+    //    }
 
-        public byte RedPart { get; set; }
-        public byte GreenPart { get; set; }
-        public byte BluePart { get; set; }
-    }
+    //    public static RGBValue Red => new RGBValue(255, 0, 0);
+    //    public static RGBValue Green => new RGBValue(0, 255, 0);
+    //    public static RGBValue Blue => new RGBValue(0, 0, 255);
+
+    //    public byte RedPart { get; set; }
+    //    public byte GreenPart { get; set; }
+    //    public byte BluePart { get; set; }
+    //}
 }

@@ -20,13 +20,19 @@ namespace HomeController.comm {
     /// </summary>
     public class LocalCentralUnit
     {
-        public string Name { get; set; }
-
         public LocalCentralUnit()
         {
             // Get and set the name for this LCU.
             SetName();
+
+            // Construct the RGB LED that every LCU is supposed to have.
+            LCULed = new RgbLed();
+            PerformStartUpLEDFlash();
         }
+
+        public RgbLed LCULed { get; set; }
+
+        public string Name { get; set; }
 
         private /*async*/ void SetName()
         {
@@ -184,6 +190,7 @@ namespace HomeController.comm {
         // Adds an item to the list of loggings.
         private void AddLogging(string text)
         {
+            Logger.Logg(text);
             loggings.Add(text);
             HouseController.GetInstance().SendEventThatModelHasChanged();
         }
@@ -271,7 +278,6 @@ namespace HomeController.comm {
                 
                 //this.serverListBox.Items.Add("server is listening...");
                 AddLogging("The server is listening...");
-                Logger.Logg("The server is listening......");
             }
             catch (Exception ex)
             {
@@ -334,6 +340,58 @@ namespace HomeController.comm {
         //        }
         //    });
         //}
+        public void GetColorForLED()
+        {
+
+        }
+
+
+        private void PerformStartUpLEDFlash()
+        {
+            LEDController ledController = new LEDController(LCULed, new LedFlashPattern(
+                new int[] {
+                    // Three fast red flashes.
+                    255, 0, 0, 200,
+                    0, 0, 0, 200,
+
+                    255, 0, 0, 200,
+                    0, 0, 0, 200,
+
+                    //255, 0, 0, 200,
+                    //0, 0, 0, 200,
+
+                    0, 0, 0, 500,
+
+
+                    // Three fast green flashes.
+                    0, 255, 0, 200,
+                    0, 0, 0, 200,
+
+                    0, 255, 0, 200,
+                    0, 0, 0, 200,
+
+                    //0, 255, 0, 200,
+                    //0, 0, 0, 200,
+
+                    0, 0, 0, 500,
+
+
+                    // Three fast blue flashes.
+                    0, 0, 255, 200,
+                    0, 0, 0, 200,
+
+                    0, 0, 255, 200,
+                    0, 0, 0, 200,
+
+                    //0, 0, 255, 200,
+                    //0, 0, 0, 200,
+
+                    0, 0, 0, 2000
+
+                }));
+            ledController.StartLedPattern();
+        }
+
     }
 }
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using HomeController;
+using HomeController.utils;
 
 namespace HomeController.model
 {
@@ -81,6 +82,8 @@ namespace HomeController.model
             {
                 timer.Interval = TimeSpan.FromMilliseconds(rgbLedPeriod.HoldValueMs);
             }
+
+            Logger.Logg("Leaving Timer_tick");
         }
     }
 }

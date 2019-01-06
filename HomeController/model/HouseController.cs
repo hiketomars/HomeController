@@ -37,10 +37,14 @@ namespace HomeController.model
         {
         }
         public void InitHouseController() { 
-            PerformStartUpLEDFlash();
+            //PerformStartUpLEDFlash();
             // Should read config here but now hard coded to have contact with only one other LCU.
             BackdoorLocalCentralUnit = new LocalCentralUnit();
             BackdoorLocalCentralUnit.SetView();
+
+            // Let us listen to changes to LED for the backdoor so that we can update the GUI.
+            BackdoorLocalCentralUnit.LCULed.LEDHasChanged += EventHandler_LedHasChanged;
+
             BackdoorLocalCentralUnit.StartLCU_Server_Communication();
             BackdoorLocalCentralUnit.StartLCU_Client_Communication();
 
@@ -54,55 +58,20 @@ namespace HomeController.model
             }
         }
 
-
-
-        private void PerformStartUpLEDFlash()
+        // Handles the event that a LED has changed.
+        private void EventHandler_LedHasChanged(RGBValue rgbValue)
         {
-            LEDController ledController = new LEDController(new RgbLed(), new LedFlashPattern(
-                new int[] {
-                            // Three fast red flashes.
-                            255, 0, 0, 200,
-                            0, 0, 0, 200,
-
-                            255, 0, 0, 200,
-                            0, 0, 0, 200,
-
-                            //255, 0, 0, 200,
-                            //0, 0, 0, 200,
-
-                            0, 0, 0, 500,
-
-
-                            // Three fast green flashes.
-                            0, 255, 0, 200,
-                            0, 0, 0, 200,
-
-                            0, 255, 0, 200,
-                            0, 0, 0, 200,
-
-                            //0, 255, 0, 200,
-                            //0, 0, 0, 200,
-
-                            0, 0, 0, 500,
-
-
-                            // Three fast blue flashes.
-                            0, 0, 255, 200,
-                            0, 0, 0, 200,
-
-                            0, 0, 255, 200,
-                            0, 0, 0, 200,
-
-                            //0, 0, 255, 200,
-                            //0, 0, 0, 200,
-
-                            0, 0, 0, 2000
-
-                            }));
-            ledController.StartLedPattern();
+            OnLCULedChanged(rgbValue);
         }
 
-
+        // Send the event LCULedChanged.
+        private void OnLCULedChanged(RGBValue rgbValue)
+        {
+            if (LCULedHasChanged != null)
+            {
+                LCULedHasChanged(rgbValue);
+            }
+        }
 
 
         public bool CorrectlyInitialized { get; set; }
@@ -123,11 +92,17 @@ namespace HomeController.model
         }
 
         public event Definition.VoidEventHandler ModelHasChanged;
+        public event Definition.LEDChangedEventHandler LCULedHasChanged;
 
         public List<string> GetLoggings()
         {
             List<string> backdoórLoggings = BackdoorLocalCentralUnit.GetLoggings();
             return loggings.Concat(backdoórLoggings).ToList();
+        }
+
+        public void GetColorForBackdoorLED()
+        {
+            BackdoorLocalCentralUnit.GetColorForLED();
         }
 
         private static HouseController houseController;

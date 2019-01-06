@@ -12,5 +12,6 @@ namespace HomeController.view
         void Logg(string text);
         void SetLoggingItems(List<string> loggings);
         void SetColorForBackdoorLED(Definition.LEDGraphColor color);
+        void SetColorForBackdoorLED(RGBValue rgbValue);
     }
 }

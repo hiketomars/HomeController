@@ -20,13 +20,22 @@ namespace HomeController.view
             this.mainView = mainView;
             houseModel = HouseModelFactory.GetHouseModel();
             houseModel.ModelHasChanged += new Definition.VoidEventHandler(ModelEventHandler_ModelHasChanged);
+            houseModel.LCULedHasChanged += new Definition.LEDChangedEventHandler(ModelEventHandler_LCULedHasChanged);
         }
+
 
         // This is the handler method for the event ModelHasChanged that comes from the model.
         public void ModelEventHandler_ModelHasChanged()
         {
             var loggings = houseModel.GetLoggings();
             mainView.SetLoggingItems(loggings);
+        }
+
+        public void ModelEventHandler_LCULedHasChanged(RGBValue rgbValue)
+        {
+            //No need to read model here since the value is supplied in the event.
+            mainView.SetColorForBackdoorLED(rgbValue);
+            Logger.Logg("ModelEventHandler_LCULedHasChanged; rgbValue="+rgbValue);
         }
 
         internal void StopApplication()
