@@ -126,7 +126,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="model\Door.cs" />
-    <Compile Include="model\HouseController.cs" />
+    <Compile Include="model\HouseHandler.cs" />
     <Compile Include="model\HouseModelFactory.cs" />
     <Compile Include="model\IHouseModel.cs" />
     <Compile Include="model\LEDController.cs" />

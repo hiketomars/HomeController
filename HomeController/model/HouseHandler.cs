@@ -12,7 +12,7 @@ namespace HomeController.model
     /// The one and only instance of the HouseController class represents the house, ie not a specific LCU.
     /// Alarm and status are summarized in this class.
     /// </summary>
-    public class HouseController : IHouseModel
+    public class HouseHandler : IHouseModel
     {
         public bool AlarmIsActive { get; set; }
         public bool AlarmIsAlarming { get; set; }
@@ -33,10 +33,10 @@ namespace HomeController.model
         /// <summary>
         /// Constructs the one and only HouseController which is the model in the MVP.
         /// </summary>
-        public HouseController()
+        public HouseHandler()
         {
         }
-        public void InitHouseController() { 
+        public void InitHouseHandler() { 
             //PerformStartUpLEDFlash();
             // Should read config here but now hard coded to have contact with only one other LCU.
             BackdoorLocalCentralUnit = new LocalCentralUnit();
@@ -105,16 +105,16 @@ namespace HomeController.model
             BackdoorLocalCentralUnit.GetColorForLED();
         }
 
-        private static HouseController houseController;
-        public static HouseController GetInstance()
+        private static HouseHandler houseHandler;
+        public static HouseHandler GetInstance()
         {
-            if (houseController == null)
+            if (houseHandler == null)
             {
-                houseController = new HouseController();
-                houseController.InitHouseController();
+                houseHandler = new HouseHandler();
+                houseHandler.InitHouseHandler();
             }
 
-            return houseController;
+            return houseHandler;
         }
 
         public void SendEventThatModelHasChanged()

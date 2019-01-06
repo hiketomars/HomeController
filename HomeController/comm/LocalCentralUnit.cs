@@ -192,7 +192,7 @@ namespace HomeController.comm {
         {
             Logger.Logg(text);
             loggings.Add(text);
-            HouseController.GetInstance().SendEventThatModelHasChanged();
+            HouseHandler.GetInstance().SendEventThatModelHasChanged();
         }
 
         public List<string> GetLoggings()

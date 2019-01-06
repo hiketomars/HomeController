@@ -15,7 +15,7 @@ namespace HomeController.model
         public static IHouseModel GetHouseModel()
         {
             // TODO At this point we always returns the real implementation but in future we can return a mock if we're running a unit test.
-            return HouseController.GetInstance();
+            return HouseHandler.GetInstance();
         }
     }
 }

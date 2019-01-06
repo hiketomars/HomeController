@@ -38,7 +38,7 @@ namespace HomeController
         private SolidColorBrush grayBrush = new SolidColorBrush(Windows.UI.Colors.LightGray);
         private SolidColorBrush yellowBrush = new SolidColorBrush(Windows.UI.Colors.Yellow);
         private Door door;
-        private HouseController houseController; // Representerar andra RPi vid andra dörrar.
+        private HouseHandler houseHandler; // Representerar andra RPi vid andra dörrar.
         private MainPresenter mainPresenter;
         public MainPage()
         {
@@ -156,10 +156,7 @@ namespace HomeController
 
         private void InfoBtn_Click(object sender, RoutedEventArgs e)
         {
-            //LoggInGui("Info about the House Controller;");
-            //LoggInGui(houseController.GetInfo());
             mainPresenter.InfoBtn_Click(sender, e);
-
         }
 
         private void StopBtn_Click(object sender, RoutedEventArgs e)
@@ -321,12 +318,12 @@ namespace HomeController
         //        // Door is open.
         //        if (door.IsDetectedOpenAtThisPoll())
         //        {
-        //            if (houseController.AlarmIsActive)
+        //            if (houseHandler.AlarmIsActive)
         //            {
-        //                houseController.StartEntrance(door);
+        //                houseHandler.StartEntrance(door);
         //            }else
         //            {
-        //                houseController.RegisterEntrance(door);
+        //                houseHandler.RegisterEntrance(door);
         //            }
         //        }
         //    }
