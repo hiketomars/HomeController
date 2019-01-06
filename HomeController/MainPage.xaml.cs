@@ -233,6 +233,10 @@ namespace HomeController
             {
                 LED.Fill = blueBrush;
             }
+            else
+            {
+                LED.Fill = grayBrush;
+            }
         }
 
         // Not used right now since I'm having another method that takes RGBValue as an argument instead.

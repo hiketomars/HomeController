@@ -35,7 +35,6 @@ namespace HomeController.view
         {
             //No need to read model here since the value is supplied in the event.
             mainView.SetColorForBackdoorLED(rgbValue);
-            Logger.Logg("ModelEventHandler_LCULedHasChanged; rgbValue="+rgbValue);
         }
 
         internal void StopApplication()

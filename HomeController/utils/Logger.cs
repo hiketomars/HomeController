@@ -64,7 +64,7 @@ namespace HomeController.utils
                         //now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
 
                     File.AppendAllText(Path.Combine(path, "rpi.txt"),
-                        now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n");
+                        now.ToString(Definition.StandardDateTimeFormat+".ff") + countString + ": " + text + "\r\n");
                     break;
                 }
                 catch (IOException ex)

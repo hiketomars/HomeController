@@ -77,13 +77,13 @@ namespace HomeController.model
             {
                 // This RGBLEDPeriod specifies that the HoldValueMs is for eternity.
                 timer.Stop();
+                Logger.Logg("Timer in LEDController stopped.");
             }
             else
             {
                 timer.Interval = TimeSpan.FromMilliseconds(rgbLedPeriod.HoldValueMs);
+                Logger.Logg("Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
             }
-
-            Logger.Logg("Leaving Timer_tick");
         }
     }
 }
