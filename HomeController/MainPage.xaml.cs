@@ -188,12 +188,32 @@ namespace HomeController
         {
             // Since this method might be called from another thread other than the GUI-thread we need to use the Dispatcher.
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
-            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
-            //this.loggListBox.Items.Clear();
-            foreach (var logging in loggings)
+
+            //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear()).GetResults();
+            //foreach (var logging in loggings)
+            //{
+            //    //this.loggListBox.Items.Add(logging);
+            //    this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Add(logging)).GetResults();
+            //}
+       
+                //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings))
+                //    .GetResults();
+
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings));
+
+            
+
+        }
+
+        private void ClearAndUpdateLoggItems(List<string> loggings)
+        {
+            lock (this)
             {
-                //this.loggListBox.Items.Add(logging);
-                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Add(logging));
+                this.loggListBox.Items.Clear();
+                foreach (var logging in loggings)
+                {
+                    this.loggListBox.Items.Add(logging);
+                }
             }
         }
 
