@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Windows.UI.Core;
 using HomeController.utils;
 using HomeController.view;
 
@@ -50,7 +51,7 @@ namespace HomeController
             //RgbLed.InitGPIO();
             LED.Fill = redBrush;
 
-            PerforStartSequence();
+            //PerforStartSequence();
             
             //if (pinRedLED != null)
             //{
@@ -58,123 +59,95 @@ namespace HomeController
             //}        
         }
 
-        public delegate void VisualizeLed(Definition.LEDGraphColor color, string message = "");
+        //public delegate void VisualizeLed(Definition.LEDGraphColor color, string message = "");
         
-        public void VisualizeLedInColor(Definition.LEDGraphColor color, string message)
-        {
-            switch (color)
-            {
-                case Definition.LEDGraphColor.Red:
-                    LED.Fill = redBrush;
-                    break;
-
-                case Definition.LEDGraphColor.Green:
-                    LED.Fill = greenBrush;
-                    break;
-
-                case Definition.LEDGraphColor.Blue:
-                    LED.Fill = blueBrush;
-                    break;
-
-                case Definition.LEDGraphColor.Gray:
-                    LED.Fill = grayBrush;
-                    break;
-
-                default:
-                    LED.Fill = yellowBrush;
-                    break;
-
-            }
-
-            GpioStatus.Text = message;
-
-        }
-
-        private void PerforStartSequence()
-        {
-            //LedFlashPattern ledFlashPattern = new LedFlashPattern(new List<RGBLEDPeriod>(){new RGBLEDPeriod)
-            //LEDController ledController = new LEDController(new RgbLed(VisualizeLedInColor), new LedFlashPattern(
-            //    new int[] {
-            //                255, 0, 0, 500,
-            //                0, 0, 0, 500,
-
-            //                255, 0, 0, 500,
-            //                0, 0, 0, 500,
-
-            //                255, 0, 0, 500,
-            //                0, 0, 0, 500,
-
-            //                0, 255, 0, 1000,
-            //                0, 0, 0, 1000,
-
-            //                0, 255, 0, 1000,
-            //                0, 0, 0, 1000,
-
-            //                0, 255, 0, 1000,
-            //                0, 0, 0, 1000,
-
-            //                0, 0, 255, 200,
-            //                0, 0, 0, 500,
-
-            //                0, 0, 255, 200,
-            //                0, 0, 0, 500,
-
-            //                0, 0, 255, 200,
-            //                0, 0, 0, 500,
-
-            //                255, 0, 0, 500,
-            //                0, 255, 0, 500,
-            //                0, 0, 255, 500,
-
-            //                0, 0, 0, 3000
-
-            //                }),
-            //                VisualizeLedInColor);
-
-            LEDController ledController = new LEDController(new RgbLed(VisualizeLedInColor), new LedFlashPattern(
-                new int[] {
-                            // Three fast red flashes.
-                            255, 0, 0, 200,
-                            0, 0, 0, 200,
-
-                            255, 0, 0, 200,
-                            0, 0, 0, 200,
-
-                            //255, 0, 0, 200,
-                            //0, 0, 0, 200,
-
-                            0, 0, 0, 500,
 
 
-                            // Three fast green flashes.
-                            0, 255, 0, 200,
-                            0, 0, 0, 200,
+        //private void PerforStartSequence()
+        //{
+        //    //LedFlashPattern ledFlashPattern = new LedFlashPattern(new List<RGBLEDPeriod>(){new RGBLEDPeriod)
+        //    //LEDController ledController = new LEDController(new RgbLed(VisualizeLedInColor), new LedFlashPattern(
+        //    //    new int[] {
+        //    //                255, 0, 0, 500,
+        //    //                0, 0, 0, 500,
 
-                            0, 255, 0, 200,
-                            0, 0, 0, 200,
+        //    //                255, 0, 0, 500,
+        //    //                0, 0, 0, 500,
 
-                            //0, 255, 0, 200,
-                            //0, 0, 0, 200,
+        //    //                255, 0, 0, 500,
+        //    //                0, 0, 0, 500,
 
-                            0, 0, 0, 500,
+        //    //                0, 255, 0, 1000,
+        //    //                0, 0, 0, 1000,
+
+        //    //                0, 255, 0, 1000,
+        //    //                0, 0, 0, 1000,
+
+        //    //                0, 255, 0, 1000,
+        //    //                0, 0, 0, 1000,
+
+        //    //                0, 0, 255, 200,
+        //    //                0, 0, 0, 500,
+
+        //    //                0, 0, 255, 200,
+        //    //                0, 0, 0, 500,
+
+        //    //                0, 0, 255, 200,
+        //    //                0, 0, 0, 500,
+
+        //    //                255, 0, 0, 500,
+        //    //                0, 255, 0, 500,
+        //    //                0, 0, 255, 500,
+
+        //    //                0, 0, 0, 3000
+
+        //    //                }),
+        //    //                VisualizeLedInColor);
+
+        //    LEDController ledController = new LEDController(new RgbLed(VisualizeLedInColor), new LedFlashPattern(
+        //        new int[] {
+        //                    // Three fast red flashes.
+        //                    255, 0, 0, 200,
+        //                    0, 0, 0, 200,
+
+        //                    255, 0, 0, 200,
+        //                    0, 0, 0, 200,
+
+        //                    //255, 0, 0, 200,
+        //                    //0, 0, 0, 200,
+
+        //                    0, 0, 0, 500,
 
 
-                            // Three fast blue flashes.
-                            0, 0, 255, 200,
-                            0, 0, 0, 200,
+        //                    // Three fast green flashes.
+        //                    0, 255, 0, 200,
+        //                    0, 0, 0, 200,
 
-                            0, 0, 255, 200,
-                            0, 0, 0, 200,
+        //                    0, 255, 0, 200,
+        //                    0, 0, 0, 200,
 
-                            //0, 0, 255, 200,
-                            //0, 0, 0, 200,
+        //                    //0, 255, 0, 200,
+        //                    //0, 0, 0, 200,
 
-                            0, 0, 0, 2000
+        //                    0, 0, 0, 500,
 
-                            }),
-                            VisualizeLedInColor);
-            ledController.StartLedPattern();
-        }
+
+        //                    // Three fast blue flashes.
+        //                    0, 0, 255, 200,
+        //                    0, 0, 0, 200,
+
+        //                    0, 0, 255, 200,
+        //                    0, 0, 0, 200,
+
+        //                    //0, 0, 255, 200,
+        //                    //0, 0, 0, 200,
+
+        //                    0, 0, 0, 2000
+
+        //                    }),
+        //                    VisualizeLedInColor);
+        //    ledController.StartLedPattern();
+        //}
 
         private void GpioStatus_SelectionChanged(object sender, RoutedEventArgs e)
         {
@@ -200,7 +173,7 @@ namespace HomeController
         }
 
         /// <summary>
-        /// From IMainView.
+        
         /// Loggs text in a listbox in the GUI.
         /// </summary>
         /// <param name="text"></param>
@@ -210,18 +183,46 @@ namespace HomeController
         }
 
         // Called from the presenter to set all logg items in this view.
-        public void SetLoggingItems(List<string> loggings)
+        // From IMainView.
+        public async void SetLoggingItems(List<string> loggings)
         {
-            this.loggListBox.Items.Clear();
+            // Since this method might be called from another thread other than the GUI-thread we need to use the Dispatcher.
+            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
+            //this.loggListBox.Items.Clear();
             foreach (var logging in loggings)
             {
-                this.loggListBox.Items.Add(logging);
+                //this.loggListBox.Items.Add(logging);
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Add(logging));
             }
         }
 
+        // Called from presenter to set the GUI color of the backdoor LED.
+        // From IMainView.
         public void SetColorForBackdoorLED(Definition.LEDGraphColor color)
         {
-            
+            switch (color)
+            {
+                case Definition.LEDGraphColor.Red:
+                    LED.Fill = redBrush;
+                    break;
+
+                case Definition.LEDGraphColor.Green:
+                    LED.Fill = greenBrush;
+                    break;
+
+                case Definition.LEDGraphColor.Blue:
+                    LED.Fill = blueBrush;
+                    break;
+
+                case Definition.LEDGraphColor.Gray:
+                    LED.Fill = grayBrush;
+                    break;
+
+                default:
+                    LED.Fill = yellowBrush;
+                    break;
+
+            }
         }
 
         //private void Sleep(int delay)

@@ -10,8 +10,9 @@ namespace HomeController.utils
     public class Definition
     {
         public delegate void LoggInGui(string text);
-        public const string StandardDateTimeFormat = "yyyy-MM-dd HH:mm.ss";
+        public const string StandardDateTimeFormat = "yyyy-MM-dd HH.mm.ss";
         public delegate void VoidEventHandler();
         public enum LEDGraphColor { Red, Green, Blue, Gray }
+        public const string PortNumber = "1337";
     }
 }

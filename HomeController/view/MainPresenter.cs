@@ -15,6 +15,8 @@ namespace HomeController.view
         private IHouseModel houseModel;
         public MainPresenter(IMainView mainView)
         {
+            Logger.Logg("=============================================");
+            Logger.Logg("MainPresenter");
             this.mainView = mainView;
             houseModel = HouseModelFactory.GetHouseModel();
             houseModel.ModelHasChanged += new Definition.VoidEventHandler(ModelEventHandler_ModelHasChanged);

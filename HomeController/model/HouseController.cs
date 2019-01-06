@@ -29,17 +29,21 @@ namespace HomeController.model
 
         private LocalCentralUnit BackdoorLocalCentralUnit;
 
-        private Definition.LoggInGui loggInGui;
+        //private Definition.LoggInGui loggInGui;
         /// <summary>
         /// Constructs the one and only HouseController which is the model in the MVP.
         /// </summary>
         public HouseController()
         {
+        }
+        public void InitHouseController() { 
             PerformStartUpLEDFlash();
             // Should read config here but now hard coded to have contact with only one other LCU.
             BackdoorLocalCentralUnit = new LocalCentralUnit();
-            BackdoorLocalCentralUnit.SetView(loggInGui);
-            BackdoorLocalCentralUnit.StartLCUCommunication();
+            BackdoorLocalCentralUnit.SetView();
+            BackdoorLocalCentralUnit.StartLCU_Server_Communication();
+            BackdoorLocalCentralUnit.StartLCU_Client_Communication();
+
 
             if(BackdoorLocalCentralUnit.Name == "DefaultNamePleaseUpdateConfigFile")
             {
@@ -50,15 +54,11 @@ namespace HomeController.model
             }
         }
 
+
+
         private void PerformStartUpLEDFlash()
         {
-
-        }
-
-
-        private void PerforStartSequence()
-        {
-            LEDController ledController = new LEDController(new RgbLed(VisualizeLedInColor), new LedFlashPattern(
+            LEDController ledController = new LEDController(new RgbLed(), new LedFlashPattern(
                 new int[] {
                             // Three fast red flashes.
                             255, 0, 0, 200,
@@ -98,8 +98,7 @@ namespace HomeController.model
 
                             0, 0, 0, 2000
 
-                            }),
-                            VisualizeLedInColor);
+                            }));
             ledController.StartLedPattern();
         }
 
@@ -120,13 +119,15 @@ namespace HomeController.model
         private void AddLogging(string text)
         {
             loggings.Add(text);
+            SendEventThatModelHasChanged();
         }
 
         public event Definition.VoidEventHandler ModelHasChanged;
 
         public List<string> GetLoggings()
         {
-            return loggings;
+            List<string> backdoórLoggings = BackdoorLocalCentralUnit.GetLoggings();
+            return loggings.Concat(backdoórLoggings).ToList();
         }
 
         private static HouseController houseController;
@@ -135,9 +136,18 @@ namespace HomeController.model
             if (houseController == null)
             {
                 houseController = new HouseController();
+                houseController.InitHouseController();
             }
 
             return houseController;
+        }
+
+        public void SendEventThatModelHasChanged()
+        {
+            if (ModelHasChanged != null)
+            {
+                ModelHasChanged();
+            }
         }
     }
 }

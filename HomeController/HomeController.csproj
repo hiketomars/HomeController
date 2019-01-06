@@ -139,6 +139,7 @@
       <DependentUpon>StreamSocketAndListenerPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="utils\Definition.cs" />
+    <Compile Include="utils\Logger.cs" />
     <Compile Include="view\IMainView.cs" />
     <Compile Include="view\IView.cs" />
     <Compile Include="view\MainPresenter.cs" />

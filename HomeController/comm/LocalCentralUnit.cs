@@ -8,6 +8,8 @@ using HomeController.utils;
 using Windows.Data.Json;
 using System.Net;
 using System.Diagnostics;
+using Windows.UI.Core;
+using HomeController.model;
 
 
 namespace HomeController.comm {
@@ -133,16 +135,16 @@ namespace HomeController.comm {
 
         
 
-        private Definition.LoggInGui doLoggInGui;
+        //private Definition.LoggInGui doLoggInGui;
 
         /// <summary>
         /// Sets a delegate function to use for logging information into the GUI for the LCU
         /// </summary>
         /// <param name="doLoggInGui"></param>
-        public void SetView(Definition.LoggInGui doLoggInGui)
+        public void SetView()
         {
-            this.doLoggInGui = doLoggInGui;
-            doLoggInGui("Name of LCU is " + Name);
+            //todo this.doLoggInGui = doLoggInGui;
+            //todo doLoggInGui("Name of LCU is " + Name);
 
 
             // Old stuff
@@ -172,12 +174,27 @@ namespace HomeController.comm {
                 // Now retrieve it.
                 value += Environment.GetEnvironmentVariable("LCUName");
             }
-            doLoggInGui("Environment variable LCUName is " + value);
+            //todo doLoggInGui("Environment variable LCUName is " + value);
             return value;
         }
 
 
-        public async void StartLCUCommunication()
+        private List<string> loggings = new List<string>();
+
+        // Adds an item to the list of loggings.
+        private void AddLogging(string text)
+        {
+            loggings.Add(text);
+            HouseController.GetInstance().SendEventThatModelHasChanged();
+        }
+
+        public List<string> GetLoggings()
+        {
+            return loggings;
+        }
+
+        // Client
+        public async void StartLCU_Client_Communication()
         {
             try
             {
@@ -188,12 +205,14 @@ namespace HomeController.comm {
                     var hostName = new Windows.Networking.HostName("localhost");
 
                     //this.clientListBox.Items.Add("client is trying to connect...");
-                    doLoggInGui("Client is trying to connect...");
+                    //doLoggInGui("Client is trying to connect...");
+                    AddLogging("The client is trying to connect...");
 
                     await streamSocket.ConnectAsync(hostName, "1337"); // Portnummer hårdkodat nu.
 
                     //this.clientListBox.Items.Add("client connected");
-                    doLoggInGui("Client connected");
+                    //doLoggInGui("Client connected");
+                    AddLogging("The client connected");
 
                     // Send a request to the echo server.
                     string request = "Hello, World!";
@@ -207,7 +226,7 @@ namespace HomeController.comm {
                     }
 
                     //this.clientListBox.Items.Add(string.Format("client sent the request: \"{0}\"", request));
-                    doLoggInGui(string.Format("client sent the request: \"{0}\"", request));
+                    //doLoggInGui(string.Format("client sent the request: \"{0}\"", request));
 
                     // Read data from the echo server.
                     string response;
@@ -220,20 +239,82 @@ namespace HomeController.comm {
                     }
 
                     //this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
-                    doLoggInGui(string.Format("client received the response: \"{0}\" ", response));
+                    // doLoggInGui(string.Format("client received the response: \"{0}\" ", response));
+                    AddLogging(string.Format("client received the response: \"{0}\" ", response));
                 }
 
                 //this.clientListBox.Items.Add("client closed its socket");
-                doLoggInGui("client closed its socket");
-
+                //doLoggInGui("client closed its socket");
+                AddLogging("The client closed its socket");
             }
             catch (Exception ex)
             {
                 Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
                 //this.clientListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-                doLoggInGui(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+                //doLoggInGui(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
             }
         }
+
+        public async void StartLCU_Server_Communication()
+        {
+            try
+            {
+                Logger.Logg("StartLCU_Server_Communication");
+                var streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
+
+                // The ConnectionReceived event is raised when connections are received.
+                streamSocketListener.ConnectionReceived += this.StreamSocketListener_ConnectionReceived;
+
+                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
+                await streamSocketListener.BindServiceNameAsync(Definition.PortNumber);
+                
+                //this.serverListBox.Items.Add("server is listening...");
+                AddLogging("The server is listening...");
+                Logger.Logg("The server is listening......");
+            }
+            catch (Exception ex)
+            {
+                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                //this.serverListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+            }
+        }
+
+
+        private async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            string request;
+            using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+            {
+                request = await streamReader.ReadLineAsync();
+            }
+
+            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
+            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server received the request: \"{0}\"", request)));
+            AddLogging(string.Format("The server received the request: \"{0}\"", request));
+            
+            // Echo the request back as the response.
+            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+            {
+                using (var streamWriter = new StreamWriter(outputStream))
+                {
+                    await streamWriter.WriteLineAsync(request);
+                    await streamWriter.FlushAsync();
+                }
+            }
+
+            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
+            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server sent back the response: \"{0}\"", request)));
+            AddLogging(string.Format("The server sent back the response: \"{0}\"", request));
+            sender.Dispose();
+
+            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
+            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add("server closed its socket"));
+            AddLogging("The server closed its socket");
+        }
+
+
 
         //void CheckStatus()
         //{

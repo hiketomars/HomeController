@@ -16,21 +16,17 @@ namespace HomeController.model
 
         private readonly RgbLed rgbLed;
         private LedFlashPattern ledFlashPattern;
-        private readonly MainPage.VisualizeLed visualizeLed;
         private DispatcherTimer timer;
 
-        public LEDController(RgbLed regbLed, MainPage.VisualizeLed drawLed) : this(regbLed, null, drawLed) { }
+        public LEDController(RgbLed regbLed) : this(regbLed, null) { }
 
-        public LEDController(RgbLed regbLed, LedFlashPattern ledFlashPattern, MainPage.VisualizeLed visualizeLed)
+        public LEDController(RgbLed regbLed, LedFlashPattern ledFlashPattern)
         {
             this.rgbLed = regbLed;
             this.ledFlashPattern = ledFlashPattern;
-            this.visualizeLed = visualizeLed;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(0);
             timer.Tick += Timer_Tick;
-
-            rgbLed.SetVisualizeLedDelegate(visualizeLed);
         }
 
         public void StartLedPattern(LedFlashPattern ledFlashPattern)

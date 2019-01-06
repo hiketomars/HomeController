@@ -13,19 +13,9 @@ namespace HomeController.model
 {
     public class RgbLed
     {
-        //public const int GPIO_PIN_RED_RGB_LED = 5;
-        //public const int GPIO_PIN_GREEN_RGB_LED = 6;
-        //public const int GPIO_PIN_BLUE_RGB_LED = 13;
-
-
-
         private GpioPin redPin;
         private GpioPin greenPin;
         private GpioPin bluePin;
-
-        //private static GpioPin pinRedLED;
-        //private static GpioPin pinGreenLED;
-        //private static GpioPin pinBlueLED;
 
         private DispatcherTimer timer;
         private GpioPin pin;
@@ -36,34 +26,83 @@ namespace HomeController.model
 
         private GpioController gpio;
 
-
-        public RgbLed(MainPage.VisualizeLed visualizeLed) : this(visualizeLed, 5, 6 , 13)
+        public RgbLed() : this(5, 6 , 13)
         {
-
         }
 
-        public RgbLed(MainPage.VisualizeLed visualizeLed, int redPinNumber, int greenPinNumber, int bluePinNumber)
+        public RgbLed(int redPinNumber, int greenPinNumber, int bluePinNumber)
         {
             this.redPinNumber = redPinNumber;
             this.greenPinNumber = greenPinNumber;
             this.bluePinNumber = bluePinNumber;
-            this.visualizeLed = visualizeLed;
+            //this.visualizeLed = visualizeLed;
             string initGpioResult = InitGPIO(); 
 
             SetRGBValue(0);
-            visualizeLed(MainPage.LEDGraphColor.Gray, initGpioResult);
+            //visualizeLed(MainPage.LEDGraphColor.Gray, initGpioResult);
         }
 
-        private MainPage.VisualizeLed visualizeLed;
-        internal void SetVisualizeLedDelegate(MainPage.VisualizeLed visualizeLed)
-        {
-            this.visualizeLed = visualizeLed;
-        }
+        //private MainPage.VisualizeLed visualizeLed;
+        //internal void SetVisualizeLedDelegate(MainPage.VisualizeLed visualizeLed)
+        //{
+        //    this.visualizeLed = visualizeLed;
+        //}
 
         // Sets red, green and blue parts to the same specified value.
-        public void SetRGBValue(byte rgbValueAllLeds) {
+        public void SetRGBValue(byte rgbValueAllLeds)
+        {
             SetRGBValue(new RGBValue(rgbValueAllLeds, rgbValueAllLeds, rgbValueAllLeds));
         }
+
+        // Sets red, green and blue parts to the specified values.
+        // Sets the pins that is connected to the red, green and blue LED wires.
+        // Currently any value for Red greater than 0 means that that pin is set high. The same for Green and Blue.
+        public void SetRGBValue(RGBValue rgbValue)
+        {
+            bool colorHasBeenSet = false;
+            //var colorMix = GetColorMix(rgbValue);
+            //List<MainPage.LEDGraphColor> colors = new List<MainPage.LEDGraphColor>();
+            if (rgbValue.RedPart > 0)
+            {
+                SetHigh(redPin);
+                //colors.Add(MainPage.LEDGraphColor.Red);
+                // todo visualizeLed(MainPage.LEDGraphColor.Red, "Röd");
+                colorHasBeenSet = true;
+            }
+            else
+            {
+                SetLow(redPin);
+            }
+
+            if (rgbValue.GreenPart > 0)
+            {
+                SetHigh(greenPin);
+                //colors.Add(MainPage.LEDGraphColor.Green);
+                //todo visualizeLed(MainPage.LEDGraphColor.Green, "Grön");
+                colorHasBeenSet = true;
+            }
+            else
+            {
+                SetLow(greenPin);
+            }
+
+            if (rgbValue.BluePart > 0)
+            {
+                SetHigh(bluePin);
+                //colors.Add(MainPage.LEDGraphColor.Blue);
+                //todo visualizeLed(MainPage.LEDGraphColor.Blue, "Blå");
+                colorHasBeenSet = true;
+            }
+            else
+            {
+                SetLow(bluePin);
+            }
+            if (!colorHasBeenSet)
+            {
+                //todo visualizeLed(MainPage.LEDGraphColor.Gray, Class1.ColorGray);
+            }
+        }
+
 
         private void SetHigh(GpioPin aPin) {
             if(aPin != null)
@@ -80,53 +119,7 @@ namespace HomeController.model
             }
         }
 
-        // Sets red, green and blue parts to the specified values.
-        public void SetRGBValue(RGBValue rgbValue)
-        {
-            bool colorHasBeenSet = false;
-            //var colorMix = GetColorMix(rgbValue);
-            //List<MainPage.LEDGraphColor> colors = new List<MainPage.LEDGraphColor>();
-            if (rgbValue.RedPart > 0)
-            {
-                SetHigh(redPin);
-                //colors.Add(MainPage.LEDGraphColor.Red);
-                visualizeLed(MainPage.LEDGraphColor.Red, "Röd");
-                colorHasBeenSet = true;
-            }
-            else
-            {
-                SetLow(redPin);
-            }
-
-            if (rgbValue.GreenPart > 0)
-            {
-                SetHigh(greenPin);
-                //colors.Add(MainPage.LEDGraphColor.Green);
-                visualizeLed(MainPage.LEDGraphColor.Green, "Grön");
-                colorHasBeenSet = true;
-            }
-            else
-            {
-                SetLow(greenPin);
-            }
-
-            if (rgbValue.BluePart > 0)
-            {
-                SetHigh(bluePin);
-                //colors.Add(MainPage.LEDGraphColor.Blue);
-                visualizeLed(MainPage.LEDGraphColor.Blue, "Blå");
-                colorHasBeenSet = true;
-            }
-            else
-            {
-                SetLow(bluePin);
-            }
-            if (!colorHasBeenSet)
-            {
-                visualizeLed(MainPage.LEDGraphColor.Gray, Class1.ColorGray);
-            }
-        }
-
+ 
 
         public string InitGPIO()
         {
