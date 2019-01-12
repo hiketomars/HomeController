@@ -17,7 +17,7 @@ namespace HomeController.model
     /// Currently there is no support for showing combinations of these colors at different intensity.
     /// That is, each of these three colors are either on or off at any given point in time.
     /// </summary>
-    public class RgbLed
+    public class RgbLed : IRgbLed
     {
         public event Definition.LEDChangedEventHandler LEDHasChanged;
 
@@ -232,5 +232,24 @@ namespace HomeController.model
         //    }
         //}
 
+        public void Red(bool offOn)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Green(bool offOn)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Blue(bool offOn)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AllColors(bool offOn)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

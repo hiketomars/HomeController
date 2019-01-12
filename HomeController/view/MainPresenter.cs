@@ -30,7 +30,7 @@ namespace HomeController.view
         public void ModelEventHandler_ModelHasChanged()
         {
             var loggings = houseModel.GetLoggings();
-            mainView.SetLoggingItems(loggings);
+            mainView.SetLoggItems(loggings);
         }
 
         public void ModelEventHandler_LCULedHasChanged(RGBValue rgbValue)
@@ -41,13 +41,13 @@ namespace HomeController.view
 
         internal void StopApplication()
         {
-            mainView.Logg("Stop clicked.");
+            mainView.AddLoggItem("Stop clicked.");
             Application.Current.Exit();
         }
 
         internal void InfoBtn_Click(object sender, RoutedEventArgs e)
         {
-            mainView.Logg("Info button clicked.");
+            mainView.AddLoggItem("Info button clicked.");
         }
     }
 }

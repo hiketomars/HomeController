@@ -68,14 +68,14 @@ namespace HomeController
         /// Loggs text in a listbox in the GUI.
         /// </summary>
         /// <param name="text"></param>
-        public void Logg(string text)
+        public void AddLoggItem(string text)
         {
             this.loggListBox.Items.Add(text);
         }
 
         // Called from the presenter to set all logg items in this view.
         // From IMainView.
-        public async void SetLoggingItems(List<string> loggings)
+        public async void SetLoggItems(List<string> loggings)
         {
             // Since this method might be called from another thread other than the GUI-thread we need to use the Dispatcher.
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());

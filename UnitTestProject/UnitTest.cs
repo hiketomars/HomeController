@@ -1,6 +1,13 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using HomeController.comm;
+using HomeController.model;
+using HomeController.utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using HomeController.view;
+using Moq;
+using NUnit.Framework;
 
 namespace UnitTestProject
 {
@@ -10,6 +17,81 @@ namespace UnitTestProject
         [TestMethod]
         public void TestMethod1()
         {
+            HouseModelFactory.TestMode = true;
+            HouseModelFactory.HouseModel = new TestHouseModel();
+            var testMainView = new TestMainView();
+            MainPresenter mainPresenter = new MainPresenter(testMainView);
+
+        }
+        [TestMethod]
+        public void TestMethod2()
+        {
+            // Skapa en kontrollenhet (RPi) och injecta dörr och led och ev andra kontrollenheter som den ska kommunicera med.
+            var doorMock = new Mock<IDoor>();
+            var rgbLedMock = new Mock<IRgbLed>();
+            LocalCentralUnit lcu = new LocalCentralUnit();
+            //IDoor door = new Door();
+            //IRgbLed rgbLed = new RgbLed();
+            lcu.Door = doorMock.Object;
+            lcu.RgbLed = rgbLedMock.Object;
+
+            // Activate alarm.
+            int delayInMs = 0;
+            lcu.ActiveAlarm(delayInMs);
+            doorMock.Object.Open();
+            lcu.DeactivateAlarm();
+            
+
+        }
+
+        [Test]
+        public void Test3()
+        {
+            // Skapa en kontrollenhet (RPi) och injecta dörr och led och ev andra kontrollenheter som den ska kommunicera med.
+            var doorMock = new Mock<IDoor>();
+            var rgbLedMock = new Mock<IRgbLed>();
+            LocalCentralUnit lcu = new LocalCentralUnit();
+            lcu.Door = doorMock.Object;
+            lcu.RgbLed = rgbLedMock.Object;
+
+            // Activate alarm.
+            int delayInMs = 0;
+            lcu.ActiveAlarm(delayInMs);
+            doorMock.Object.Open();
+            lcu.DeactivateAlarm();
+        }
+    }
+
+    class TestHouseModel : IHouseModel
+    {
+        public event Definition.VoidEventHandler ModelHasChanged;
+        public event Definition.LEDChangedEventHandler LCULedHasChanged;
+        public List<string> GetLoggings()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetColorForBackdoorLED()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class TestMainView : IMainView
+    {
+        public void AddLoggItem(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLoggItems(List<string> loggings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetColorForBackdoorLED(RGBValue rgbValue)
+        {
+            throw new NotImplementedException();
         }
     }
 }

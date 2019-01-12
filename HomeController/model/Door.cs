@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HomeController.model
 {
-    public class Door
+    public class Door : IDoor
     {
         public bool Closed { get; set; }
         public bool Sealed { get; set; } //Reglad = haspad
@@ -65,5 +65,18 @@ namespace HomeController.model
         {
             throw new NotImplementedException();
         }
+
+        public void Open()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Close()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsOpen { get; set; }
     }
+
 }

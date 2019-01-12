@@ -128,7 +128,9 @@
     <Compile Include="model\Door.cs" />
     <Compile Include="model\HouseHandler.cs" />
     <Compile Include="model\HouseModelFactory.cs" />
+    <Compile Include="model\IDoor.cs" />
     <Compile Include="model\IHouseModel.cs" />
+    <Compile Include="model\IRgbLed.cs" />
     <Compile Include="model\LEDController.cs" />
     <Compile Include="model\LedFlashPattern.cs" />
     <Compile Include="model\RgbLed.cs" />
@@ -184,6 +186,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.2</Version>
+    </PackageReference>
+    <PackageReference Include="Moq">
+      <Version>4.10.1</Version>
+    </PackageReference>
+    <PackageReference Include="NUnit">
+      <Version>3.11.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

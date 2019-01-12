@@ -10,7 +10,7 @@ using System.Net;
 using System.Diagnostics;
 using Windows.UI.Core;
 using HomeController.model;
-
+using System.Threading;
 
 namespace HomeController.comm {
 
@@ -138,6 +138,10 @@ namespace HomeController.comm {
             }
 
         }
+
+        public IDoor Door { get; set; }
+        public IRgbLed RgbLed { get; set; }
+        //public bool AlarmActive { get; }
 
         /// <summary>
         /// Sets a delegate function to use for logging information into the GUI for the LCU
@@ -366,6 +370,15 @@ namespace HomeController.comm {
 
                 }));
             ledController.StartLedPattern();
+        }
+
+        public void ActiveAlarm(int delayInMs)
+        {
+            //Thread. .Sleep(delayInMs);
+        }
+
+        public void DeactivateAlarm()
+        {
         }
     }
 }

@@ -12,8 +12,8 @@ namespace HomeController.view
     /// </summary>
     public interface IMainView : IView
     {
-        void Logg(string text);
-        void SetLoggingItems(List<string> loggings);
+        void AddLoggItem(string text);
+        void SetLoggItems(List<string> loggings);
         void SetColorForBackdoorLED(RGBValue rgbValue);
     }
 }

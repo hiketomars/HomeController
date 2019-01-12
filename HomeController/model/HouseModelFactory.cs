@@ -12,10 +12,19 @@ namespace HomeController.model
     /// </summary>
     public class HouseModelFactory
     {
+        public static bool TestMode { get; set; }
+        public static IHouseModel HouseModel { get; set; }
         public static IHouseModel GetHouseModel()
         {
             // TODO At this point we always returns the real implementation but in future we can return a mock if we're running a unit test.
-            return HouseHandler.GetInstance();
+
+            if (!TestMode)
+            {
+                return HouseHandler.GetInstance();
+            }
+
+            return HouseModel;// todo return mock here.
         }
+
     }
 }
