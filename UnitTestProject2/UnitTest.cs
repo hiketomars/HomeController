@@ -8,28 +8,52 @@ using HomeController.utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HomeController.view;
 using Moq;
-using Assert = NUnit.Framework.Assert;
-using NUnit;
 using NUnit.Framework;
+using Xunit;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace UnitTestProject
+namespace UnitTestProject2
 {
-    [TestClass][TestFixture]
+    [TestFixture]
     public class UnitTest1
     {
-        //[TestMethod]
-        //public void TestMethod1()
-        //{
-        //    HouseModelFactory.TestMode = true;
-        //    HouseModelFactory.HouseModel = new TestHouseModel();
-        //    var testMainView = new TestMainView();
-        //    MainPresenter mainPresenter = new MainPresenter(testMainView);
+//        [TestMethod]
+        public void TestMethod1()
+        {
+            HouseModelFactory.TestMode = true;
+            HouseModelFactory.HouseModel = new TestHouseModel();
+            var testMainView = new TestMainView();
+            MainPresenter mainPresenter = new MainPresenter(testMainView);
 
-        //}
-        
+        }
+//        [TestMethod]
+        public void TestMethod2()
+        {
+            // Skapa en kontrollenhet (RPi) och injecta dörr och led och ev andra kontrollenheter som den ska kommunicera med.
+            var doorMock = new Mock<IDoor>();
+            var rgbLedMock = new Mock<IRgbLed>();
+            LocalCentralUnit lcu = new LocalCentralUnit();
+            //IDoor door = new Door();
+            //IRgbLed rgbLed = new RgbLed();
+            lcu.Door = doorMock.Object;
+            lcu.RgbLed = rgbLedMock.Object;
 
-        [TestMethod][Test]
-        public void LCUfunctionality_WhenAlarmActiveVeryShort_DoorCalled()
+            // Activate alarm.
+            int delayInMs = 0;
+            lcu.ActiveAlarm(delayInMs);
+            lcu.DeactivateAlarm();
+
+
+        }
+
+        [Fact]
+        public void Test444()
+        {
+            Xunit.Assert.Equal(1,2);
+        }
+
+        [Fact]
+        public void Test4()
         {
             // Skapa en kontrollenhet (RPi) och injecta dörr och led och ev andra kontrollenheter som den ska kommunicera med.
             var doorMock = new Mock<IDoor>();
@@ -37,10 +61,6 @@ namespace UnitTestProject
             LocalCentralUnit lcu = new LocalCentralUnit();
             lcu.Door = doorMock.Object;
             lcu.RgbLed = rgbLedMock.Object;
-            doorMock.SetupAllProperties();
-
-            // När LCU anropar IsOpen ska den vara false.
-            doorMock.Setup(f => f.IsOpen).Returns(false);
 
             // Activate alarm.
             int delayInMs = 0;
@@ -52,9 +72,8 @@ namespace UnitTestProject
             doorMock.Verify(f => f.IsOpen, Times.AtLeastOnce());
         }
 
-        [TestMethod]
         [Test]
-        public void LCUfunctionality_WhenAlarmActiveAndDoorIsOpened_ActivateSirenCalled()
+        public void Test3()
         {
             // Skapa en kontrollenhet (RPi) och injecta dörr och led och ev andra kontrollenheter som den ska kommunicera med.
             var doorMock = new Mock<IDoor>();
@@ -62,10 +81,6 @@ namespace UnitTestProject
             LocalCentralUnit lcu = new LocalCentralUnit();
             lcu.Door = doorMock.Object;
             lcu.RgbLed = rgbLedMock.Object;
-            doorMock.SetupAllProperties();
-
-            // När LCU anropar IsOpen ska den vara false.
-            doorMock.Setup(f => f.IsOpen).Returns(false);
 
             // Activate alarm.
             int delayInMs = 0;
@@ -76,12 +91,6 @@ namespace UnitTestProject
             // Called at least once
             doorMock.Verify(f => f.IsOpen, Times.AtLeastOnce());
         }
-        [Test]
-        public void Test4_UTP_UW()
-        {
-
-        }
-
     }
 
     class TestHouseModel : IHouseModel

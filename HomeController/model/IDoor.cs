@@ -8,8 +8,6 @@ namespace HomeController.model
 {
     public interface IDoor
     {
-        void Open();
-        void Close();
         bool IsOpen { get; set; }
     }
 }
