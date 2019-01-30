@@ -10,15 +10,15 @@ using HomeController.utils;
 namespace HomeController.model
 {
     // En LEDController kan sköta en LED. Bland annat kan den få den att blinka enligt ett visst mönster.
-    public class LEDController
+    public class LEDController : ILEDController
     {
-        private readonly RgbLed rgbLed;
+        private readonly IRgbLed rgbLed;
         private LedFlashPattern ledFlashPattern;
         private DispatcherTimer timer;
 
-        public LEDController(RgbLed regbLed) : this(regbLed, null) { }
+        public LEDController(IRgbLed regbLed) : this(regbLed, null) { }
 
-        public LEDController(RgbLed regbLed, LedFlashPattern ledFlashPattern)
+        public LEDController(IRgbLed regbLed, LedFlashPattern ledFlashPattern)
         {
             this.rgbLed = regbLed;
             this.ledFlashPattern = ledFlashPattern;
@@ -80,5 +80,7 @@ namespace HomeController.model
                 //Logger.Logg("Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
             }
         }
+
+        public IRgbLed ControlledRgbLed { get; set; }
     }
 }

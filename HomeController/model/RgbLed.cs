@@ -38,6 +38,9 @@ namespace HomeController.model
         // If the LED is connected on different pins the other constructor must be used.
         public RgbLed() : this(5, 6 , 13)
         {
+            //just some test code
+            //var list = new List<string>();
+            //list.ForEach();
         }
 
         public RgbLed(int redPinNumber, int greenPinNumber, int bluePinNumber)
@@ -248,6 +251,11 @@ namespace HomeController.model
         }
 
         public void AllColors(bool offOn)
+        {
+            throw new NotImplementedException();
+        }
+
+        public RGBValue GetColor()
         {
             throw new NotImplementedException();
         }

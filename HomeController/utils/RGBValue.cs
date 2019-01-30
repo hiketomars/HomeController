@@ -30,6 +30,10 @@ namespace HomeController.utils
         public bool HasRedPart   => GreenPart > 0;
         public bool HasBluePart  => BluePart  > 0;
 
+        public bool HasOnlyGreenPart => RedPart == 0 && GreenPart >0 && BluePart ==0;
+        public bool HasOnlyRedPart => RedPart > 0 && GreenPart == 0 && BluePart == 0;
+        public bool HasOnlyBluePart => RedPart == 0 && GreenPart == 0 && BluePart > 0;
+
         public override string ToString()
         {
             return "RGB: " + RedPart + ";" + GreenPart + ";" + BluePart + ";";

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using Windows.UI.Core;
 using HomeController.model;
 using System.Threading;
+using Moq;
 
 namespace HomeController.comm {
 
@@ -26,11 +27,11 @@ namespace HomeController.comm {
             SetName();
 
             // Construct the RGB LED that every LCU is supposed to have.
-            LCULed = new RgbLed();
+            //LCULed = new RgbLed();
             PerformStartUpLEDFlash();
         }
 
-        public RgbLed LCULed { get; set; }
+        //public RgbLed LCULed { get; set; }
 
         public string Name { get; set; }
 
@@ -140,7 +141,12 @@ namespace HomeController.comm {
         }
 
         public IDoor Door { get; set; }
-        public IRgbLed RgbLed { get; set; }
+        //public IRgbLed RgbLed { get; set; }
+        public ILEDController LEDController { get; set; }
+
+        public ISiren Siren { get; set; }
+
+        public IDoorController DoorController { get; set; }
         //public bool AlarmActive { get; }
 
         /// <summary>
@@ -328,7 +334,7 @@ namespace HomeController.comm {
 
         private void PerformStartUpLEDFlash()
         {
-            LEDController ledController = new LEDController(LCULed, new LedFlashPattern(
+            LEDController ledController = new LEDController(null, new LedFlashPattern(
                 new int[] {
                     // Three fast red flashes.
                     255, 0, 0, 200,
@@ -372,7 +378,8 @@ namespace HomeController.comm {
             ledController.StartLedPattern();
         }
 
-        public void ActiveAlarm(int delayInMs)
+        // Turns the alarm on so that it will start monitoring doors etc.
+        public void ActivateAlarm(int delayInMs)
         {
             //Thread. .Sleep(delayInMs);
         }
