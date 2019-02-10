@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace HomeController.model
 {
-    public interface IDoorController
+    public interface ISirenController
     {
-        IDoor Door { get; set; }
-        bool IsDoorOpen();
+        void TurnOn();
+        void TurnOff();
+        bool IsOn { get; } 
     }
 }

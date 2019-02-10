@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.System.Profile;
+using Moq;
 
 namespace HomeController.model
 {
@@ -18,7 +20,7 @@ namespace HomeController.model
         {
             // TODO At this point we always returns the real implementation but in future we can return a mock if we're running a unit test.
 
-            if (!TestMode)
+            if(!TestMode)
             {
                 return HouseHandler.GetInstance();
             }
@@ -26,5 +28,43 @@ namespace HomeController.model
             return HouseModel;// todo return mock here.
         }
 
+        public static IDoor GetDoor()
+        {
+            if (HasGpioCapacity())
+            {
+                var mock = new Mock<IDoor>();
+                mock.SetupAllProperties();
+                return mock.Object;
+            }
+            return new Door();
+        }
+
+        public static IRgbLed GetRgbLed()
+        {
+            if(HasGpioCapacity())
+            {
+                var mock = new Mock<IRgbLed>();
+                mock.SetupAllProperties();
+                return mock.Object;
+            }
+            return new RgbLed();
+        }
+
+        public static ISiren GetSiren()
+        {
+            if(HasGpioCapacity())
+            {
+                var mock = new Mock<ISiren>();
+                mock.SetupAllProperties();
+                return mock.Object;
+            }
+            return new Siren();
+        }
+
+        private static bool HasGpioCapacity()
+        {
+            string os = AnalyticsInfo.VersionInfo.DeviceFamily;
+            return !os.Contains("windows");
+        }
     }
 }

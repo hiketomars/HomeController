@@ -16,12 +16,10 @@ namespace HomeController.model
         private LedFlashPattern ledFlashPattern;
         private DispatcherTimer timer;
 
-        public LEDController(IRgbLed regbLed) : this(regbLed, null) { }
 
-        public LEDController(IRgbLed regbLed, LedFlashPattern ledFlashPattern)
+        public LEDController(IRgbLed regbLed)
         {
             this.rgbLed = regbLed;
-            this.ledFlashPattern = ledFlashPattern;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(0);
             timer.Tick += Timer_Tick;
@@ -43,14 +41,63 @@ namespace HomeController.model
             timer.Start();
         }
 
+        public void PerformStartUpLedFlash()
+        {
+            ledFlashPattern = new LedFlashPattern(
+                new int[] {
+                    // Three fast red flashes.
+                    255, 0, 0, 200,
+                    0, 0, 0, 200,
+
+                    255, 0, 0, 200,
+                    0, 0, 0, 200,
+
+                    255, 0, 0, 200,
+                    0, 0, 0, 200,
+
+                    // Three fast green flashes.
+                    0, 255, 0, 200,
+                    0, 0, 0, 200,
+
+                    0, 255, 0, 200,
+                    0, 0, 0, 200,
+
+                    0, 255, 0, 200,
+                    0, 0, 0, 200,
+
+                    // Three fast blue flashes.
+                    0, 0, 255, 200,
+                    0, 0, 0, 200,
+
+                    0, 0, 255, 200,
+                    0, 0, 0, 200,
+
+                    0, 0, 255, 200,
+                    0, 0, 0, 200,
+
+                }, 1);
+            StartLedPattern();
+        }
+
         public void StopLedPattern()
         {
             timer.Stop();
         }
 
+        public IRgbLed ControlledRgbLed => rgbLed;
+
+        public void SetTotalColor(RGBValue green)
+        {
+            
+        }
+
+        public RGBValue GetLedColor()
+        {
+            return RGBValue.Red;//todo
+        }
+
         private int currentPos;
         private int currentCycle;
-
         private void Timer_Tick(object sender, object e)
         {
             if(currentPos >= ledFlashPattern.RGBLEDPeriods.Count)
@@ -80,7 +127,5 @@ namespace HomeController.model
                 //Logger.Logg("Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
             }
         }
-
-        public IRgbLed ControlledRgbLed { get; set; }
     }
 }

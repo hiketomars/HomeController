@@ -120,11 +120,13 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="comm\ConfigHandler.cs" />
+    <Compile Include="comm\GpioConnector.cs" />
     <Compile Include="comm\IConfigHandler.cs" />
     <Compile Include="comm\LocalCentralUnit.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="model\AlarmHandler.cs" />
     <Compile Include="model\Door.cs" />
     <Compile Include="model\DoorController.cs" />
     <Compile Include="model\HouseHandler.cs" />
@@ -133,14 +135,16 @@
     <Compile Include="model\IDoorController.cs" />
     <Compile Include="model\IHouseModel.cs" />
     <Compile Include="model\ILEDController.cs" />
+    <Compile Include="model\Interface1.cs" />
     <Compile Include="model\IRgbLed.cs" />
     <Compile Include="model\ISiren.cs" />
     <Compile Include="model\LEDController.cs" />
     <Compile Include="model\LedFlashPattern.cs" />
     <Compile Include="model\RgbLed.cs" />
     <Compile Include="model\RGBLEDPeriod.cs" />
-    <Compile Include="model\RGBValue.cs" />
     <Compile Include="model\Siren.cs" />
+    <Compile Include="model\ISirenController.cs" />
+    <Compile Include="model\SirenController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StreamSocketAndListenerPage.xaml.cs">
       <DependentUpon>StreamSocketAndListenerPage.xaml</DependentUpon>

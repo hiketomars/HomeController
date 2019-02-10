@@ -21,6 +21,7 @@ namespace HomeController.utils
         public static utils.RGBValue Red => new utils.RGBValue(255, 0, 0);
         public static utils.RGBValue Green => new utils.RGBValue(0, 255, 0);
         public static utils.RGBValue Blue => new utils.RGBValue(0, 0, 255);
+        public static utils.RGBValue Black => new utils.RGBValue(0, 0, 0);
 
         public byte RedPart { get; set; }
         public byte GreenPart { get; set; }

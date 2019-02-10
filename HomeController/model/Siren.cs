@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Gpio;
+using HomeController.comm;
 
 namespace HomeController.model
 {
-    public class Siren : ISiren
+    public class Siren : GpioConnector, ISiren
     {
+        private readonly int sirenPinNumber;
+        private GpioPin sirenPin;
+
+        private GpioController gpio;
         public void TurnOn()
         {
             // todo set pin to activate siren.
@@ -27,5 +34,11 @@ namespace HomeController.model
         }
 
         private bool isOn;
+        public sealed override void InitGpio()
+        {
+            base.InitGpio();
+            sirenPin = gpio.OpenPin(sirenPinNumber); ;
+        }
+
     }
 }

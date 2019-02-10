@@ -9,11 +9,15 @@ namespace HomeController.model
 {
     public class DoorController : IDoorController
     {
+        public DoorController()
+        {
+                        
+        }
         public IDoor Door { get; set; }
 
-        public bool IsDoorOpen
+        public bool IsDoorOpen() 
         {
-            get { return Door.IsOpen; }
+            return Door.IsOpen; 
         }
     }
 }

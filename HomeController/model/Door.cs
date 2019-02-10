@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomeController.comm;
 
 namespace HomeController.model
 {
-    public class Door : IDoor
+    public class Door : GpioConnector, IDoor
     {
         public bool Closed { get; set; }
         public bool Sealed { get; set; } //Reglad = haspad
@@ -77,6 +78,10 @@ namespace HomeController.model
         }
 
         public bool IsOpen { get; set; }
+        public override void InitGpio()
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

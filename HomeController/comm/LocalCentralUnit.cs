@@ -10,6 +10,7 @@ using System.Net;
 using System.Diagnostics;
 using Windows.UI.Core;
 using HomeController.model;
+using Windows.UI.Xaml;
 using System.Threading;
 using Moq;
 
@@ -21,48 +22,262 @@ namespace HomeController.comm {
     /// </summary>
     public class LocalCentralUnit
     {
-        public LocalCentralUnit()
+        private DispatcherTimer timer;
+        private AlarmHandler LcuAlarmHandler;
+
+        public LocalCentralUnit() 
+        {
+            // Door
+            var door = HouseModelFactory.GetDoor();
+            var doorController = new DoorController();
+
+            // LED
+            var doorLed = HouseModelFactory.GetRgbLed();
+            var ledController = new LEDController(doorLed);
+
+            // Siren
+            var lcuSiren = HouseModelFactory.GetSiren();
+            var lcuSirenController = new SirenController(LcuSiren);
+
+            SetupLcu(door, doorController, doorLed, ledController, lcuSiren, lcuSirenController);
+
+        }
+
+        // Constructor for unit tests.
+
+        public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IDoorController doorController, ISiren siren, ISirenController sirenController)
+        {
+            SetupLcu(door, doorController, doorLed, ledController, siren, sirenController);
+        }
+
+        private void SetupLcu(IDoor door, IDoorController doorController, IRgbLed doorLed, ILEDController ledController, ISiren siren, ISirenController sirenController)
         {
             // Get and set the name for this LCU.
             SetName();
 
-            // Construct the RGB LED that every LCU is supposed to have.
-            //LCULed = new RgbLed();
-            PerformStartUpLEDFlash();
+            // LED
+            DoorLed = doorLed;
+            LcuLedController = ledController;
+
+            // Door
+            Door = door;
+            DoorController = doorController;
+
+            // Siren
+            LcuSiren = siren;
+            LcuSirenController = sirenController;
+
+            LcuAlarmHandler = new AlarmHandler(this);
+            
+            // Perform start sequence.
+            //LcuLedController.PerformStartUpLedFlash();
+
+            // Start never ending timer loop
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(1000);
+            timer.Tick += Timer_Tick;
+
+
         }
 
-        //public RgbLed LCULed { get; set; }
+        public ISirenController LcuSirenController { get; set; }
+
+        private void Timer_Tick(object sender, object e)
+        {
+            LcuAlarmHandler.CheckForEntrance();
+
+            // Call other controllers here for regularly checking things.
+        }
 
         public string Name { get; set; }
 
-        private /*async*/ void SetName()
+        public ISiren LcuSiren { get; set; }
+
+        private bool autoStatusUpdate = false;
+
+        public bool AutoStatusUpdate
         {
-            string configName = GetNameFromConfigFile();
-            Name = configName;
+            get => autoStatusUpdate;
+            set
+            {
+                
+            }
+
+        }
+
+        public IDoor Door { get; set; }
+
+        public ILEDController LcuLedController { get; set; }
+
+        public IDoorController DoorController { get; set; }
+
+        // Delay before the alarm turns the siren on when opening the door.
+        public int EntranceDelay { get; set; }
+
+        //public bool AlarmActive { get; }
+
+        /// <summary>
+        /// Sets a delegate function to use for logging information into the GUI for the LCU
+        /// </summary>
+        /// <param name="doLoggInGui"></param>
+        public void SetView()
+        {
+            //todo this.doLoggInGui = doLoggInGui;
+            //todo doLoggInGui("Name of LCU is " + Name);
+
 
             // Old stuff
 
-            // Use the MAC-address as the name.
-            //string MacAddress = await GetMAC();
-            //Name = MacAddress +";" + configName;
+            //System.IO.Path.GetDirectoryName(Environment.ExecutablePath);
+            //string path = System.IO.Path.GetDirectoryName(System.Diagnostics.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+            //Environment.GetEnvironmentVariable
+            //StorageFolder folder = ApplicationData.Current.LocalFolder;
+            //doLoggInGui(Windows.Storage. Environment. "");
         }
 
-        private string GetNameFromConfigFile()
+        public string ReadEnvironmentVariable()
         {
-            string name = "ErrorReadingLCUName";
+            // Check whether the environment variable exists.
+            var value = Environment.GetEnvironmentVariable("LCUName");
+            // If necessary, create it.
+            if (value == null)
+            {
+                try
+                {
+                    Environment.SetEnvironmentVariable("LCUName", "TheBackDoor");
+                }
+                catch (Exception ex)
+                {
+                    value = "ERR Could not create:" + ex.Message;
+                }
+                // Now retrieve it.
+                value += Environment.GetEnvironmentVariable("LCUName");
+            }
+            //todo doLoggInGui("Environment variable LCUName is " + value);
+            return value;
+        }
+
+        public List<string> GetLoggings()
+        {
+            return loggings;
+        }
+
+        public async void StartLCU_Client_Communication()
+        {
             try
             {
-                var resources = new Windows.ApplicationModel.Resources.ResourceLoader("HCResources");
-                name = resources.GetString("LCUName");
-            }catch(Exception ex)
-            {
-                name += ": " + ex.Message;
+                // Create the StreamSocket and establish a connection to the echo server.
+                using (var streamSocket = new Windows.Networking.Sockets.StreamSocket())
+                {
+                    // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
+                    var hostName = new Windows.Networking.HostName("localhost");
+
+                    AddLogging("The client is trying to connect...");
+
+                    await streamSocket.ConnectAsync(hostName, "1337"); // Portnummer hårdkodat nu.
+
+                    AddLogging("The client connected");
+
+                    // Send a request to the echo server.
+                    var request = "Hello, World!";
+                    using (var outputStream = streamSocket.OutputStream.AsStreamForWrite())
+                    {
+                        using (var streamWriter = new StreamWriter(outputStream))
+                        {
+                            await streamWriter.WriteLineAsync(request);
+                            await streamWriter.FlushAsync();
+                        }
+                    }
+
+                    // Read data from the echo server.
+                    string response;
+                    using (var inputStream = streamSocket.InputStream.AsStreamForRead())
+                    {
+                        using (var streamReader = new StreamReader(inputStream))
+                        {
+                            response = await streamReader.ReadLineAsync();
+                        }
+                    }
+
+                    AddLogging(string.Format("client received the response: \"{0}\" ", response));
+                }
+                AddLogging("The client closed its socket");
             }
-            return name;
+            catch (Exception ex)
+            {
+                var webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+            }
+        }
+
+        public async void StartLCU_Server_Communication()
+        {
+            try
+            {
+                Logger.Logg("StartLCU_Server_Communication");
+                var streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
+
+                // The ConnectionReceived event is raised when connections are received.
+                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
+
+                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
+                await streamSocketListener.BindServiceNameAsync(Definition.PortNumber);
+                
+                AddLogging("The server is listening...");
+            }
+            catch (Exception ex)
+            {
+                var webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+            }
         }
 
 
-        //#region Get MAC-address
+        //void CheckStatus()
+        //{
+        //    // Code from https://blogs.msdn.microsoft.com/benwilli/2016/06/30/asynchronous-infinite-loops-instead-of-timers/
+        //    Task.Run(async () =>
+        //    {
+        //        while (true)
+        //        {
+        //            // do the work in the loop
+        //            string newData = DateTime.Now.ToString(Definition.StandardDateTimeFormat);
+
+        //            // update the UI on the UI thread
+        //            Dispatcher.Invoke(() => txtTicks.Text = "TASK - " + newData);
+
+        //            // don't run again for at least 200 milliseconds
+        //            await Task.Delay(200);
+        //        }
+        //    });
+        //}
+        public void GetColorForLED()
+        {
+
+        }
+
+        //private Task IntruderSurevillance = new Task();
+
+        // Turns the alarm on so that it will start monitoring doors etc.
+        public void ActivateAlarm(int delayInMs)
+        {
+            LcuAlarmHandler.ActivateAlarm(delayInMs);
+            //IsAlarmActive = true;
+            //Action checkTheDoor = CheckDoor;
+            //Task.Run(checkTheDoor);
+        }
+
+        //private void CheckDoor()
+        //{
+        //}
+
+        //public bool IsAlarmActive { get; private set; }
+
+        public void DeactivateAlarm()
+        {
+            LcuAlarmHandler.DeactivateAlarm();
+        }
+
         //// http://embedded101.com/BruceEitman/entryid/676/windows-10-iot-core-getting-the-mac-address-from-raspberry-pi
         //private async Task<string> GetMAC()
         //{
@@ -122,76 +337,35 @@ namespace HomeController.comm {
         //    }
         //    return objReader;
         //}
+        // Client
 
-        //#endregion
-
-        private bool autoStatusUpdate = false;
-
-        public bool AutoStatusUpdate
+        private void SetName()
         {
-            get
-            {
-                return autoStatusUpdate;
-            }
-            set
-            {
-                
-            }
+            var configName = GetNameFromConfigFile();
+            Name = configName;
 
+            // Use the MAC-address as the name.
+            //string MacAddress = await GetMAC();
+            //Name = MacAddress +";" + configName;
         }
 
-        public IDoor Door { get; set; }
-        //public IRgbLed RgbLed { get; set; }
-        public ILEDController LEDController { get; set; }
-
-        public ISiren Siren { get; set; }
-
-        public IDoorController DoorController { get; set; }
-        //public bool AlarmActive { get; }
-
-        /// <summary>
-        /// Sets a delegate function to use for logging information into the GUI for the LCU
-        /// </summary>
-        /// <param name="doLoggInGui"></param>
-        public void SetView()
+        private string GetNameFromConfigFile()
         {
-            //todo this.doLoggInGui = doLoggInGui;
-            //todo doLoggInGui("Name of LCU is " + Name);
-
-
-            // Old stuff
-
-            //System.IO.Path.GetDirectoryName(Environment.ExecutablePath);
-            //string path = System.IO.Path.GetDirectoryName(System.Diagnostics.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-            //Environment.GetEnvironmentVariable
-            //StorageFolder folder = ApplicationData.Current.LocalFolder;
-            //doLoggInGui(Windows.Storage. Environment. "");
-        }
-
-        public string ReadEnvironmentVariable()
-        {
-            // Check whether the environment variable exists.
-            string value = Environment.GetEnvironmentVariable("LCUName");
-            // If necessary, create it.
-            if (value == null)
+            var name = "ErrorReadingLCUName";
+            try
             {
-                try
-                {
-                    Environment.SetEnvironmentVariable("LCUName", "TheBackDoor");
-                }
-                catch (Exception ex)
-                {
-                    value = "ERR Could not create:" + ex.Message;
-                }
-                // Now retrieve it.
-                value += Environment.GetEnvironmentVariable("LCUName");
+                var resources = new Windows.ApplicationModel.Resources.ResourceLoader("HCResources");
+                name = resources.GetString("LCUName");
             }
-            //todo doLoggInGui("Environment variable LCUName is " + value);
-            return value;
+            catch (Exception ex)
+            {
+                name += ": " + ex.Message;
+            }
+            return name;
         }
-
 
         private List<string> loggings = new List<string>();
+        private IRgbLed DoorLed { get; set; }
 
         // Adds an item to the list of loggings.
         private void AddLogging(string text)
@@ -199,82 +373,6 @@ namespace HomeController.comm {
             Logger.Logg(text);
             loggings.Add(text);
             HouseHandler.GetInstance().SendEventThatModelHasChanged();
-        }
-
-        public List<string> GetLoggings()
-        {
-            return loggings;
-        }
-
-        // Client
-        public async void StartLCU_Client_Communication()
-        {
-            try
-            {
-                // Create the StreamSocket and establish a connection to the echo server.
-                using (var streamSocket = new Windows.Networking.Sockets.StreamSocket())
-                {
-                    // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
-                    var hostName = new Windows.Networking.HostName("localhost");
-
-                    AddLogging("The client is trying to connect...");
-
-                    await streamSocket.ConnectAsync(hostName, "1337"); // Portnummer hårdkodat nu.
-
-                    AddLogging("The client connected");
-
-                    // Send a request to the echo server.
-                    string request = "Hello, World!";
-                    using (Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
-                    {
-                        using (var streamWriter = new StreamWriter(outputStream))
-                        {
-                            await streamWriter.WriteLineAsync(request);
-                            await streamWriter.FlushAsync();
-                        }
-                    }
-
-                    // Read data from the echo server.
-                    string response;
-                    using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
-                    {
-                        using (StreamReader streamReader = new StreamReader(inputStream))
-                        {
-                            response = await streamReader.ReadLineAsync();
-                        }
-                    }
-
-                    AddLogging(string.Format("client received the response: \"{0}\" ", response));
-                }
-                AddLogging("The client closed its socket");
-            }
-            catch (Exception ex)
-            {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-            }
-        }
-
-        public async void StartLCU_Server_Communication()
-        {
-            try
-            {
-                Logger.Logg("StartLCU_Server_Communication");
-                var streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
-
-                // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += this.StreamSocketListener_ConnectionReceived;
-
-                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
-                await streamSocketListener.BindServiceNameAsync(Definition.PortNumber);
-                
-                AddLogging("The server is listening...");
-            }
-            catch (Exception ex)
-            {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-            }
         }
 
         private async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
@@ -288,9 +386,9 @@ namespace HomeController.comm {
             // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server received the request: \"{0}\"", request)));
             AddLogging(string.Format("The server received the request: \"{0}\"", request));
-            
+
             // Echo the request back as the response.
-            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+            using (var outputStream = args.Socket.OutputStream.AsStreamForWrite())
             {
                 using (var streamWriter = new StreamWriter(outputStream))
                 {
@@ -309,84 +407,6 @@ namespace HomeController.comm {
             AddLogging("The server closed its socket");
         }
 
-        //void CheckStatus()
-        //{
-        //    // Code from https://blogs.msdn.microsoft.com/benwilli/2016/06/30/asynchronous-infinite-loops-instead-of-timers/
-        //    Task.Run(async () =>
-        //    {
-        //        while (true)
-        //        {
-        //            // do the work in the loop
-        //            string newData = DateTime.Now.ToString(Definition.StandardDateTimeFormat);
-
-        //            // update the UI on the UI thread
-        //            Dispatcher.Invoke(() => txtTicks.Text = "TASK - " + newData);
-
-        //            // don't run again for at least 200 milliseconds
-        //            await Task.Delay(200);
-        //        }
-        //    });
-        //}
-        public void GetColorForLED()
-        {
-
-        }
-
-        private void PerformStartUpLEDFlash()
-        {
-            LEDController ledController = new LEDController(null, new LedFlashPattern(
-                new int[] {
-                    // Three fast red flashes.
-                    255, 0, 0, 200,
-                    0, 0, 0, 200,
-
-                    255, 0, 0, 200,
-                    0, 0, 0, 200,
-
-                    //255, 0, 0, 200,
-                    //0, 0, 0, 200,
-
-                    0, 0, 0, 500,
-
-
-                    // Three fast green flashes.
-                    0, 255, 0, 200,
-                    0, 0, 0, 200,
-
-                    0, 255, 0, 200,
-                    0, 0, 0, 200,
-
-                    //0, 255, 0, 200,
-                    //0, 0, 0, 200,
-
-                    0, 0, 0, 500,
-
-
-                    // Three fast blue flashes.
-                    0, 0, 255, 200,
-                    0, 0, 0, 200,
-
-                    0, 0, 255, 200,
-                    0, 0, 0, 200,
-
-                    //0, 0, 255, 200,
-                    //0, 0, 0, 200,
-
-                    0, 0, 0, 2000
-
-                }));
-            ledController.StartLedPattern();
-        }
-
-        // Turns the alarm on so that it will start monitoring doors etc.
-        public void ActivateAlarm(int delayInMs)
-        {
-            //Thread. .Sleep(delayInMs);
-        }
-
-        public void DeactivateAlarm()
-        {
-        }
     }
 }
 

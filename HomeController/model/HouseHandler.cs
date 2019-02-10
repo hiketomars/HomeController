@@ -42,7 +42,7 @@ namespace HomeController.model
             BackdoorLocalCentralUnit.SetView();
 
             // Let us listen to changes to LED for the backdoor so that we can update the GUI.
-            BackdoorLocalCentralUnit.LEDController.ControlledRgbLed.LEDHasChanged += EventHandler_LedHasChanged;
+            BackdoorLocalCentralUnit.LcuLedController.ControlledRgbLed.LEDHasChanged += EventHandler_LedHasChanged;
 
             BackdoorLocalCentralUnit.StartLCU_Server_Communication();
             BackdoorLocalCentralUnit.StartLCU_Client_Communication();

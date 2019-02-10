@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace HomeController.model
 {
-    public interface IDoorController
+    interface Interface1
     {
-        IDoor Door { get; set; }
-        bool IsDoorOpen();
     }
 }

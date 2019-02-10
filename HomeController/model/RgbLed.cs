@@ -7,6 +7,7 @@ using Windows.UI.Xaml;
 using Windows.Devices.Gpio;
 using static HomeController.model.Door;
 using Windows.Devices.Gpio;
+using HomeController.comm;
 using HomeController.utils;
 using SocketComm;
 
@@ -17,7 +18,7 @@ namespace HomeController.model
     /// Currently there is no support for showing combinations of these colors at different intensity.
     /// That is, each of these three colors are either on or off at any given point in time.
     /// </summary>
-    public class RgbLed : IRgbLed
+    public sealed class RgbLed : GpioConnector, IRgbLed
     {
         public event Definition.LEDChangedEventHandler LEDHasChanged;
 
@@ -32,15 +33,12 @@ namespace HomeController.model
         private readonly int greenPinNumber;
         private readonly int bluePinNumber;
 
-        private GpioController gpio;
+        private GpioController gpioController;
 
         // This constructor uses default pins on the hardware to control the LED.
         // If the LED is connected on different pins the other constructor must be used.
         public RgbLed() : this(5, 6 , 13)
         {
-            //just some test code
-            //var list = new List<string>();
-            //list.ForEach();
         }
 
         public RgbLed(int redPinNumber, int greenPinNumber, int bluePinNumber)
@@ -49,7 +47,7 @@ namespace HomeController.model
             this.greenPinNumber = greenPinNumber;
             this.bluePinNumber = bluePinNumber;
             //this.visualizeLed = visualizeLed;
-            string initGpioResult = InitGPIO(); 
+            InitGpio(); 
 
             SetRGBValue(0);
             //visualizeLed(MainPage.LEDGraphColor.Gray, initGpioResult);
@@ -143,35 +141,29 @@ namespace HomeController.model
             }
         }
 
- 
 
-        public string InitGPIO()
+        // Need to be sealed in order to avoid inherit this class since that would cause
+        // Virutal member call in constructor:
+        // https://www.jetbrains.com/help/resharper/2018.3/VirtualMemberCallInConstructor.html
+        public override void InitGpio()
         {
-            gpio = GpioController.GetDefault();
+            base.InitGpio();
 
-            // Show an error if there is no GPIO controller
-            if (gpio == null)
-            {
-                //GpioStatus.Text = "There is no GPIO controller on this device.";
-                return "There is no GPIO controller on this device.";
-            }
-
-            redPin = gpio.OpenPin(redPinNumber);;
+            redPin = gpioController.OpenPin(redPinNumber);;
             redPin.Write(GpioPinValue.High);
             redPin.SetDriveMode(GpioPinDriveMode.Output);
 
-            greenPin = gpio.OpenPin(greenPinNumber);
+            greenPin = gpioController.OpenPin(greenPinNumber);
             greenPin.Write(GpioPinValue.High);
             greenPin.SetDriveMode(GpioPinDriveMode.Output);
 
-            bluePin = gpio.OpenPin(bluePinNumber);
+            bluePin = gpioController.OpenPin(bluePinNumber);
             bluePin.Write(GpioPinValue.High);
             bluePin.SetDriveMode(GpioPinDriveMode.Output);
-            return "GPIO initialized";
         }
 
 
- 
+
         //private LedPattern theLedPattern;
         //public LedPattern TheLedPattern
         //{
