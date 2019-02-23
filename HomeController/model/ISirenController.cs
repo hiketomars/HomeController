@@ -10,6 +10,7 @@ namespace HomeController.model
     {
         void TurnOn();
         void TurnOff();
-        bool IsOn { get; } 
+        bool IsOn { get; }
+        void Reset();
     }
 }

@@ -26,5 +26,9 @@ namespace HomeController.model
         }
 
         public bool IsOn => Siren.IsOn();
+        public void Reset()
+        {
+            TurnOff();
+        }
     }
 }

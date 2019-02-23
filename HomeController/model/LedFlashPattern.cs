@@ -61,5 +61,52 @@ namespace HomeController.model
             return new LedFlashPattern(new int[] {  255, 0, 0, 1000,
                                                     0, 0, 0, 1000, });
         }
+
+        public static LedFlashPattern CreateFlash1Second50percentGreen50PercentBlack()
+        {
+            return new LedFlashPattern(new int[] {  0, 255, 0, 1000,
+                0, 0, 0, 1000, });
+        }
+        public static LedFlashPattern CreateFlash1Second50percentGreen50PercentRed()
+        {
+            return new LedFlashPattern(new int[] {  0, 255, 0, 1000,
+                255, 0, 0, 1000, });
+        }
+
+        public static LedFlashPattern CreateSolidRedWithSpecialIndication()
+        {
+            return new LedFlashPattern(new int[] {
+                255, 0, 0, 480,
+                0, 0, 0, 40, // Flickering
+                255, 0, 0, 480,
+                0, 0, 0, 1000, });
+        }
+
+
+        public static LedFlashPattern CreateSolidGreenWithSpecialIndication()
+        {
+            return new LedFlashPattern(new int[] {
+                0, 255, 0, 480,
+                0, 0, 0, 40, // Flickering
+                0, 255, 0, 480,
+                0, 0, 0, 1000, });
+        }
+        public static LedFlashPattern CreateFlash1Second50percentGreen50PercentRedWithSpecialIndication()
+        {
+            return new LedFlashPattern(new int[] {
+                0, 255, 0, 480,
+                0, 0, 0, 40, // Flickering
+                0, 255, 0, 480,
+                255, 0, 0, 480,
+                0, 0, 0, 40, // Flickering
+                255, 0, 0, 480,
+            });
+        }
+
+        public static LedFlashPattern CreateFlash100MS50percentBlue50PercentBlack()
+        {
+            return new LedFlashPattern(new int[] {  0, 0, 255, 50,
+                0, 0, 0, 50 });
+        }
     }
 }

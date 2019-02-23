@@ -19,5 +19,14 @@ namespace HomeController.model
         {
             return Door.IsOpen; 
         }
+
+        public bool IsDoorLocked()
+        {
+            return Door.IsLocked;
+        }
+
+        public void Reset()
+        {
+        }
     }
 }

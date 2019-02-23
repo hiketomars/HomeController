@@ -9,5 +9,6 @@ namespace HomeController.model
     public interface IDoor
     {
         bool IsOpen { get; set; }
+        bool IsLocked { get; set; }
     }
 }

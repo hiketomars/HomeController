@@ -12,6 +12,7 @@ using Windows.UI.Core;
 using HomeController.model;
 using Windows.UI.Xaml;
 using System.Threading;
+using Windows.System.Threading;
 using Moq;
 
 namespace HomeController.comm {
@@ -22,11 +23,14 @@ namespace HomeController.comm {
     /// </summary>
     public class LocalCentralUnit
     {
-        private DispatcherTimer timer;
-        private AlarmHandler LcuAlarmHandler;
+        //private DispatcherTimer timer;
+        private ThreadPoolTimer SurveillancePoolTimer;
+        public AlarmHandler LcuAlarmHandler;
+        public LedHandler LcuLedHandler;
 
         public LocalCentralUnit() 
         {
+            // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
             // Door
             var door = HouseModelFactory.GetDoor();
             var doorController = new DoorController();
@@ -35,22 +39,24 @@ namespace HomeController.comm {
             var doorLed = HouseModelFactory.GetRgbLed();
             var ledController = new LEDController(doorLed);
 
+            // Remote Central Unit Controller
+            var remoteCentralUnitsController = new RemoteCentralUnitsController();
             // Siren
             var lcuSiren = HouseModelFactory.GetSiren();
             var lcuSirenController = new SirenController(LcuSiren);
 
-            SetupLcu(door, doorController, doorLed, ledController, lcuSiren, lcuSirenController);
+            SetupLcu(door, doorController, doorLed, ledController, remoteCentralUnitsController, lcuSiren, lcuSirenController);
 
         }
 
         // Constructor for unit tests.
 
-        public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IDoorController doorController, ISiren siren, ISirenController sirenController)
+        public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IDoorController doorController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
-            SetupLcu(door, doorController, doorLed, ledController, siren, sirenController);
+            SetupLcu(door, doorController, doorLed, ledController, remoteCentralUnitsController, siren, sirenController);
         }
 
-        private void SetupLcu(IDoor door, IDoorController doorController, IRgbLed doorLed, ILEDController ledController, ISiren siren, ISirenController sirenController)
+        private void SetupLcu(IDoor door, IDoorController doorController, IRgbLed doorLed, ILEDController ledController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
             // Get and set the name for this LCU.
             SetName();
@@ -68,30 +74,42 @@ namespace HomeController.comm {
             LcuSirenController = sirenController;
 
             LcuAlarmHandler = new AlarmHandler(this);
-            
+            LcuLedHandler = new LedHandler(this);
+
+            // Remote central units
+            LcuRemoteCentralUnitsController = remoteCentralUnitsController;
+
             // Perform start sequence.
             //LcuLedController.PerformStartUpLedFlash();
 
             // Start never ending timer loop
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000);
-            timer.Tick += Timer_Tick;
+            SurveillancePoolTimer = ThreadPoolTimer.CreatePeriodicTimer(SurveillancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(1000));
+
+            //timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromMilliseconds(1000);
+            //timer.Tick += Timer_Tick;
 
 
         }
 
         public ISirenController LcuSirenController { get; set; }
 
-        private void Timer_Tick(object sender, object e)
-        {
-            LcuAlarmHandler.CheckForEntrance();
 
-            // Call other controllers here for regularly checking things.
+        // This is the central surveillance loop.
+        // It is typcally called once a second or more and checks for local and remote statuses and might start actions as a reaction of that.
+        private void SurveillancePoolTimerElapsedHandler(ThreadPoolTimer timer)
+        {
+            // Check for different alarm situations, local or remote.
+            LcuAlarmHandler.CheckSituation();
+
+            // The color and pattern of the local LED might be affected of remote statuses.
+            LcuLedHandler.SetLedCorrectly();
+
         }
 
         public string Name { get; set; }
 
-        public ISiren LcuSiren { get; set; }
+        private ISiren LcuSiren { get; set; }
 
         private bool autoStatusUpdate = false;
 
@@ -366,6 +384,7 @@ namespace HomeController.comm {
 
         private List<string> loggings = new List<string>();
         private IRgbLed DoorLed { get; set; }
+        public IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; set; }
 
         // Adds an item to the list of loggings.
         private void AddLogging(string text)
@@ -407,6 +426,13 @@ namespace HomeController.comm {
             AddLogging("The server closed its socket");
         }
 
+        // Stops timers, turns off LED and siren.
+        public void Reset()
+        {
+            DoorController.Reset();
+            LcuLedController.Reset();
+            LcuSirenController.Reset();
+        }
     }
 }
 

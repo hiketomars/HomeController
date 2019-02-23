@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using HomeController;
 using HomeController.utils;
 
@@ -79,6 +80,92 @@ namespace HomeController.model
             StartLedPattern();
         }
 
+        public void SetLed_IntrusionHasOccurred()
+        {
+            SetAndStartFlash(RGBValue.Red, RGBValue.Blue, 1000);
+        }
+
+        // Patterns for Inactive Alarms.
+
+        public void Reset()
+        {
+            timer.Stop();
+            rgbLed.SetRGBValue(RGBValue.Black);
+        }
+
+        public void SetLed_RemoteIntrusionHasOccurred()
+        {
+        //    ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsInactiveAndDoorIsUnlockedAndNotAllOthersAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreenWithSpecialIndication();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsInactiveAndDoorIsLockedAndSoAreAllTheOthers()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidRed();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsInactiveAndDoorIsLockedButNotAllTheOthersAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreenWithSpecialIndication();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsInactiveAndDoorIsOpenButAllOtherDoorsAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateFlash1Second50percentGreen50PercentBlack();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsInactiveAndDoorIsOpenAndNotAllOtherDoorsAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsActiveAndDoorIsOpenAndLocked_StatusError()
+        {
+            ledFlashPattern = LedPatternFactory.CreateFlash100MS50percentBlue50PercentBlack();
+            StartLedPattern();
+        }
+
+        // Patterns for Active Alarms.
+        public void SetLed_AlarmIsActiveAndDoorIsLockedButNotAllTheOthersAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsActiveAndDoorIsUnlockedButAllTheOthersAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsActiveAndDoorIsUnlockedAndNotAllTheOthersAreLocked()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
+        public void SetLed_AlarmIsActiveAndDoorIsLockedAndAllTheOthersAsWell()
+        {
+            ledFlashPattern = LedPatternFactory.CreateSolidGreen();
+            StartLedPattern();
+        }
+
         public void StopLedPattern()
         {
             timer.Stop();
@@ -86,18 +173,42 @@ namespace HomeController.model
 
         public IRgbLed ControlledRgbLed => rgbLed;
 
-        public void SetTotalColor(RGBValue green)
+        public void SetTotalColor(RGBValue color)
         {
-            
+            rgbLed.SetRGBValue(color);
         }
 
         public RGBValue GetLedColor()
         {
-            return RGBValue.Red;//todo
+            return rgbLed.GetColor();
+        }
+
+        // One color flash.
+        private void SetAndStartFlash(RGBValue rgbValue, int timeMs)
+        {
+            ledFlashPattern = new LedFlashPattern(
+                new int[] {
+                    rgbValue.RedPart, rgbValue.GreenPart, rgbValue.BluePart, timeMs,
+                    0, 0, 0, timeMs
+                }, -1);
+            StartLedPattern();
+        }
+
+        // Two color flash.
+        private void SetAndStartFlash(RGBValue rgbValue1, RGBValue rgbValue2, int timeMs)
+        {
+            ledFlashPattern = new LedFlashPattern(
+                new int[] {
+                    rgbValue1.RedPart, rgbValue1.GreenPart, rgbValue1.BluePart, timeMs,
+                    rgbValue2.RedPart, rgbValue2.GreenPart, rgbValue2.BluePart, timeMs
+                }, -1);
+            StartLedPattern();
         }
 
         private int currentPos;
+
         private int currentCycle;
+
         private void Timer_Tick(object sender, object e)
         {
             if(currentPos >= ledFlashPattern.RGBLEDPeriods.Count)

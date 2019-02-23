@@ -123,6 +123,7 @@
     <Compile Include="comm\GpioConnector.cs" />
     <Compile Include="comm\IConfigHandler.cs" />
     <Compile Include="comm\LocalCentralUnit.cs" />
+    <Compile Include="model\RemoteCentralUnitsController.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -136,10 +137,12 @@
     <Compile Include="model\IHouseModel.cs" />
     <Compile Include="model\ILEDController.cs" />
     <Compile Include="model\Interface1.cs" />
+    <Compile Include="model\IRemoteCentralUnitsController.cs" />
     <Compile Include="model\IRgbLed.cs" />
     <Compile Include="model\ISiren.cs" />
     <Compile Include="model\LEDController.cs" />
     <Compile Include="model\LedFlashPattern.cs" />
+    <Compile Include="model\LedHandler.cs" />
     <Compile Include="model\RgbLed.cs" />
     <Compile Include="model\RGBLEDPeriod.cs" />
     <Compile Include="model\Siren.cs" />

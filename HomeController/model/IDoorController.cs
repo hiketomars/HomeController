@@ -10,5 +10,7 @@ namespace HomeController.model
     {
         IDoor Door { get; set; }
         bool IsDoorOpen();
+        bool IsDoorLocked();
+        void Reset();
     }
 }

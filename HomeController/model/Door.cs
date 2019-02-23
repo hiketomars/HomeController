@@ -78,6 +78,8 @@ namespace HomeController.model
         }
 
         public bool IsOpen { get; set; }
+        public bool IsLocked { get; set; }
+
         public override void InitGpio()
         {
             throw new NotImplementedException();
