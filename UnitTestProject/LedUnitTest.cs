@@ -289,13 +289,45 @@ namespace UnitTestProject
             sirenMock.Verify(f => f.TurnOn(), Times.Never());
 
             // Door is closed.
-            doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
+            doorControllerMock.Setup(f => f
+.IsDoorOpen()).Returns(false);
 
             // Delay
             Task.Delay(2000).Wait();
         
             // Verify correct led light.
             ledControllerMock.Verify(f => f.SetLed_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked(), Times.AtLeastOnce);
+        }
+
+        [TestMethod]
+        public void MessageIsReceivedFromOneRemoteLcuThatIntrusionHasOccurred_When_AlarmIsActive_Expect_LcuToAcknowledgeMessage()
+        {
+            doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
+            doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
+            remoteCentralUnitsControllerMock.Setup(f => f.IsAnyRemoteDoorUnlocked()).Returns(false);
+
+            lcu.ActivateAlarm(0);
+            Task.Delay(2000).Wait();
+
+            // Verify that door is checked.
+            doorControllerMock.Verify(f => f.IsDoorOpen(), Times.AtLeastOnce());
+            doorControllerMock.Verify(f => f.IsDoorLocked(), Times.AtLeastOnce());
+
+            // Verify that remote doors are checked.
+            remoteCentralUnitsControllerMock.Verify(f => f.IsAnyRemoteDoorUnlocked(), Times.AtLeastOnce());
+
+            // Verify that correct light turned on.
+            ledControllerMock.Verify(f => f.SetLed_AlarmIsActiveAndDoorIsLockedAndAllTheOthersAsWell(), Times.AtLeastOnce);
+
+            // Verify that siren is not turned on.
+            sirenControllerMock.Verify(f => f.TurnOn(), Times.Never());
+
+            // Remote intrusion
+            remoteCentralUnitsControllerMock.Setup(f => f.HasIntrusionOccurred()).Returns(true);
+
+            Task.Delay(2000).Wait();
+
+            //remoteCentralUnitsControllerMock.Verify(f=>f.);
         }
 
     }

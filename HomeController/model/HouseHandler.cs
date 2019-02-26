@@ -15,26 +15,16 @@ namespace HomeController.model
     public class HouseHandler : IHouseModel
     {
         public bool AlarmIsActive { get; set; }
-        public bool AlarmIsAlarming { get; set; }
-
-        internal void StartEntrance(Door door)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void RegisterEntrance(Door door)
-        {
-            throw new NotImplementedException();
-        }
 
         private LocalCentralUnit BackdoorLocalCentralUnit;
 
         /// <summary>
-        /// Constructs the one and only HouseController which is the model in the MVP.
+        /// Constructs the one and only HouseHandler which is the model in the MVP.
         /// </summary>
         public HouseHandler()
         {
         }
+
         public void InitHouseHandler() { 
             //PerformStartUpLEDFlash();
             // Should read config here but now hard coded to have contact with only one other LCU.

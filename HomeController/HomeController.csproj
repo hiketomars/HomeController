@@ -119,10 +119,12 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="comm\ConfigHandler.cs" />
     <Compile Include="comm\GpioConnector.cs" />
-    <Compile Include="comm\IConfigHandler.cs" />
+    <Compile Include="config\IConfigHandler.cs" />
     <Compile Include="comm\LocalCentralUnit.cs" />
+    <Compile Include="config\ConfigHandler.cs" />
+    <Compile Include="model\IRemoteCentralUnit.cs" />
+    <Compile Include="model\RemoteCentralUnit.cs" />
     <Compile Include="model\RemoteCentralUnitsController.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

@@ -28,6 +28,7 @@ namespace HomeController.comm {
         public AlarmHandler LcuAlarmHandler;
         public LedHandler LcuLedHandler;
 
+        // Constructor for normal use (not unit tests).
         public LocalCentralUnit() 
         {
             // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
@@ -50,7 +51,6 @@ namespace HomeController.comm {
         }
 
         // Constructor for unit tests.
-
         public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IDoorController doorController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
             SetupLcu(door, doorController, doorLed, ledController, remoteCentralUnitsController, siren, sirenController);

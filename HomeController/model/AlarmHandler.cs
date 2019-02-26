@@ -168,6 +168,7 @@ namespace HomeController.model
 
             if (lcu.LcuRemoteCentralUnitsController.HasIntrusionOccurred())
             {
+                //LcuRemoteCentralUnitsController.
                 lcu.LcuSirenController.TurnOn();
             }
         }
