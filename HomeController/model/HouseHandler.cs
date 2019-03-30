@@ -14,38 +14,46 @@ namespace HomeController.model
     /// </summary>
     public class HouseHandler : IHouseModel
     {
+        private readonly LocalCentralUnit lcu;
         public bool AlarmIsActive { get; set; }
 
-        private LocalCentralUnit BackdoorLocalCentralUnit;
+        //private RemoteCentralUnit BackdoorRemoteCentralUnit;
 
         /// <summary>
         /// Constructs the one and only HouseHandler which is the model in the MVP.
         /// </summary>
-        public HouseHandler()
+        public HouseHandler(LocalCentralUnit lcu)
         {
+            this.lcu = lcu;
         }
 
         public void InitHouseHandler() { 
             //PerformStartUpLEDFlash();
             // Should read config here but now hard coded to have contact with only one other LCU.
-            BackdoorLocalCentralUnit = new LocalCentralUnit();
-            BackdoorLocalCentralUnit.SetView();
+            //BackdoorRemoteCentralUnit = new RemoteCentralUnit("", "", "");//todo
+            //BackdoorRemoteCentralUnit.SetView();
 
             // Let us listen to changes to LED for the backdoor so that we can update the GUI.
-            BackdoorLocalCentralUnit.LcuLedController.ControlledRgbLed.LEDHasChanged += EventHandler_LedHasChanged;
+            //BackdoorRemoteCentralUnit.LcuLedController.ControlledRgbLed.LEDHasChanged += EventHandler_LedHasChanged;
+            //BackdoorRemoteCentralUnit.RemoteLcuStatusHasChanged += BackdoorRemoteCentralUnit_RemoteLcuStatusHasChanged;
 
-            BackdoorLocalCentralUnit.StartLCU_Server_Communication();
-            BackdoorLocalCentralUnit.StartLCU_Client_Communication();
+            //lcu.StartListeningOnRemoteLcu();
+            //lcu.SendCommandToRemoteLcu("LCU_STARTED: " + lcu.Name + ";");
 
 
-            if(BackdoorLocalCentralUnit.Name == "DefaultNamePleaseUpdateConfigFile")
-            {
-                CorrectlyInitialized = false;
-            }else if(BackdoorLocalCentralUnit.Name == "BackDoor")
-            {
-                CorrectlyInitialized = true;
-            }
+            //if(BackdoorRemoteCentralUnit.Name == "DefaultNamePleaseUpdateConfigFile")
+            //{
+            //    CorrectlyInitialized = false;
+            //}else if(BackdoorRemoteCentralUnit.Name == "BackDoor")
+            //{
+            //    CorrectlyInitialized = true;
+            //}
         }
+
+        //private void BackdoorRemoteCentralUnit_RemoteLcuStatusHasChanged(string todoType)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         // Handles the event that a LED has changed.
         private void EventHandler_LedHasChanged(RGBValue rgbValue)
@@ -65,10 +73,10 @@ namespace HomeController.model
 
         public bool CorrectlyInitialized { get; set; }
 
-        public string GetInfo()
-        {
-            return "Currently only LCU with name " + BackdoorLocalCentralUnit.Name + " is present.";
-        }
+        //public string GetInfo()
+        //{
+        //    return "Currently only LCU with name " + BackdoorRemoteCentralUnit.Name + " is present.";
+        //}
 
         private List<string> loggings = new List<string>();
 
@@ -84,21 +92,27 @@ namespace HomeController.model
 
         public List<string> GetLoggings()
         {
-            List<string> backdoórLoggings = BackdoorLocalCentralUnit.GetLoggings();
-            return loggings.Concat(backdoórLoggings).ToList();
+            //todo List<string> backdoórLoggings = BackdoorRemoteCentralUnit.GetLoggings();
+            //todo return loggings.Concat(backdoórLoggings).ToList();
+            return null;
         }
 
         public void GetColorForBackdoorLED()
         {
-            BackdoorLocalCentralUnit.GetColorForLED();
+            //todo BackdoorRemoteCentralUnit.GetColorForLED();
+        }
+
+        public void ConnectToRemoteLCU()
+        {
+            //lcu.SetupRemoteLCUCommunication();
         }
 
         private static HouseHandler houseHandler;
-        public static HouseHandler GetInstance()
+        public static HouseHandler GetInstance(LocalCentralUnit lcu)
         {
             if (houseHandler == null)
             {
-                houseHandler = new HouseHandler();
+                houseHandler = new HouseHandler(lcu);
                 houseHandler.InitHouseHandler();
             }
 

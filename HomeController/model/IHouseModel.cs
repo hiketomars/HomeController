@@ -15,5 +15,6 @@ namespace HomeController.model
         event Definition.LEDChangedEventHandler LCULedHasChanged;
         List<string> GetLoggings();
         void GetColorForBackdoorLED();
+        void ConnectToRemoteLCU();
     }
 }

@@ -159,6 +159,12 @@ namespace HomeController
 
             }
         }
+
+        // When the user clicks this button the LCU makes a connection to the other LCU.
+        private void ConnectBtn_OnClickBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.ConnectBtn_Click();
+        }
     }
 }
 

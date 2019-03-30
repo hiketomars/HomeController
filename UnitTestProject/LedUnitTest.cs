@@ -62,8 +62,11 @@ namespace UnitTestProject
             //doorController = new Mock<IDoorController>().Object;
             //doorController.Door = door;
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, doorControllerMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
+            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
+            lcu.LcuDoorController = doorControllerMock.Object;
+            lcu.StartSurveillance();
         }
+
 
         [TestCleanup]
         public void DoClean()
@@ -75,7 +78,7 @@ namespace UnitTestProject
 
         // Steady green = Door is unlocked but all other are locked.
         [TestMethod] // Ready
-        public void Generally_When_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked_Expect_CorrectLedLight()
+        public void L1_Generally_When_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked_Expect_CorrectLedLight()
         {
             // Door is closed and unlocked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
@@ -96,7 +99,7 @@ namespace UnitTestProject
 
         // Steady green with flicker = Door is unlocked. Not all of the others are locked.
         [TestMethod]
-        public void Generally_When_AlarmIsInactiveAndDoorIsUnlockedAndNotAllOthersAreLocked_Expect_CorrectLedLight()
+        public void L2_Generally_When_AlarmIsInactiveAndDoorIsUnlockedAndNotAllOthersAreLocked_Expect_CorrectLedLight()
         {
             // Door is closed and unlocked. One or more remote doors are unlocked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
@@ -120,7 +123,7 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public void Normally_When_AlarmIsInactiveAndDoorIsLockedAndSoAreAllTheOthers_Expect_CorrectLedLight()
+        public void L3_Normally_When_AlarmIsInactiveAndDoorIsLockedAndSoAreAllTheOthers_Expect_CorrectLedLight()
         {
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
@@ -145,7 +148,7 @@ namespace UnitTestProject
 
         // Steady red with flicker = Door is locked. Not all of the others are locked.
         [TestMethod]
-        public void Normally_When_AlarmIsInactiveAndDoorIsLockedButNotAllTheOthersAreLocked_Expect_CorrectLedLight()
+        public void L4_Normally_When_AlarmIsInactiveAndDoorIsLockedButNotAllTheOthersAreLocked_Expect_CorrectLedLight()
         {
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
@@ -169,7 +172,7 @@ namespace UnitTestProject
 
         // Flashing red = Alarm is active. All doors are locked.
         [TestMethod]
-        public void Normally_When_AlarmIsActiveAndDoorIsLockedAndAllTheOthersAsWell_Expect_FlashingRedLED()
+        public void L5_Normally_When_AlarmIsActiveAndDoorIsLockedAndAllTheOthersAsWell_Expect_FlashingRedLED()
         {
             // Door is closed and locked. All remote doors are locked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
@@ -195,7 +198,7 @@ namespace UnitTestProject
 
         // Flashing red with flicker = Alarm is active. Door is Locked. Not all of the others are locked.
         [TestMethod]
-        public void Normally_When_AlarmIsActiveAndDoorIsLockedButNotAllTheOthersAreLocked_Expect_FlashingFlickeringRedLED()
+        public void L6_Normally_When_AlarmIsActiveAndDoorIsLockedButNotAllTheOthersAreLocked_Expect_FlashingFlickeringRedLED()
         {
             // Door is closed and locked. All remote doors are locked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
@@ -221,7 +224,7 @@ namespace UnitTestProject
 
         // Flashing red / green = Alarm is active.Door is not locked. All the others are locked.
         [TestMethod]
-        public void Normally_When_AlarmIsActiveAndDoorIsUnlockedButAllTheOthersAreLocked_Expect_CorrectLedLight()
+        public void L7_Normally_When_AlarmIsActiveAndDoorIsUnlockedButAllTheOthersAreLocked_Expect_CorrectLedLight()
         {
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);
@@ -246,7 +249,7 @@ namespace UnitTestProject
 
         // Flashing red / green = Alarm is active.Door is not locked. Not all of the others are locked.
         [TestMethod]
-        public void Normally_When_AlarmIsActiveAndDoorIsUnlockedAndNotAllTheOthersAreLocked_Expect_FlashingFlickeringRedAndGreenLED()
+        public void L8_Normally_When_AlarmIsActiveAndDoorIsUnlockedAndNotAllTheOthersAreLocked_Expect_FlashingFlickeringRedAndGreenLED()
         {
             // Door is closed but not locked. All remote doors are locked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
@@ -271,7 +274,7 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public void DoorIsOpenAndThenClosed_When_AlarmIsInactiveAndAllOthersAreLocked_Expect_CorrectLedLightInBothSituations()
+        public void L9_DoorIsOpenAndThenClosed_When_AlarmIsInactiveAndAllOthersAreLocked_Expect_CorrectLedLightInBothSituations()
         {
             // Door is open.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(true);
@@ -289,45 +292,13 @@ namespace UnitTestProject
             sirenMock.Verify(f => f.TurnOn(), Times.Never());
 
             // Door is closed.
-            doorControllerMock.Setup(f => f
-.IsDoorOpen()).Returns(false);
+            doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
 
             // Delay
             Task.Delay(2000).Wait();
         
             // Verify correct led light.
             ledControllerMock.Verify(f => f.SetLed_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked(), Times.AtLeastOnce);
-        }
-
-        [TestMethod]
-        public void MessageIsReceivedFromOneRemoteLcuThatIntrusionHasOccurred_When_AlarmIsActive_Expect_LcuToAcknowledgeMessage()
-        {
-            doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
-            doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
-            remoteCentralUnitsControllerMock.Setup(f => f.IsAnyRemoteDoorUnlocked()).Returns(false);
-
-            lcu.ActivateAlarm(0);
-            Task.Delay(2000).Wait();
-
-            // Verify that door is checked.
-            doorControllerMock.Verify(f => f.IsDoorOpen(), Times.AtLeastOnce());
-            doorControllerMock.Verify(f => f.IsDoorLocked(), Times.AtLeastOnce());
-
-            // Verify that remote doors are checked.
-            remoteCentralUnitsControllerMock.Verify(f => f.IsAnyRemoteDoorUnlocked(), Times.AtLeastOnce());
-
-            // Verify that correct light turned on.
-            ledControllerMock.Verify(f => f.SetLed_AlarmIsActiveAndDoorIsLockedAndAllTheOthersAsWell(), Times.AtLeastOnce);
-
-            // Verify that siren is not turned on.
-            sirenControllerMock.Verify(f => f.TurnOn(), Times.Never());
-
-            // Remote intrusion
-            remoteCentralUnitsControllerMock.Setup(f => f.HasIntrusionOccurred()).Returns(true);
-
-            Task.Delay(2000).Wait();
-
-            //remoteCentralUnitsControllerMock.Verify(f=>f.);
         }
 
     }
@@ -343,6 +314,11 @@ namespace UnitTestProject
         }
 
         public void GetColorForBackdoorLED()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConnectToRemoteLCU()
         {
             throw new NotImplementedException();
         }

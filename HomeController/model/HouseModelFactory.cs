@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.System.Profile;
+using HomeController.comm;
 using Moq;
 
 namespace HomeController.model
@@ -22,7 +23,7 @@ namespace HomeController.model
 
             if(!TestMode)
             {
-                return HouseHandler.GetInstance();
+                return HouseHandler.GetInstance(LocalCentralUnit.GetInstance());
             }
 
             return HouseModel;// todo return mock here.

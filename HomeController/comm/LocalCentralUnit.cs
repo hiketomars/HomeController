@@ -13,24 +13,71 @@ using HomeController.model;
 using Windows.UI.Xaml;
 using System.Threading;
 using Windows.System.Threading;
+using HomeController.config;
 using Moq;
 
 namespace HomeController.comm {
 
     /// <summary>
     /// Local Central Unit is in control of the local equipment.
-    /// Typically this is a door with a LED, a siren. Also it has communication chanells to other LCU:s, RemoteCentralUnits.
+    /// Typically this is a door with a LED, a siren. Also it has communication channels to other LCU:s, RemoteCentralUnits.
     /// </summary>
     public class LocalCentralUnit
     {
         //private DispatcherTimer timer;
         private ThreadPoolTimer SurveillancePoolTimer;
-        public AlarmHandler LcuAlarmHandler;
+        public AlarmHandler LcuAlarmHandler { get; set; }
         public LedHandler LcuLedHandler;
 
-        // Constructor for normal use (not unit tests).
-        public LocalCentralUnit() 
+        private IRemoteCentralUnitsController lcuRemoteCentralUnitsController;
+
+        public IRemoteCentralUnitsController LcuRemoteCentralUnitsController
         {
+            get
+            {
+                if (lcuRemoteCentralUnitsController == null)
+                {
+                    lcuRemoteCentralUnitsController = new RemoteCentralUnitsController();
+                }
+
+                return lcuRemoteCentralUnitsController;
+            }
+            set { lcuRemoteCentralUnitsController = value; }
+        }
+
+        //public ConfigHandler LcuConfigHandler;
+
+        private static LocalCentralUnit instance;
+
+        public static LocalCentralUnit GetInstance()
+        {
+            if (instance != null)
+            {
+                return instance;
+            }
+            return new LocalCentralUnit();
+        }
+
+        // Can be used to inject a config handler before
+        public static IConfigHandler LcuConfigHandler { get; set; }
+
+        // Constructor for normal use (not unit tests).
+        //public LocalCentralUnit() : this(new ConfigHandler())
+        //{
+        //}
+
+        //public IRemoteCentralUnitsController RemoteCentralUnitsController { get; set; }
+
+        public LocalCentralUnit()
+        {
+            instance = this;
+            //this.LcuConfigHandler = lcuConfigHandler;
+
+            if (LcuConfigHandler == null)
+            {
+                LcuConfigHandler = new ConfigHandler();
+            }
+
             // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
             // Door
             var door = HouseModelFactory.GetDoor();
@@ -40,23 +87,35 @@ namespace HomeController.comm {
             var doorLed = HouseModelFactory.GetRgbLed();
             var ledController = new LEDController(doorLed);
 
+            // var remoteCentralUnit  = BackdoorRemoteCentralUnit;
+
+
             // Remote Central Unit Controller
-            var remoteCentralUnitsController = new RemoteCentralUnitsController();
+            LcuRemoteCentralUnitsController = new RemoteCentralUnitsController();
+            LcuRemoteCentralUnitsController.Setup(this);
             // Siren
             var lcuSiren = HouseModelFactory.GetSiren();
-            var lcuSirenController = new SirenController(LcuSiren);
+            var lcuSirenController = new SirenController();
 
-            SetupLcu(door, doorController, doorLed, ledController, remoteCentralUnitsController, lcuSiren, lcuSirenController);
+            SetupLcu(door, doorLed, ledController, LcuRemoteCentralUnitsController, lcuSiren, lcuSirenController);
 
+            LcuRemoteCentralUnitsController.SendStartUpMessage();
         }
+
+
+        //private void BackdoorRemoteCentralUnit_RemoteLcuStatusHasChanged(string todoType)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
 
         // Constructor for unit tests.
-        public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IDoorController doorController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
+        public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
-            SetupLcu(door, doorController, doorLed, ledController, remoteCentralUnitsController, siren, sirenController);
+            SetupLcu(door, doorLed, ledController, remoteCentralUnitsController, siren, sirenController);
         }
 
-        private void SetupLcu(IDoor door, IDoorController doorController, IRgbLed doorLed, ILEDController ledController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
+        private void SetupLcu(IDoor door, IRgbLed doorLed, ILEDController ledController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
             // Get and set the name for this LCU.
             SetName();
@@ -67,11 +126,14 @@ namespace HomeController.comm {
 
             // Door
             Door = door;
-            DoorController = doorController;
+            //DoorController = doorController;
+            LcuDoorController = new DoorController();
+            LcuDoorController.Door = Door;
 
             // Siren
-            LcuSiren = siren;
+            //LcuSiren = siren;
             LcuSirenController = sirenController;
+            LcuSirenController.Siren = siren;
 
             LcuAlarmHandler = new AlarmHandler(this);
             LcuLedHandler = new LedHandler(this);
@@ -82,9 +144,7 @@ namespace HomeController.comm {
             // Perform start sequence.
             //LcuLedController.PerformStartUpLedFlash();
 
-            // Start never ending timer loop
-            SurveillancePoolTimer = ThreadPoolTimer.CreatePeriodicTimer(SurveillancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(1000));
-
+            
             //timer = new DispatcherTimer();
             //timer.Interval = TimeSpan.FromMilliseconds(1000);
             //timer.Tick += Timer_Tick;
@@ -94,6 +154,11 @@ namespace HomeController.comm {
 
         public ISirenController LcuSirenController { get; set; }
 
+        public void StartSurveillance()
+        {
+            // Start never ending timer loop
+            SurveillancePoolTimer = ThreadPoolTimer.CreatePeriodicTimer(SurveillancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(1000));
+        }
 
         // This is the central surveillance loop.
         // It is typcally called once a second or more and checks for local and remote statuses and might start actions as a reaction of that.
@@ -127,32 +192,12 @@ namespace HomeController.comm {
 
         public ILEDController LcuLedController { get; set; }
 
-        public IDoorController DoorController { get; set; }
+        public IDoorController LcuDoorController { get; set; }
 
         // Delay before the alarm turns the siren on when opening the door.
         public int EntranceDelay { get; set; }
 
-        //public bool AlarmActive { get; }
-
-        /// <summary>
-        /// Sets a delegate function to use for logging information into the GUI for the LCU
-        /// </summary>
-        /// <param name="doLoggInGui"></param>
-        public void SetView()
-        {
-            //todo this.doLoggInGui = doLoggInGui;
-            //todo doLoggInGui("Name of LCU is " + Name);
-
-
-            // Old stuff
-
-            //System.IO.Path.GetDirectoryName(Environment.ExecutablePath);
-            //string path = System.IO.Path.GetDirectoryName(System.Diagnostics.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-            //Environment.GetEnvironmentVariable
-            //StorageFolder folder = ApplicationData.Current.LocalFolder;
-            //doLoggInGui(Windows.Storage. Environment. "");
-        }
-
+       
         public string ReadEnvironmentVariable()
         {
             // Check whether the environment variable exists.
@@ -180,75 +225,6 @@ namespace HomeController.comm {
             return loggings;
         }
 
-        public async void StartLCU_Client_Communication()
-        {
-            try
-            {
-                // Create the StreamSocket and establish a connection to the echo server.
-                using (var streamSocket = new Windows.Networking.Sockets.StreamSocket())
-                {
-                    // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
-                    var hostName = new Windows.Networking.HostName("localhost");
-
-                    AddLogging("The client is trying to connect...");
-
-                    await streamSocket.ConnectAsync(hostName, "1337"); // Portnummer hårdkodat nu.
-
-                    AddLogging("The client connected");
-
-                    // Send a request to the echo server.
-                    var request = "Hello, World!";
-                    using (var outputStream = streamSocket.OutputStream.AsStreamForWrite())
-                    {
-                        using (var streamWriter = new StreamWriter(outputStream))
-                        {
-                            await streamWriter.WriteLineAsync(request);
-                            await streamWriter.FlushAsync();
-                        }
-                    }
-
-                    // Read data from the echo server.
-                    string response;
-                    using (var inputStream = streamSocket.InputStream.AsStreamForRead())
-                    {
-                        using (var streamReader = new StreamReader(inputStream))
-                        {
-                            response = await streamReader.ReadLineAsync();
-                        }
-                    }
-
-                    AddLogging(string.Format("client received the response: \"{0}\" ", response));
-                }
-                AddLogging("The client closed its socket");
-            }
-            catch (Exception ex)
-            {
-                var webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-            }
-        }
-
-        public async void StartLCU_Server_Communication()
-        {
-            try
-            {
-                Logger.Logg("StartLCU_Server_Communication");
-                var streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
-
-                // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
-
-                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
-                await streamSocketListener.BindServiceNameAsync(Definition.PortNumber);
-                
-                AddLogging("The server is listening...");
-            }
-            catch (Exception ex)
-            {
-                var webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-            }
-        }
 
 
         //void CheckStatus()
@@ -384,55 +360,29 @@ namespace HomeController.comm {
 
         private List<string> loggings = new List<string>();
         private IRgbLed DoorLed { get; set; }
-        public IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; set; }
 
         // Adds an item to the list of loggings.
-        private void AddLogging(string text)
+        public void AddLogging(string text)
         {
             Logger.Logg(text);
             loggings.Add(text);
-            HouseHandler.GetInstance().SendEventThatModelHasChanged();
+            HouseHandler.GetInstance(this).SendEventThatModelHasChanged();
         }
 
-        private async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
-        {
-            string request;
-            using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
-            {
-                request = await streamReader.ReadLineAsync();
-            }
-
-            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server received the request: \"{0}\"", request)));
-            AddLogging(string.Format("The server received the request: \"{0}\"", request));
-
-            // Echo the request back as the response.
-            using (var outputStream = args.Socket.OutputStream.AsStreamForWrite())
-            {
-                using (var streamWriter = new StreamWriter(outputStream))
-                {
-                    await streamWriter.WriteLineAsync(request);
-                    await streamWriter.FlushAsync();
-                }
-            }
-
-            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server sent back the response: \"{0}\"", request)));
-            AddLogging(string.Format("The server sent back the response: \"{0}\"", request));
-            sender.Dispose();
-
-            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add("server closed its socket"));
-            AddLogging("The server closed its socket");
-        }
-
+ 
         // Stops timers, turns off LED and siren.
         public void Reset()
         {
-            DoorController.Reset();
+            LcuDoorController.Reset();
             LcuLedController.Reset();
             LcuSirenController.Reset();
         }
+
+        //public void SetupRemoteLCUCommunication()
+        //{
+        //    StartListeningOnRemoteLcu();
+        //    SendCommandToRemoteLcu(TODO);
+        //}
     }
 }
 

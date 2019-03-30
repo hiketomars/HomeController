@@ -30,10 +30,10 @@ namespace HomeController.model
             else if (lcu.LcuAlarmHandler.IsAlarmActive)
             {
                 // Active
-                if (!lcu.DoorController.IsDoorOpen())
+                if (!lcu.LcuDoorController.IsDoorOpen())
                 {
                     // Closed
-                    if (lcu.DoorController.IsDoorLocked())
+                    if (lcu.LcuDoorController.IsDoorLocked())
                     {
                         // Locked
                         if (lcu.LcuRemoteCentralUnitsController.IsAnyRemoteDoorUnlocked())
@@ -65,7 +65,7 @@ namespace HomeController.model
                 else
                 {
                     // Open
-                    if(lcu.DoorController.IsDoorLocked())
+                    if(lcu.LcuDoorController.IsDoorLocked())
                     {
                         // Locked but also Open is an error!!
                         lcu.LcuLedController.SetLed_AlarmIsActiveAndDoorIsOpenAndLocked_StatusError();
@@ -89,10 +89,10 @@ namespace HomeController.model
             else
             {
                 // Inactive
-                if(!lcu.DoorController.IsDoorOpen())
+                if(!lcu.LcuDoorController.IsDoorOpen())
                 {
                     // Closed
-                    if (lcu.DoorController.IsDoorLocked())
+                    if (lcu.LcuDoorController.IsDoorLocked())
                     {
                         // Locked
                         if(lcu.LcuRemoteCentralUnitsController.IsAnyRemoteDoorUnlocked())

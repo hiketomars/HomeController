@@ -9,10 +9,6 @@ namespace HomeController.model
 {
     public class DoorController : IDoorController
     {
-        public DoorController()
-        {
-                        
-        }
         public IDoor Door { get; set; }
 
         public bool IsDoorOpen() 
@@ -28,5 +24,21 @@ namespace HomeController.model
         public void Reset()
         {
         }
+
+        //private static IDoorController instance;
+
+        //public static void SetInstance(IDoorController doorController)
+        //{
+        //    instance = doorController;
+        //}
+        //public static IDoorController GetInstance()
+        //{
+        //    if (instance == null)
+        //    {
+        //        instance = new DoorController();
+        //    }
+
+        //    return instance;
+        //}
     }
 }

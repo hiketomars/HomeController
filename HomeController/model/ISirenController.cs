@@ -11,6 +11,7 @@ namespace HomeController.model
         void TurnOn();
         void TurnOff();
         bool IsOn { get; }
+        ISiren Siren { get; set; }
         void Reset();
     }
 }

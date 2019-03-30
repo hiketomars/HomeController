@@ -9,7 +9,7 @@ namespace HomeController.config
 {
     public interface IConfigHandler
     {
-        List<RemoteCentralUnit> GetRemoteLcus();
+        List<IRemoteCentralUnitProxy> GetRemoteLcus();
 
     }
 }

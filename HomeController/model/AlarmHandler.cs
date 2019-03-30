@@ -11,6 +11,7 @@ namespace HomeController.model
 {
     public class AlarmHandler
     {
+        private readonly LocalCentralUnit lcu;
         public const int EntranceDelayDefaultMs = 6000;
         public const int SirenDuranceDefaultMs = 5 * 60 * 1000;
         public const int ActivationDelayDefaultMs = 30 * 1000;
@@ -23,7 +24,6 @@ namespace HomeController.model
         private ThreadPoolTimer SirenPoolTimer;
         //private DispatcherTimer ActivationTimer;
         private ThreadPoolTimer ActivationPoolTimer;
-        private LocalCentralUnit lcu;
 
         public enum AlarmActivityStatus
         { Undefined, Off, Activating, Active, EntranceOngoing, Siren,
@@ -31,10 +31,22 @@ namespace HomeController.model
         }
 
         public AlarmActivityStatus CurrentStatus { get; set; }
+
+        private static AlarmHandler instance;
+
+        //public static AlarmHandler GetInstance()
+        //{
+        //    if (instance == null)
+        //    {
+        //        instance = new AlarmHandler();
+        //    }
+        //    return instance;
+        //}
+    
         public AlarmHandler(LocalCentralUnit lcu)
         {
-            CurrentStatus = AlarmActivityStatus.Undefined;
             this.lcu = lcu;
+            CurrentStatus = AlarmHandler.AlarmActivityStatus.Undefined;
             //EntranceTimer = new DispatcherTimer();
             //EntranceTimer.Interval = TimeSpan.FromMilliseconds(EntranceDelayMs);
             //EntranceTimer.Tick += EntranceTimer_Tick;
@@ -52,7 +64,7 @@ namespace HomeController.model
 
             EntranceDelayMs = EntranceDelayDefaultMs;
             SirenDuranceMs = SirenDuranceDefaultMs;
-            CurrentStatus = AlarmActivityStatus.Off;
+            CurrentStatus = AlarmHandler.AlarmActivityStatus.Off;
 
         }
 
@@ -73,7 +85,7 @@ namespace HomeController.model
         private void ActivationPoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
             IsAlarmActive = true;
-            CurrentStatus = AlarmActivityStatus.Active;
+            CurrentStatus = AlarmHandler.AlarmActivityStatus.Active;
         }
 
 
@@ -85,7 +97,7 @@ namespace HomeController.model
             IsEntrancePeriodOngoing = false;
             //HasIntrusionOccurred = false;
             IsAlarmActive = false;
-            CurrentStatus = AlarmActivityStatus.Off;
+            CurrentStatus = AlarmHandler.AlarmActivityStatus.Off;
 
         }
 
@@ -97,27 +109,21 @@ namespace HomeController.model
 
             //ActivationPoolTimer.Period = delay;
             //ActivationTimer.Start();
-            CurrentStatus = AlarmActivityStatus.Activating;
+            CurrentStatus = AlarmHandler.AlarmActivityStatus.Activating;
 
         }
 
         public bool IsAlarmActive { get; private set; }
 
 
-        //private void SirenDuranceTimer_Tick(object sender, object e)
-        //{
-        //    SirenPoolTimer.Cancel();
-        //    lcu.LcuSiren.TurnOff();
-        //}
-
         private void SirenPoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
             SirenPoolTimer.Cancel();
+            //SirenController.GetInstance().TurnOff();
             lcu.LcuSirenController.TurnOff();
-            CurrentStatus = AlarmActivityStatus.SirenOff;
+            CurrentStatus = AlarmHandler.AlarmActivityStatus.SirenOff;
 
         }
-
 
         private void EntrancePoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
@@ -127,10 +133,11 @@ namespace HomeController.model
             {
                 // Intrusion! Turn on siren. 
                 HasIntrusionOccurred = true;
+                //SirenController.GetInstance().TurnOn();
                 lcu.LcuSirenController.TurnOn();
                 SirenPoolTimer = ThreadPoolTimer.CreateTimer(SirenPoolTimerElapsedHandler,
                     TimeSpan.FromMilliseconds(SirenDuranceMs));
-                CurrentStatus = AlarmActivityStatus.Siren;
+                CurrentStatus = AlarmHandler.AlarmActivityStatus.Siren;
 
             }
         }
@@ -148,27 +155,34 @@ namespace HomeController.model
         //}
 
 
+        // Local intrusion.
         public bool HasIntrusionOccurred { get; set; }
+
         public bool IsEntrancePeriodOngoing { get; set; }
 
         public void CheckSituation()
         {
-            if(lcu.DoorController.IsDoorOpen())
+            if(lcu.LcuDoorController.IsDoorOpen())
             {
                 if(IsAlarmActive && CurrentStatus == AlarmActivityStatus.Active)
                 {
                     IsEntrancePeriodOngoing = true;
                     EntrancePoolTimer = ThreadPoolTimer.CreateTimer(EntrancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(EntranceDelayMs));
-                    CurrentStatus = AlarmActivityStatus.EntranceOngoing;
+                    CurrentStatus = AlarmHandler.AlarmActivityStatus.EntranceOngoing;
 
                     //EntranceTimer.Stop(); //todo kolla om det är en bra ide att stoppa den först i fall den redan var igång.
                     //EntranceTimer.Start();
+                }
+                else
+                {
+                    int a = 0;
                 }
             }
 
             if (lcu.LcuRemoteCentralUnitsController.HasIntrusionOccurred())
             {
                 //LcuRemoteCentralUnitsController.
+                //SirenController.GetInstance().TurnOn();
                 lcu.LcuSirenController.TurnOn();
             }
         }

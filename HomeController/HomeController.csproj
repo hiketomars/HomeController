@@ -123,8 +123,8 @@
     <Compile Include="config\IConfigHandler.cs" />
     <Compile Include="comm\LocalCentralUnit.cs" />
     <Compile Include="config\ConfigHandler.cs" />
-    <Compile Include="model\IRemoteCentralUnit.cs" />
-    <Compile Include="model\RemoteCentralUnit.cs" />
+    <Compile Include="model\IRemoteCentralUnitProxy.cs" />
+    <Compile Include="model\RemoteCentralUnitProxy.cs" />
     <Compile Include="model\RemoteCentralUnitsController.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -145,12 +145,15 @@
     <Compile Include="model\LEDController.cs" />
     <Compile Include="model\LedFlashPattern.cs" />
     <Compile Include="model\LedHandler.cs" />
+    <Compile Include="model\RemoteLcuStatus.cs" />
     <Compile Include="model\RgbLed.cs" />
     <Compile Include="model\RGBLEDPeriod.cs" />
     <Compile Include="model\Siren.cs" />
     <Compile Include="model\ISirenController.cs" />
     <Compile Include="model\SirenController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="service\RemoteFactory.cs" />
+    <Compile Include="service\RemoteMockService.cs" />
     <Compile Include="StreamSocketAndListenerPage.xaml.cs">
       <DependentUpon>StreamSocketAndListenerPage.xaml</DependentUpon>
     </Compile>

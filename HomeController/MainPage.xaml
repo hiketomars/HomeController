@@ -17,6 +17,7 @@
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock x:Name="LocalCentralUnitHeading" Text="LCU" Margin="10" TextAlignment="Center" FontSize="26.667" />
             <Button x:Name="InfoBtn"  Content="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Click="InfoBtn_Click" />
+            <Button x:Name="ConnectBtn"  Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ConnectBtn_OnClickBtn_Click" />
             <CheckBox x:Name="ListenOnPort" Content="Listen on Port" HorizontalAlignment="Left" Checked="ListenOnPort_Checked"></CheckBox>
             <CheckBox x:Name="xyz" Content="xyz" HorizontalAlignment="Left"></CheckBox>            <Ellipse x:Name="LED" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
             <TextBlock x:Name="DelayText" Text="" Margin="10" TextAlignment="Center" FontSize="26.667" />

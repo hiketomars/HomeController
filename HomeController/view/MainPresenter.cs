@@ -49,5 +49,10 @@ namespace HomeController.view
         {
             mainView.AddLoggItem("Info button clicked.");
         }
+
+        public void ConnectBtn_Click()
+        {
+            houseModel.ConnectToRemoteLCU();
+        }
     }
 }

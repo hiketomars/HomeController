@@ -57,7 +57,7 @@ namespace UnitTestProject
             //doorController = new Mock<IDoorController>().Object;
             //doorController.Door = door;
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, doorControllerMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
+            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
         }
 
         [TestCleanup]

@@ -8,12 +8,16 @@ namespace HomeController.model
 {
     public class SirenController : ISirenController
     {
-        public SirenController(ISiren siren)
+        public SirenController()
         {
-            Siren = siren;
         }
 
-        public ISiren Siren { get; }
+        //public void SetSiren(ISiren siren)
+        //{
+        //    Siren = siren;
+        //}
+
+        public ISiren Siren { get; set; }
 
         public void TurnOn()
         {
@@ -30,5 +34,21 @@ namespace HomeController.model
         {
             TurnOff();
         }
+
+        //private static ISirenController instance;
+        //public static ISirenController GetInstance()
+        //{
+        //    if (instance == null)
+        //    {
+        //        instance = new SirenController();
+        //    }
+
+        //    return instance;
+        //}
+
+        //public static void SetInstance(ISirenController sirenController)
+        //{
+        //    instance = sirenController;
+        //}
     }
 }
