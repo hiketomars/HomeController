@@ -19,5 +19,8 @@ namespace HomeController.model
         string Name { set; get; }
         string IpAddress { get; set; }
         string PortNumber { get; set; }
+        bool SendPingMessage();
+        void SendStateChangedMessage(AlarmHandler.AlarmActivityStatus currentStatus);
+
     }
 }

@@ -113,7 +113,7 @@ namespace HomeController.model
             if (houseHandler == null)
             {
                 houseHandler = new HouseHandler(lcu);
-                houseHandler.InitHouseHandler();
+                //houseHandler.InitHouseHandler();
             }
 
             return houseHandler;

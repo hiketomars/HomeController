@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media.Capture.Frames;
 using Windows.System.Threading;
 using HomeController.comm;
 using Windows.UI.Xaml;
@@ -109,8 +110,17 @@ namespace HomeController.model
 
             //ActivationPoolTimer.Period = delay;
             //ActivationTimer.Start();
+            SetStatus(AlarmHandler.AlarmActivityStatus.Activating);
+        }
+
+        private void SetStatus(AlarmActivityStatus newStatus)
+        {
             CurrentStatus = AlarmHandler.AlarmActivityStatus.Activating;
 
+            /* Behöver inte tala om att status har ändrats. Remote LCU:er får fråga oss så svarar vi.
+            // Tell other LCU:s about our new status.
+            lcu.LcuRemoteCentralUnitsController.StatusHasChanged(CurrentStatus);
+            */
         }
 
         public bool IsAlarmActive { get; private set; }

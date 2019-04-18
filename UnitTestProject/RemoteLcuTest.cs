@@ -377,7 +377,7 @@ namespace UnitTestProject
 
 
         [TestMethod]
-        public void C20_IntrusionOccurrsAtOneRemoteLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtLocalCentralUnit()
+        public void R20_IntrusionOccurrsAtOneRemoteLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtLocalCentralUnit()
         {
             string lcuFrontdoorName = "Ytterdörren";
             string lcuBackdoorName = "Baksidan";
@@ -444,7 +444,7 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public void C21_IntrusionOccurrsAtLocalLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtAllRemoteCentralUnits()
+        public void R21_IntrusionOccurrsAtLocalLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtAllRemoteCentralUnits()
         {
             string lcuFrontdoorName = "Ytterdörren";
             string lcuBackdoorName = "Baksidan";

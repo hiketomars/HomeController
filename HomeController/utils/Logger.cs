@@ -5,12 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using System.Diagnostics;
 
 namespace HomeController.utils
 {
     public class Logger
     {
+        public const string RCUProxy = "RCUProxy";
+        public const string LCU = "LCU";
+        public const string Test = "Test";
+
         public static async void Logg(string text)
+        {
+            Logg(null, text, "rpi.txt");
+        }
+        public static async void Logg(string category, string text, string fileName)
         {
             #region Unused Code
             //using (StreamWriter outputFile = new StreamWriter(new FileStream(@"c:\temp\rpi.txt", FileMode.Append)))
@@ -45,6 +54,10 @@ namespace HomeController.utils
             //});
             #endregion
 
+            if (category != null)
+            {
+                text = category + "; " + text;
+            }
             // This is not a very nice way to write to a log file since we need to make several attempts.
             // The exception is about the text file itself: "because it is being used by another process"
             // There is something fundamental wrong about it but at least it works so it will have to do right now.
@@ -52,6 +65,8 @@ namespace HomeController.utils
 
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
             var path = localFolder.Path;
+
+//path = @"c:\temp\";   
 
             int count = 1;
             string countString = "";
@@ -61,10 +76,12 @@ namespace HomeController.utils
                 {
                     // C:\Users\makl\AppData\Local\Packages\9c6bbe75-87fc-407f-9ad3-a5035f3268a0_n0repxk218c66\LocalState
                     //await Task.Run(() => File.AppendAllText(Path.Combine(path, "rpi.txt"),
-                        //now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
+                    //now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
 
-                    File.AppendAllText(Path.Combine(path, "rpi.txt"),
-                        now.ToString(Definition.StandardDateTimeFormat+".ff") + countString + ": " + text + "\r\n");
+                    string stringToWrite = now.ToString(Definition.StandardDateTimeFormat + ".ff") + countString +
+                                           ": " + text + "\r\n";
+                    File.AppendAllText(Path.Combine(path, fileName), stringToWrite);
+                    Debug.WriteLine(stringToWrite);
                     break;
                 }
                 catch (IOException ex)
@@ -72,9 +89,15 @@ namespace HomeController.utils
                     int a = 0;
                     Task.Delay(1).Wait();
                 }
+
                 count++;
                 countString = " [" + count + "]";
             }
+        }
+
+        public static void Logg(string category, string s)
+        {
+            Logg(category, s, "rpi.txt");
         }
     }
 }

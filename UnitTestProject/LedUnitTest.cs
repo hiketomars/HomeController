@@ -80,6 +80,8 @@ namespace UnitTestProject
         [TestMethod] // Ready
         public void L1_Generally_When_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked_Expect_CorrectLedLight()
         {
+            System.Diagnostics.Debug.WriteLine("hej");
+            Logger.Logg(Logger.Test, "Running test L1.");
             // Door is closed and unlocked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);

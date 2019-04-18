@@ -9,6 +9,7 @@ using HomeController.config;
 using HomeController.model;
 using HomeController.service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.AppContainer;
 using Moq;
 
 namespace UnitTestProject
@@ -131,7 +132,8 @@ namespace UnitTestProject
                 null, altanenDoorSirenMock.Object, altanenDoorSirenControllerMock.Object);
 
             // Use mocks for doorControllers
-            frontDoorLcu.LcuDoorController = frontDoorControllerMock.Object;
+            frontDoorLcu.
+LcuDoorController = frontDoorControllerMock.Object;
             backDoorLcu.LcuDoorController = frontDoorControllerMock.Object;
             altanenDoorLcu.LcuDoorController = frontDoorControllerMock.Object;
             RemoteMockService.UseMocks = true;
@@ -151,5 +153,92 @@ namespace UnitTestProject
             //Assert.IsTrue(RemoteCentralUnitsController.GetInstance().IsAnyRemoteDoorUnlocked(),
             //    "All other doors except for one are locked but controller thinks all are locked.");
         }
+
+        [UITestMethod]
+        public void C20_IntrusionOccursAtOneRemoteLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtLocalCentralUnit()
+        {
+
+            // Sätt upp tre lcu:er med mockad siren och dörr. Dess remote controller och dess proxies ska inte vara mockade.
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler(
+                    new List<IRemoteCentralUnitProxy>()
+                    {
+                        new RemoteCentralUnitProxy("Baksidan", "192.168.11.2", "80"),
+                        //new RemoteCentralUnitProxy("Altanen", "192.168.11.3", "80")
+                    }
+                );
+            ConfigHandler configHandlerBackDoor = new ConfigHandler(
+                new List<IRemoteCentralUnitProxy>()
+                {
+                    new RemoteCentralUnitProxy("Framsidan", "192.168.11.1", "80"),
+                    //new RemoteCentralUnitProxy("Altanen", "192.168.11.3", "80")
+                }
+            );
+
+            string lcuFrontdoorName = "Framsidan";
+            string lcuBackdoorName = "Baksidan";
+            //string lcuAltanenName = "Altanen";
+
+            string lcuFrontdoorIp = "192.168.11.1";
+            string lcuBackdoorIp = "192.168.11.2";
+            //string lcuAltanenIp = "192.168.11.3";
+
+            // Front door
+            frontDoorLcu = new LocalCentralUnit(configHandlerFrontDoor);
+            frontDoorLcu.LcuDoorController.Door = frontDoorMock.Object;
+            frontDoorLcu.LcuSirenController.Siren= frontDoorSirenMock.Object;
+            frontDoorLcu.StartSurveillance();
+
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 3, "(1)Front door LCU does not have 3 remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+
+            // Back door
+            backDoorLcu = new LocalCentralUnit(configHandlerBackDoor);
+            backDoorLcu.LcuDoorController.Door = backDoorMock.Object;
+            backDoorLcu.LcuSirenController.Siren = backDoorSirenMock.Object;
+            backDoorLcu.StartSurveillance();
+
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 3, "(2)Front door LCU does not have 3 remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+
+            // Altanen door
+            //altanenDoorLcu = new LocalCentralUnit();
+            //altanenDoorLcu.LcuDoorController.Door = altanenDoorMock.Object;
+            //altanenDoorLcu.LcuSirenController.Siren = altanenDoorSirenMock.Object;
+            //altanenDoorLcu.StartSurveillance();
+
+            Task.Delay(2000).Wait();
+
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 3, "(3)Front door LCU does not have 3 remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.VerifyContact(), "Front door LCU does not have contact with all the other remote LCU:s.");
+
+            // Activate alarm. Activating it at the front door shall activate the alarm on all lcu:s.
+            frontDoorLcu.ActivateAlarm(0);
+            Task.Delay(2000).Wait();
+
+            // Check that alarm really is active on all LCU:s now.
+            Assert.IsTrue(frontDoorLcu.LcuAlarmHandler.IsAlarmActive, "Alarm not active for front door LCU");
+            Assert.IsTrue(backDoorLcu.LcuAlarmHandler.IsAlarmActive, "Alarm not active for back door LCU");
+            Assert.IsTrue(altanenDoorLcu.LcuAlarmHandler.IsAlarmActive, "Alarm not active for altanen LCU");
+
+            Assert.IsFalse(frontDoorLcu.LcuRemoteCentralUnitsController.HasIntrusionOccurred(),
+                "No intrusion at any door but controller does not think so.");
+            Task.Delay(2000).Wait();
+
+            // Setup intrusion.
+            backDoorLcu.LcuAlarmHandler.EntranceDelayMs = 0;
+            backDoorMock.Setup(f => f.IsOpen).Returns(true);
+            Task.Delay(2000).Wait();
+
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.HasIntrusionOccurred(),
+                "Intrusion at back door but controller does not think so.");
+
+            // Verify that backdoor lcu is alarming
+            Assert.IsTrue(backDoorLcu.LcuAlarmHandler.CurrentStatus == AlarmHandler.AlarmActivityStatus.Siren, "Back dorr LCU is not alarming");
+
+            // Verify that siren is turned on all LCU:s.
+            frontDoorSirenControllerMock.Verify(f => f.TurnOn(), Times.AtLeastOnce, "Siren not turned on at front door"); // Will be called many times...
+            backDoorSirenControllerMock.Verify(f => f.TurnOn(), Times.AtLeastOnce, "Siren not turned on at back door"); // Will be called many times...
+            altanenDoorSirenControllerMock.Verify(f => f.TurnOn(), Times.AtLeastOnce, "Siren not turned on at altanen"); // Will be called many times...
+
+        }
+
     }
 }

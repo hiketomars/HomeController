@@ -119,6 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="comm\CommunicationResponse.cs" />
     <Compile Include="comm\GpioConnector.cs" />
     <Compile Include="config\IConfigHandler.cs" />
     <Compile Include="comm\LocalCentralUnit.cs" />
@@ -145,12 +146,15 @@
     <Compile Include="model\LEDController.cs" />
     <Compile Include="model\LedFlashPattern.cs" />
     <Compile Include="model\LedHandler.cs" />
+    <Compile Include="model\RemoteLcuResponse.cs" />
     <Compile Include="model\RemoteLcuStatus.cs" />
+    <Compile Include="model\RemoteMessage.cs" />
     <Compile Include="model\RgbLed.cs" />
     <Compile Include="model\RGBLEDPeriod.cs" />
     <Compile Include="model\Siren.cs" />
     <Compile Include="model\ISirenController.cs" />
     <Compile Include="model\SirenController.cs" />
+    <Compile Include="model\ITransferObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="service\RemoteFactory.cs" />
     <Compile Include="service\RemoteMockService.cs" />

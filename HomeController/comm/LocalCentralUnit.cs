@@ -55,7 +55,7 @@ namespace HomeController.comm {
             {
                 return instance;
             }
-            return new LocalCentralUnit();
+            return new LocalCentralUnit(null);//todo 190418
         }
 
         // Can be used to inject a config handler before
@@ -68,15 +68,18 @@ namespace HomeController.comm {
 
         //public IRemoteCentralUnitsController RemoteCentralUnitsController { get; set; }
 
-        public LocalCentralUnit()
+        //public LocalCentralUnit(): this(new ConfigHandler())
+        //{
+        //}
+
+        public LocalCentralUnit(IConfigHandler configHandler)
         {
             instance = this;
-            //this.LcuConfigHandler = lcuConfigHandler;
 
-            if (LcuConfigHandler == null)
-            {
-                LcuConfigHandler = new ConfigHandler();
-            }
+            //if (LcuConfigHandler == null)
+            //{
+            //    LcuConfigHandler = new ConfigHandler();
+            //}
 
             // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
             // Door
@@ -92,7 +95,7 @@ namespace HomeController.comm {
 
             // Remote Central Unit Controller
             LcuRemoteCentralUnitsController = new RemoteCentralUnitsController();
-            LcuRemoteCentralUnitsController.Setup(this);
+            //LcuRemoteCentralUnitsController.Setup(this);
             // Siren
             var lcuSiren = HouseModelFactory.GetSiren();
             var lcuSirenController = new SirenController();
@@ -101,12 +104,6 @@ namespace HomeController.comm {
 
             LcuRemoteCentralUnitsController.SendStartUpMessage();
         }
-
-
-        //private void BackdoorRemoteCentralUnit_RemoteLcuStatusHasChanged(string todoType)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
 
         // Constructor for unit tests.
@@ -119,7 +116,6 @@ namespace HomeController.comm {
         {
             // Get and set the name for this LCU.
             SetName();
-
             // LED
             DoorLed = doorLed;
             LcuLedController = ledController;
@@ -164,6 +160,8 @@ namespace HomeController.comm {
         // It is typcally called once a second or more and checks for local and remote statuses and might start actions as a reaction of that.
         private void SurveillancePoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
+            Logger.Logg(Logger.LCU, "Time to do surveillance!");
+
             // Check for different alarm situations, local or remote.
             LcuAlarmHandler.CheckSituation();
 

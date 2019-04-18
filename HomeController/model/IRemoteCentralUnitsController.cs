@@ -14,5 +14,8 @@ namespace HomeController.model
         bool IsAnyRemoteDoorUnlocked();
         void SendStartUpMessage();
         void Setup(LocalCentralUnit localCentralUnit);
+        bool VerifyContact();
+        //void StatusHasChanged(AlarmHandler.AlarmActivityStatus currentStatus);
+        int RemoteCentralUnitsCount { get; }
     }
 }

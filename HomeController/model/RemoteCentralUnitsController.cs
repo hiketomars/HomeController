@@ -24,7 +24,7 @@ namespace HomeController.model
     public class RemoteCentralUnitsController : IRemoteCentralUnitsController
     {
 
-        private LocalCentralUnit lcu;
+        //private LocalCentralUnit lcu;
         private readonly IRemoteCentralUnitProxy rcu;
 
         
@@ -53,6 +53,8 @@ namespace HomeController.model
             this.remoteCentralUnitProxies = remoteCentralUnitProxies;
         }
 
+        public int RemoteCentralUnitsCount => remoteCentralUnitProxies.Count;
+
 
         public void ActivateRemoteCentralUnits()
         {
@@ -72,7 +74,7 @@ namespace HomeController.model
 
         public void Setup(LocalCentralUnit lcu)
         {
-            this.lcu = lcu;
+            //this.lcu = lcu;
 
             //this.configHandler = configHandler;
 
@@ -90,6 +92,31 @@ namespace HomeController.model
 
         }
 
+        public bool VerifyContact()
+        {
+            foreach (var remoteCentralUnitProxy in remoteCentralUnitProxies)
+            {
+                var contact = remoteCentralUnitProxy.SendPingMessage();
+                if (!contact)
+                {
+                    Logger.Logg("VerifyContact: No contact with " + remoteCentralUnitProxy.Name);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+/* Jag tror inte jag behöver tala om att status har ändrats. De får fråga så svarar jag.
+        // Inform other LCU:s that our status has changed.
+        public void StatusHasChanged(AlarmHandler.AlarmActivityStatus currentStatus)
+        {
+            foreach(var remoteCentralUnitProxy in remoteCentralUnitProxies)
+            {
+                remoteCentralUnitProxy.SendStateChangedMessage(currentStatus);
+                Logger.Logg("Informed " + remoteCentralUnitProxy.Name + " that the state of "+LocalCentralUnit.GetInstance().Name+" has changed to "+currentStatus);
+            }
+        }
+*/
         private void remoteCentralUnit_RemoteLcuStatusHasChanged(string todotype)
         {
             throw new NotImplementedException();
