@@ -14,7 +14,7 @@ namespace HomeController.model
     /// </summary>
     public class HouseHandler : IHouseModel
     {
-        private readonly LocalCentralUnit lcu;
+        //private readonly LocalCentralUnit lcu;
         public bool AlarmIsActive { get; set; }
 
         //private RemoteCentralUnit BackdoorRemoteCentralUnit;
@@ -22,9 +22,8 @@ namespace HomeController.model
         /// <summary>
         /// Constructs the one and only HouseHandler which is the model in the MVP.
         /// </summary>
-        public HouseHandler(LocalCentralUnit lcu)
+        public HouseHandler()
         {
-            this.lcu = lcu;
         }
 
         public void InitHouseHandler() { 
@@ -108,12 +107,11 @@ namespace HomeController.model
         }
 
         private static HouseHandler houseHandler;
-        public static HouseHandler GetInstance(LocalCentralUnit lcu)
+        public static HouseHandler GetInstance()
         {
             if (houseHandler == null)
             {
-                houseHandler = new HouseHandler(lcu);
-                //houseHandler.InitHouseHandler();
+                houseHandler = new HouseHandler();
             }
 
             return houseHandler;

@@ -15,6 +15,19 @@ namespace HomeController.utils
         public const string LCU = "LCU";
         public const string Test = "Test";
 
+        static  Logger()
+        {
+            try
+            {
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                var path = localFolder.Path;
+                Debug.WriteLine("Path is " + path);
+            }
+            catch 
+            {
+            }
+        }
+
         public static async void Logg(string text)
         {
             Logg(null, text, "rpi.txt");

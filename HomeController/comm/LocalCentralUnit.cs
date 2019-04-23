@@ -364,7 +364,7 @@ namespace HomeController.comm {
         {
             Logger.Logg(text);
             loggings.Add(text);
-            HouseHandler.GetInstance(this).SendEventThatModelHasChanged();
+            HouseHandler.GetInstance().SendEventThatModelHasChanged();
         }
 
  
