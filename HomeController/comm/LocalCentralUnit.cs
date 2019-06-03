@@ -22,22 +22,29 @@ namespace HomeController.comm {
     /// Local Central Unit is in control of the local equipment.
     /// Typically this is a door with a LED, a siren. Also it has communication channels to other LCU:s, RemoteCentralUnits.
     /// </summary>
-    public class LocalCentralUnit
+    public class LocalCentralUnit : ILocalCentralUnit
     {
         //private DispatcherTimer timer;
         private ThreadPoolTimer SurveillancePoolTimer;
-        public AlarmHandler LcuAlarmHandler { get; set; }
+        public IAlarmHandler LcuAlarmHandler { get; set; }
         public LedHandler LcuLedHandler;
 
         private IRemoteCentralUnitsController lcuRemoteCentralUnitsController;
 
+        //public HomeStatus CurrentHomeStatus;
+
+        // Latest status that has been gathered from all RCU:s and the LCU.
+        public CompoundStatus LatestCompoundStatus;
+
+        
         public IRemoteCentralUnitsController LcuRemoteCentralUnitsController
         {
             get
             {
                 if (lcuRemoteCentralUnitsController == null)
                 {
-                    lcuRemoteCentralUnitsController = new RemoteCentralUnitsController();
+                    throw new Exception("Should never occur. A Controller should always have been created in the constructor");
+                    lcuRemoteCentralUnitsController = new RemoteCentralUnitsController(this, LcuConfigHandler.GetRemoteLcus());
                 }
 
                 return lcuRemoteCentralUnitsController;
@@ -47,19 +54,19 @@ namespace HomeController.comm {
 
         //public ConfigHandler LcuConfigHandler;
 
-        private static LocalCentralUnit instance;
+        //private static LocalCentralUnit instance;
 
-        public static LocalCentralUnit GetInstance()
-        {
-            if (instance != null)
-            {
-                return instance;
-            }
-            return new LocalCentralUnit(null);//todo 190418
-        }
+        //public static LocalCentralUnit GetInstance()
+        //{
+        //    if (instance != null)
+        //    {
+        //        return instance;
+        //    }
+        //    return new LocalCentralUnit(null);//todo 190418
+        //}
 
         // Can be used to inject a config handler before
-        public static IConfigHandler LcuConfigHandler { get; set; }
+        public IConfigHandler LcuConfigHandler { get; set; }
 
         // Constructor for normal use (not unit tests).
         //public LocalCentralUnit() : this(new ConfigHandler())
@@ -72,14 +79,15 @@ namespace HomeController.comm {
         //{
         //}
 
+        private IConfigHandler configHandler;
+
         public LocalCentralUnit(IConfigHandler configHandler)
         {
-            instance = this;
+            Logger.Logg(configHandler.GetLCUName(), Logger.LCU_Cat,
+                "Creating Lcu with name " + configHandler.GetLCUName());
 
-            //if (LcuConfigHandler == null)
-            //{
-            //    LcuConfigHandler = new ConfigHandler();
-            //}
+            this.configHandler = configHandler;
+            SetName();
 
             // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
             // Door
@@ -88,23 +96,18 @@ namespace HomeController.comm {
 
             // LED
             var doorLed = HouseModelFactory.GetRgbLed();
-            var ledController = new LEDController(doorLed);
-
-            // var remoteCentralUnit  = BackdoorRemoteCentralUnit;
-
+            var ledController = new LEDController(this, doorLed);
 
             // Remote Central Unit Controller
-            LcuRemoteCentralUnitsController = new RemoteCentralUnitsController();
-            //LcuRemoteCentralUnitsController.Setup(this);
+            LcuRemoteCentralUnitsController = new RemoteCentralUnitsController(this, configHandler.GetRemoteLcus());
+LcuRemoteCentralUnitsController.Setup(this);
             // Siren
             var lcuSiren = HouseModelFactory.GetSiren();
-            var lcuSirenController = new SirenController();
+            var lcuSirenController = new SirenController(this);
 
             SetupLcu(door, doorLed, ledController, LcuRemoteCentralUnitsController, lcuSiren, lcuSirenController);
-
             LcuRemoteCentralUnitsController.SendStartUpMessage();
         }
-
 
         // Constructor for unit tests.
         public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
@@ -114,8 +117,6 @@ namespace HomeController.comm {
 
         private void SetupLcu(IDoor door, IRgbLed doorLed, ILEDController ledController, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
-            // Get and set the name for this LCU.
-            SetName();
             // LED
             DoorLed = doorLed;
             LcuLedController = ledController;
@@ -136,11 +137,12 @@ namespace HomeController.comm {
 
             // Remote central units
             LcuRemoteCentralUnitsController = remoteCentralUnitsController;
+            LcuRemoteCentralUnitsController.Lcu = this;
 
             // Perform start sequence.
             //LcuLedController.PerformStartUpLedFlash();
 
-            
+
             //timer = new DispatcherTimer();
             //timer.Interval = TimeSpan.FromMilliseconds(1000);
             //timer.Tick += Timer_Tick;
@@ -150,25 +152,62 @@ namespace HomeController.comm {
 
         public ISirenController LcuSirenController { get; set; }
 
-        public void StartSurveillance()
+        public void StartSurveillance(bool startReceivers = true)
         {
             // Start never ending timer loop
             SurveillancePoolTimer = ThreadPoolTimer.CreatePeriodicTimer(SurveillancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(1000));
+            if (startReceivers)
+            {
+                StartReceivers();
+                Logger.Logg(Name,Logger.LCU_Cat, "Starting surveillance and receivers.");
+            }
+            else
+            {
+                Logger.Logg(Name, Logger.LCU_Cat, "Starting surveillance but NOT receivers.");
+            }
+        }
+
+        public void StartReceivers()
+        {
+            LcuRemoteCentralUnitsController.StartReceiverOnAllProxys();
+        }
+
+        public void StopSurveillance()
+        {
+            SurveillancePoolTimer.Cancel();
+
         }
 
         // This is the central surveillance loop.
         // It is typcally called once a second or more and checks for local and remote statuses and might start actions as a reaction of that.
         private void SurveillancePoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
-            Logger.Logg(Logger.LCU, "Time to do surveillance!");
+            Logger.Logg(Name, Logger.LCU_Cat, "Time to do surveillance!");
+
+            // First we need to find out the current overall (compound) status of the home.
+            var compoundStatus = LcuRemoteCentralUnitsController.GetCompoundStatus();
+            var localLcuStatus = GetLocalStatus();
+            compoundStatus.AddLocalStatus(localLcuStatus);
+            // The compound status is now ready.
+
+            LatestCompoundStatus = compoundStatus; 
+
 
             // Check for different alarm situations, local or remote.
             LcuAlarmHandler.CheckSituation();
 
             // The color and pattern of the local LED might be affected of remote statuses.
-            LcuLedHandler.SetLedCorrectly();
+// Setting LED causes problems during debug "wrong thread".
+// Temporarily commented. maklchange SetLedCorrectly not invoked now.
+//LcuLedHandler.SetLedCorrectly();
 
         }
+
+        //private CompoundStatus CalculateCurrentCompoundStatus()
+        //{
+        //    //compoundStatus.GetNewestAlarmStatus()
+        //    return null;
+        //}
 
         public string Name { get; set; }
 
@@ -253,10 +292,13 @@ namespace HomeController.comm {
         // Turns the alarm on so that it will start monitoring doors etc.
         public void ActivateAlarm(int delayInMs)
         {
+Logger.Logg(this.Name, Logger.LCU_Cat, "Entering Lcu.ActivateAlarm.");
             LcuAlarmHandler.ActivateAlarm(delayInMs);
             //IsAlarmActive = true;
             //Action checkTheDoor = CheckDoor;
             //Task.Run(checkTheDoor);
+Logger.Logg(this.Name, Logger.LCU_Cat, "Leaving Lcu.ActivateAlarm.");
+
         }
 
         //private void CheckDoor()
@@ -333,7 +375,7 @@ namespace HomeController.comm {
 
         private void SetName()
         {
-            var configName = GetNameFromConfigFile();
+            var configName = GetNameFromConfig();
             Name = configName;
 
             // Use the MAC-address as the name.
@@ -341,8 +383,12 @@ namespace HomeController.comm {
             //Name = MacAddress +";" + configName;
         }
 
-        private string GetNameFromConfigFile()
+        private string GetNameFromConfig()
         {
+            if (configHandler != null)
+            {
+                return configHandler.GetLCUName();
+            }
             var name = "ErrorReadingLCUName";
             try
             {
@@ -358,11 +404,12 @@ namespace HomeController.comm {
 
         private List<string> loggings = new List<string>();
         private IRgbLed DoorLed { get; set; }
+        public int Id { get; set; }
 
         // Adds an item to the list of loggings.
         public void AddLogging(string text)
         {
-            Logger.Logg(text);
+            Logger.Logg(Name, text);
             loggings.Add(text);
             HouseHandler.GetInstance().SendEventThatModelHasChanged();
         }
@@ -371,9 +418,9 @@ namespace HomeController.comm {
         // Stops timers, turns off LED and siren.
         public void Reset()
         {
-            LcuDoorController.Reset();
-            LcuLedController.Reset();
-            LcuSirenController.Reset();
+            LcuDoorController?.Reset();
+            LcuLedController?.Reset();
+            LcuSirenController?.Reset();
         }
 
         //public void SetupRemoteLCUCommunication()
@@ -381,6 +428,15 @@ namespace HomeController.comm {
         //    StartListeningOnRemoteLcu();
         //    SendCommandToRemoteLcu(TODO);
         //}
+        public LocalLcuStatus GetLocalStatus()
+        {
+            return new LocalLcuStatus()
+            {
+                IsDoorLocked = LcuDoorController.IsDoorLocked(),
+                IsDoorOpen = LcuDoorController.IsDoorOpen(),
+                AlarmActivity = LcuAlarmHandler.CurrentLocalStatus
+            };
+        }
     }
 }
 

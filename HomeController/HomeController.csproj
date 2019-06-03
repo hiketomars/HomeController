@@ -124,7 +124,16 @@
     <Compile Include="config\IConfigHandler.cs" />
     <Compile Include="comm\LocalCentralUnit.cs" />
     <Compile Include="config\ConfigHandler.cs" />
+    <Compile Include="model\CompoundStatus.cs" />
+    <Compile Include="model\CurrentStatusMessage.cs" />
+    <Compile Include="model\IAlarmHandler.cs" />
+    <Compile Include="model\ILocalCentralUnit.cs" />
+    <Compile Include="model\RequestRcuStatusMessage.cs" />
+    <Compile Include="model\HomeStatus.cs" />
+    <Compile Include="model\ILcuStatus.cs" />
     <Compile Include="model\IRemoteCentralUnitProxy.cs" />
+    <Compile Include="model\LocalLcuStatus.cs" />
+    <Compile Include="model\RemoteCentralUnitConfiguration.cs" />
     <Compile Include="model\RemoteCentralUnitProxy.cs" />
     <Compile Include="model\RemoteCentralUnitsController.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -147,8 +156,6 @@
     <Compile Include="model\LedFlashPattern.cs" />
     <Compile Include="model\LedHandler.cs" />
     <Compile Include="model\RemoteLcuResponse.cs" />
-    <Compile Include="model\RemoteLcuStatus.cs" />
-    <Compile Include="model\RemoteMessage.cs" />
     <Compile Include="model\RgbLed.cs" />
     <Compile Include="model\RGBLEDPeriod.cs" />
     <Compile Include="model\Siren.cs" />

@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace HomeController.model
 {
-    public interface ITransferObject
+    public interface ITransferObject : ILcuStatus
     {
-        string Message { get; set; }
+        string MessageType { get; }
         string Id { get; set; }
+        string CompleteMessageStringToSend { get; }
+        string ToString();
     }
 }

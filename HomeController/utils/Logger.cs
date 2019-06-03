@@ -6,33 +6,64 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using System.Diagnostics;
+using Castle.DynamicProxy.Generators;
 
 namespace HomeController.utils
 {
     public class Logger
     {
-        public const string RCUProxy = "RCUProxy";
-        public const string LCU = "LCU";
-        public const string Test = "Test";
 
-        static  Logger()
+        // Logging categories.
+        public const string LCU_Cat = "LCU";
+        public const string LEDCtrl_Cat = "LEDCtrl";
+        public const string RCUProxy_Cat = "RCUProxy";
+        public static string RCUCtrl_Cat = "RCUCtrl";
+        public static string MainPresenter_Cat = "MainPres";
+
+        public const string Test_Cat = "Test";
+        private static object locker = new object();
+        private static DirectoryInfo loggFolder;
+
+        private const bool LoggLoggTypeEntering = false;
+        private const bool LoggLoggTypeLeaving = false;
+
+        static Logger()
         {
             try
             {
-                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                var path = localFolder.Path;
-                Debug.WriteLine("Path is " + path);
+                var localRoot = ApplicationData.Current.LocalFolder.Path;
+                loggFolder = new DirectoryInfo(localRoot + "\\hclogg");
+                if (!loggFolder.Exists)
+                {
+                    loggFolder.Create();
+                }
+                ////StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                //var path = localFolder.Path;
+                //loggFolder = new DirectoryInfo(localRoot + "\\logg");
+
+                Debug.WriteLine("LoggFolder is " + loggFolder);
             }
-            catch 
+            catch
             {
+                int a = 0;
             }
         }
 
-        public static async void Logg(string text)
+        //public enum LogginInstance {
+        //    frontDoorLcu, backDoorLcu, altanen
+        //};
+
+        public static async void Logg(string instance, string text)
         {
             Logg(null, text, "rpi.txt");
         }
-        public static async void Logg(string category, string text, string fileName)
+
+        public static void Logg(string instance, string category, string text)
+        {
+            Logg(instance, category, text, "rpi.txt");
+        }
+
+        public static async void Logg(string instance, string category, string text, string fileName)
         {
             #region Unused Code
             //using (StreamWriter outputFile = new StreamWriter(new FileStream(@"c:\temp\rpi.txt", FileMode.Append)))
@@ -67,50 +98,65 @@ namespace HomeController.utils
             //});
             #endregion
 
-            if (category != null)
+            if (text.StartsWith("Entering") && !LoggLoggTypeEntering)
             {
-                text = category + "; " + text;
+                return;
             }
-            // This is not a very nice way to write to a log file since we need to make several attempts.
-            // The exception is about the text file itself: "because it is being used by another process"
-            // There is something fundamental wrong about it but at least it works so it will have to do right now.
-            var now = DateTime.Now;
+            if(text.StartsWith("Leaving") && !LoggLoggTypeLeaving)
+            {
+                return;
+            }
 
-            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            var path = localFolder.Path;
+            lock(locker)
+            {
+                if (category != null)
+                {
+                    text = category + "; " + text;
+                }
+                if(instance != null)
+                {
+                    if (instance.ToLower().Contains("back"))
+                    {
+                        text = "     " + instance + "; " + text;
+                    }
+                    text = instance + "; " + text;
+                }
+                // This is not a very nice way to write to a log file since we need to make several attempts.
+                // The exception is about the text file itself: "because it is being used by another process"
+                // There is something fundamental wrong about it but at least it works so it will have to do right now.
+                var now = DateTime.Now;
+
+                //StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                //var path = localFolder.Path;
 
 //path = @"c:\temp\";   
 
-            int count = 1;
-            string countString = "";
-            while (count < 10)
-            {
-                try
+                int count = 1;
+                string countString = "";
+                while (count < 10)
                 {
-                    // C:\Users\makl\AppData\Local\Packages\9c6bbe75-87fc-407f-9ad3-a5035f3268a0_n0repxk218c66\LocalState
-                    //await Task.Run(() => File.AppendAllText(Path.Combine(path, "rpi.txt"),
-                    //now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
+                    try
+                    {
+                        // C:\Users\makl\AppData\Local\Packages\9c6bbe75-87fc-407f-9ad3-a5035f3268a0_n0repxk218c66\LocalState
+                        //await Task.Run(() => File.AppendAllText(Path.Combine(path, "rpi.txt"),
+                        //now.ToString(Definition.StandardDateTimeFormat) + countString + ": " + text + "\r\n"));
 
-                    string stringToWrite = now.ToString(Definition.StandardDateTimeFormat + ".ff") + countString +
-                                           ": " + text + "\r\n";
-                    File.AppendAllText(Path.Combine(path, fileName), stringToWrite);
-                    Debug.WriteLine(stringToWrite);
-                    break;
-                }
-                catch (IOException ex)
-                {
-                    int a = 0;
-                    Task.Delay(1).Wait();
-                }
+                        string stringToWrite = now.ToString(Definition.StandardDateTimeFormat + ".ff") + countString +
+                                               ": " + text + "\r\n";
+                        File.AppendAllText(Path.Combine(Logger.loggFolder.FullName, fileName), stringToWrite);
+                        Debug.WriteLine(stringToWrite);
+                        break;
+                    }
+                    catch (IOException ex)
+                    {
+                        int a = 0;
+                        Task.Delay(1).Wait();
+                    }
 
-                count++;
-                countString = " [" + count + "]";
+                    count++;
+                    countString = " [" + count + "]";
+                }
             }
-        }
-
-        public static void Logg(string category, string s)
-        {
-            Logg(category, s, "rpi.txt");
         }
     }
 }

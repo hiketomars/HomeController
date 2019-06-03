@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
+using Windows.Storage;
 using HomeController.comm;
 using HomeController.model;
 using HomeController.utils;
@@ -10,6 +13,7 @@ using Moq;
 using Assert = NUnit.Framework.Assert;
 using NUnit;
 using NUnit.Framework;
+
 
 namespace UnitTestProject
 {
@@ -71,8 +75,9 @@ namespace UnitTestProject
         [TestCleanup]
         public void DoClean()
         {
-            lcu.Reset();
+            lcu?.Reset();
         }
+
 
         // LED
 
@@ -81,7 +86,16 @@ namespace UnitTestProject
         public void L1_Generally_When_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked_Expect_CorrectLedLight()
         {
             System.Diagnostics.Debug.WriteLine("hej");
-            Logger.Logg(Logger.Test, "Running test L1.");
+
+
+            var localRoot = ApplicationData.Current.LocalFolder.Path;
+            DirectoryInfo d = new DirectoryInfo(localRoot + "\\test");
+            if (!d.Exists)
+            {
+                d.Create();
+            }
+
+            Logger.Logg("L1", Logger.Test_Cat, "Running test L1.");
             // Door is closed and unlocked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);

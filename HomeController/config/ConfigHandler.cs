@@ -26,16 +26,22 @@ namespace HomeController.config
     //}
     public class ConfigHandler : IConfigHandler
     {
-        private List<IRemoteCentralUnitProxy> remoteLcus;
-
-        public ConfigHandler(List<IRemoteCentralUnitProxy> remoteLcus)
+        private List<IRemoteCentralUnitConfiguration> remoteLcus;
+        private string LCUName;
+        public ConfigHandler(string lcuName, List<IRemoteCentralUnitConfiguration> remoteLcus)
         {
             this.remoteLcus = remoteLcus;
+            LCUName = lcuName;
 
         }
-        public List<IRemoteCentralUnitProxy> GetRemoteLcus()
+        public List<IRemoteCentralUnitConfiguration> GetRemoteLcus()
         {
             return remoteLcus;
+        }
+
+        public string GetLCUName()
+        {
+            return LCUName;
         }
     }
 

@@ -8,6 +8,7 @@ namespace HomeController.model
 {
     public interface ISirenController
     {
+        void TurnOn(int sirenDuranceMs);
         void TurnOn();
         void TurnOff();
         bool IsOn { get; }

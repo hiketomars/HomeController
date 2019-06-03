@@ -9,7 +9,7 @@ namespace HomeController.model
 {
     public interface IRemoteCentralUnitProxy
     {
-        Task<string> SendCommand(string hostName, string command);
+        Task<string> SendCommandSpecific(string hostName, string command);
         bool HasIntrusionOccurred();
         bool HasIntrusionOccurredRemotely();
         bool IsDoorUnlocked();
@@ -18,9 +18,26 @@ namespace HomeController.model
         void ActivateCommunication();
         string Name { set; get; }
         string IpAddress { get; set; }
-        string PortNumber { get; set; }
+        //string PortNumber { get; set; }
+        CurrentStatusMessage RcuCurrentStatusMessage { get; set; }
         bool SendPingMessage();
-        void SendStateChangedMessage(AlarmHandler.AlarmActivityStatus currentStatus);
+        void SendRequestRcuStatusMessage();
+        //void SendCurrentStatusMessage(AlarmHandler.AlarmActivityStatus currentStatus);
+        void StartReceiver();
+        //void InformAboutNewAlarmStatus();
+    }
+
+    public interface IRemoteCentralUnitConfiguration
+    {
+        string Name { set; get; }
+        int Id { set; get; }
+        string IpAddress { get; set; }
+
+        string InitiatorPortNumber { get; set; }
+
+        string ResponderPortNumber { get; set; }
+        //string ActingPortNumber { get; set; } // Used for acting part when sending etc.
+        //string ReactingPortNumber { get; set; } // Used for reacting part when receiving etc.
 
     }
 }

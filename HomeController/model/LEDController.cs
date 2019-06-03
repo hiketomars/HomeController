@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using HomeController;
+using HomeController.comm;
 using HomeController.utils;
 
 namespace HomeController.model
@@ -13,13 +14,17 @@ namespace HomeController.model
     // En LEDController kan sköta en LED. Bland annat kan den få den att blinka enligt ett visst mönster.
     public class LEDController : ILEDController
     {
+        private readonly LocalCentralUnit lcu;
         private readonly IRgbLed rgbLed;
         private LedFlashPattern ledFlashPattern;
         private DispatcherTimer timer;
 
 
-        public LEDController(IRgbLed regbLed)
+        public LEDController(LocalCentralUnit lcu, IRgbLed regbLed)
         {
+            //maklchanged
+            return;
+            this.lcu = lcu;
             this.rgbLed = regbLed;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(0);
@@ -38,6 +43,11 @@ namespace HomeController.model
             {
                 throw new Exception("Must set a pattern");
             }
+//maklchanged
+if (timer == null)
+{
+    return;
+}
             timer.Interval = TimeSpan.FromMilliseconds(0);
             timer.Start();
         }
@@ -230,12 +240,12 @@ namespace HomeController.model
             {
                 // This RGBLEDPeriod specifies that the HoldValueMs is for eternity.
                 timer.Stop();
-                Logger.Logg("Timer in LEDController stopped.");
+                Logger.Logg(lcu.Name, Logger.LEDCtrl_Cat,"Timer in LEDController stopped.");
             }
             else
             {
                 timer.Interval = TimeSpan.FromMilliseconds(rgbLedPeriod.HoldValueMs);
-                //Logger.Logg("Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
+                //Logger.Logg(lcu.Name, "Soon leaving Timer_tick. Interval set to " + timer.Interval + " ms.");
             }
         }
     }

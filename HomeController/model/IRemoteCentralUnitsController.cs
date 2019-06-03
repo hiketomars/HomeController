@@ -17,5 +17,8 @@ namespace HomeController.model
         bool VerifyContact();
         //void StatusHasChanged(AlarmHandler.AlarmActivityStatus currentStatus);
         int RemoteCentralUnitsCount { get; }
+        LocalCentralUnit Lcu { get; set; }
+        void StartReceiverOnAllProxys();
+        CompoundStatus GetCompoundStatus();
     }
 }

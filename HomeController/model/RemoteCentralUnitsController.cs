@@ -29,28 +29,68 @@ namespace HomeController.model
 
         
         private IConfigHandler configHandler;
-        private List<IRemoteCentralUnitProxy> configuredRemoteCentralUnitProxys = new List<IRemoteCentralUnitProxy>();
+        //private List<IRemoteCentralUnitProxy> configuredRemoteCentralUnitProxys = new List<IRemoteCentralUnitProxy>();
         private List<IRemoteCentralUnitProxy> remoteCentralUnitProxies = new List<IRemoteCentralUnitProxy>();
 
-        // This constructor is for real use.
-        public RemoteCentralUnitsController()
+        //// This constructor is for real use.
+        //public RemoteCentralUnitsController(LocalCentralUnit lcu)
+        //{
+        //    configuredRemoteCentralUnitProxys = lcu.LcuConfigHandler.GetRemoteLcus();
+
+        //    foreach(var configuredRemoteCentralUnit in configuredRemoteCentralUnitProxys)
+        //    {
+        //        IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(lcu, configuredRemoteCentralUnit.Name, configuredRemoteCentralUnit.IpAddress, configuredRemoteCentralUnit.PortNumber);
+        //        //remoteCentralUnit.RemoteLcuStatusHasChanged += remoteCentralUnit_RemoteLcuStatusHasChanged;
+        //        remoteCentralUnitProxies.Add(remoteCentralUnit);
+
+        //    }
+
+        //}
+
+        public void StartReceiverOnAllProxys()
         {
-            configuredRemoteCentralUnitProxys = LocalCentralUnit.LcuConfigHandler.GetRemoteLcus();
-
-            foreach(var configuredRemoteCentralUnit in configuredRemoteCentralUnitProxys)
+            foreach (var configuredRemoteCentralUnit in remoteCentralUnitProxies)
             {
-                IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(configuredRemoteCentralUnit.Name, configuredRemoteCentralUnit.IpAddress, configuredRemoteCentralUnit.PortNumber);
-                //remoteCentralUnit.RemoteLcuStatusHasChanged += remoteCentralUnit_RemoteLcuStatusHasChanged;
-                remoteCentralUnitProxies.Add(remoteCentralUnit);
-
+                configuredRemoteCentralUnit.StartReceiver();
             }
-
         }
 
-        // This constructor is for test use.
+        // Collect the statuses from the LCU:s and finds out which one has most recently changed its alarm status.
+        public CompoundStatus GetCompoundStatus()
+        {
+            DateTime newestAlarmStatus = new DateTime(1970, 1, 1, 0, 0, 0);
+            //RemoteLcuStatus newestLcuStatus = configuredRemoteCentralUnitProxys[0].RemoteLcuStatus; 
+            IRemoteCentralUnitProxy mostRecentChangedLcu = remoteCentralUnitProxies[0]; // Initiate //todo Kan det vara så att vi inte har några RCU:er?
+
+            var compoundStatus = new CompoundStatus();
+            foreach(var configuredRemoteCentralUnit in remoteCentralUnitProxies)
+            {
+                compoundStatus.LcuStatuses.Add(configuredRemoteCentralUnit.RcuCurrentStatusMessage);
+
+                if (configuredRemoteCentralUnit.RcuCurrentStatusMessage.StatusTime > mostRecentChangedLcu.RcuCurrentStatusMessage.StatusTime)
+                {
+                    mostRecentChangedLcu = configuredRemoteCentralUnit;
+                }
+            }
+
+            compoundStatus.MostRecentChangedLcu = mostRecentChangedLcu;
+            return compoundStatus;
+        }
+
+        public LocalCentralUnit Lcu { get; set; }
+        private List<IRemoteCentralUnitConfiguration> remoteCentralUnitConfigurations;
+
+        // This constructor is used by unit tests.
         public RemoteCentralUnitsController(List<IRemoteCentralUnitProxy> remoteCentralUnitProxies)
         {
             this.remoteCentralUnitProxies = remoteCentralUnitProxies;
+        }
+        
+        // This constructor is for test use.
+        public RemoteCentralUnitsController(LocalCentralUnit lcu, List<IRemoteCentralUnitConfiguration> remoteCentralUnitConfigurations)
+        {
+            Lcu = lcu;
+            this.remoteCentralUnitConfigurations = remoteCentralUnitConfigurations;
         }
 
         public int RemoteCentralUnitsCount => remoteCentralUnitProxies.Count;
@@ -72,16 +112,13 @@ namespace HomeController.model
         //}
 
 
+        // If this RemoteCentralUnitsController has been created from a list of RemoteCentralUnitConfigurations then
+        // this Setup has to be called to create the actual list of CentralUnitProxies.
         public void Setup(LocalCentralUnit lcu)
         {
-            //this.lcu = lcu;
-
-            //this.configHandler = configHandler;
-
-
-            foreach(var configuredRemoteCentralUnit in configuredRemoteCentralUnitProxys)
+            foreach(var remoteCentralUnitConfiguration in remoteCentralUnitConfigurations)
             {
-                IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(configuredRemoteCentralUnit.Name, configuredRemoteCentralUnit.IpAddress, configuredRemoteCentralUnit.PortNumber);
+                IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(lcu, remoteCentralUnitConfiguration.Name, remoteCentralUnitConfiguration.Id, remoteCentralUnitConfiguration.IpAddress, remoteCentralUnitConfiguration.InitiatorPortNumber, remoteCentralUnitConfiguration.ResponderPortNumber);
                 //remoteCentralUnit.RemoteLcuStatusHasChanged += remoteCentralUnit_RemoteLcuStatusHasChanged;
                 remoteCentralUnitProxies.Add(remoteCentralUnit);
                 remoteCentralUnit.ActivateCommunication(); // StartListeningOnRemoteLcu();
@@ -89,8 +126,8 @@ namespace HomeController.model
             }
 
             //backdoorRemoteCentralUnit.RemoteLcuStatusHasChanged += remoteCentralUnit_RemoteLcuStatusHasChanged;
-
         }
+
 
         public bool VerifyContact()
         {
@@ -99,7 +136,7 @@ namespace HomeController.model
                 var contact = remoteCentralUnitProxy.SendPingMessage();
                 if (!contact)
                 {
-                    Logger.Logg("VerifyContact: No contact with " + remoteCentralUnitProxy.Name);
+                    Logger.Logg(Lcu.Name, Logger.RCUCtrl_Cat, "VerifyContact: No contact with " + remoteCentralUnitProxy.Name);
                     return false;
                 }
             }
@@ -113,7 +150,8 @@ namespace HomeController.model
             foreach(var remoteCentralUnitProxy in remoteCentralUnitProxies)
             {
                 remoteCentralUnitProxy.SendStateChangedMessage(currentStatus);
-                Logger.Logg("Informed " + remoteCentralUnitProxy.Name + " that the state of "+LocalCentralUnit.GetInstance().Name+" has changed to "+currentStatus);
+        public static string RCUCtrl_Cat;
+                Logger.Logg(lcu.Name, "Informed " + remoteCentralUnitProxy.Name + " that the state of "+LocalCentralUnit.GetInstance().Name+" has changed to "+currentStatus);
             }
         }
 */
@@ -191,7 +229,19 @@ namespace HomeController.model
 
             }
             //SendCommandToRemoteLcu(MessageLcuStarting);
+
         }
+
+        //public void InformAboutNewAlarmStatus(AlarmHandler.AlarmActivityStatus status)
+        //{
+        //    foreach(var remoteCentralUnitProxy in remoteCentralUnitProxies)
+        //    {
+        //        remoteCentralUnitProxy.InformAboutNewAlarmStatus();
+
+        //    }
+        //    //SendCommandToRemoteLcu(MessageLcuStarting);
+        //}
+
     }
 
 }

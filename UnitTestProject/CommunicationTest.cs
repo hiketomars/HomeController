@@ -8,6 +8,7 @@ using HomeController.comm;
 using HomeController.config;
 using HomeController.model;
 using HomeController.service;
+using HomeController.utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting.AppContainer;
 using Moq;
@@ -40,11 +41,13 @@ namespace UnitTestProject
         private Mock<ISirenController> altanenDoorSirenControllerMock;
         private Mock<ILEDController> altanenDoorLedControllerMock;
         private LocalCentralUnit altanenDoorLcu;
+        private string testName = "?";
 
         // Test LCU.
         [TestInitialize]
         public void DoSetup()
         {
+            testName = "-";
             // Front Door
             // Construct mocks.
             frontDoorMock = new Mock<IDoor>();
@@ -115,34 +118,74 @@ namespace UnitTestProject
             altanenDoorLcu?.Reset();
         }
 
+        [TestMethod]
+        public void C0_CommunicatingProxies()
+        {
+            var lcuMock1 = new Mock<ILocalCentralUnit>();
+            var ah1 = new Mock<IAlarmHandler>();
+            lcuMock1.Setup(f => f.LcuAlarmHandler).Returns(ah1.Object);
+            var remoteCentralUnitProxy1A = new RemoteCentralUnitProxy(lcuMock1.Object, "remoteLcuB", 2, "localhost", "1330", "1331");
 
+            var lcuMock2 = new Mock<ILocalCentralUnit>();
+            var ah2 = new Mock<IAlarmHandler>();
+            lcuMock2.Setup(f => f.LcuAlarmHandler).Returns(ah2.Object);
+            ah2.Setup(f => f.CurrentLocalStatus).Returns(AlarmHandler.AlarmActivityStatus.EntranceOngoing);
+
+            var remoteCentralUnitProxy2B = new RemoteCentralUnitProxy(lcuMock2.Object, "remoteLcuA", 1, "localhost", "1331", "1330");
+
+            Assert.IsTrue(remoteCentralUnitProxy1A.RcuCurrentStatusMessage.AlarmStatus ==
+                          AlarmHandler.AlarmActivityStatus.EntranceOngoing);
+
+        }
 
         [TestMethod]
         public void
             C1_ReadingIsDoorUnlockedFromRemoteControlUnits_WhenAllButOneRemoteDoorsAreLocked_Expect_CorrectResponse()
         {
 
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
+                {
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","192.168.1.8", "1340", "1341"),
+                }
+            );
+            var frontDoorLcuRemoteCentralUnitsController = new RemoteCentralUnitsController(null, configHandlerFrontDoor.GetRemoteLcus());
+
+            ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLcu", new List<IRemoteCentralUnitConfiguration>()
+                {
+                    new RemoteCentralUnitConfiguration("Framsidan", "1", "192.168.1.8", "1341", "1340"),
+                }
+            );
+
+            var backDoorLcuRemoteCentralUnitsController = new RemoteCentralUnitsController(null, configHandlerBackDoor.GetRemoteLcus());
+
+
             frontDoorLcu = new LocalCentralUnit(frontDoorRgbLedMock.Object, frontDoorLedControllerMock.Object, frontDoorMock.Object,
-                null, frontDoorSirenMock.Object, frontDoorSirenControllerMock.Object);
+                frontDoorLcuRemoteCentralUnitsController, frontDoorSirenMock.Object, frontDoorSirenControllerMock.Object);
 
             backDoorLcu = new LocalCentralUnit(backDoorRgbLedMock.Object, backDoorLedControllerMock.Object, backDoorMock.Object,
-               null, backDoorSirenMock.Object, backDoorSirenControllerMock.Object);
+                backDoorLcuRemoteCentralUnitsController, backDoorSirenMock.Object, backDoorSirenControllerMock.Object);
 
+            /* 190602 Väntar lite med att blanda in även altanen.
             altanenDoorLcu = new LocalCentralUnit(altanenDoorRgbLedMock.Object, altanenDoorLedControllerMock.Object, altanenDoorMock.Object,
                 null, altanenDoorSirenMock.Object, altanenDoorSirenControllerMock.Object);
-
+                */
             // Use mocks for doorControllers
-            frontDoorLcu.
-LcuDoorController = frontDoorControllerMock.Object;
+            frontDoorLcu.LcuDoorController = frontDoorControllerMock.Object;
             backDoorLcu.LcuDoorController = frontDoorControllerMock.Object;
+
+            /* 190602 Väntar lite med att blanda in även altanen.
             altanenDoorLcu.LcuDoorController = frontDoorControllerMock.Object;
+            */
             RemoteMockService.UseMocks = true;
 
+            // Set up backdoor lcu door controler to say that door is locked
+            backDoorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
+            frontDoorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
 
             //LocalCentralUnit.LcuConfigHandler = configHandlerMock.Object;
             //remoteCentralUnitsController.Setup(lcu);
             //frontDoorLcu.ActivateAlarm(0);
-            //Task.Delay(2000).Wait();
+            Task.Delay(3000).Wait();
 
 
             //// Since front door is first in list it will be asked first and then the second one but the last one will not be checked.
@@ -150,36 +193,45 @@ LcuDoorController = frontDoorControllerMock.Object;
             //rcuBackDoor.Verify(f => f.IsDoorUnlocked(), Times.AtLeastOnce);
             //rcuAltanenDoor.Verify(f => f.IsDoorUnlocked(), Times.Never);
 
-            //Assert.IsTrue(RemoteCentralUnitsController.GetInstance().IsAnyRemoteDoorUnlocked(),
-            //    "All other doors except for one are locked but controller thinks all are locked.");
+            Assert.IsFalse(frontDoorLcu.LcuRemoteCentralUnitsController.IsAnyRemoteDoorUnlocked(),
+                "All other doors except for one are locked but controller thinks all are locked.");
+
+
+            // Set up backdoor lcu door controler to say that door is locked
+            backDoorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);
+            frontDoorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
+
+            Task.Delay(3000).Wait();
+
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.IsAnyRemoteDoorUnlocked(),
+                "All other doors except for one are locked but controller thinks all are locked.");
+
         }
 
         [UITestMethod]
         public void C20_IntrusionOccursAtOneRemoteLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtLocalCentralUnit()
         {
-
-            // Sätt upp tre lcu:er med mockad siren och dörr. Dess remote controller och dess proxies ska inte vara mockade.
-            ConfigHandler configHandlerFrontDoor = new ConfigHandler(
-                    new List<IRemoteCentralUnitProxy>()
-                    {
-                        new RemoteCentralUnitProxy("Baksidan", "192.168.11.2", "80"),
-                        //new RemoteCentralUnitProxy("Altanen", "192.168.11.3", "80")
-                    }
-                );
-            ConfigHandler configHandlerBackDoor = new ConfigHandler(
-                new List<IRemoteCentralUnitProxy>()
+            testName = "C20v1";
+            Logger.Logg(testName, Logger.Test_Cat, "Starting");
+            // Sätt upp några remote lcu:er för de olika LCU:erna med mockad siren och dörr.
+            // Dess remote controller och dess proxies ska inte vara mockade.
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitProxy("Framsidan", "192.168.11.1", "80"),
-                    //new RemoteCentralUnitProxy("Altanen", "192.168.11.3", "80")
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","192.168.1.8", "1340", "1341"),
+                }
+                );
+            ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLcu", new List<IRemoteCentralUnitConfiguration>()
+                {
+                    new RemoteCentralUnitConfiguration("Framsidan", "1", "192.168.1.8", "1341", "1340"),
                 }
             );
 
-            string lcuFrontdoorName = "Framsidan";
-            string lcuBackdoorName = "Baksidan";
+            //string lcuFrontdoorName = "Framsidan";
+            //string lcuBackdoorName = "Baksidan";
             //string lcuAltanenName = "Altanen";
 
-            string lcuFrontdoorIp = "192.168.11.1";
-            string lcuBackdoorIp = "192.168.11.2";
+            //string lcuFrontdoorIp = "192.168.11.1";
+            //string lcuBackdoorIp = "192.168.11.2";
             //string lcuAltanenIp = "192.168.11.3";
 
             // Front door
@@ -188,7 +240,7 @@ LcuDoorController = frontDoorControllerMock.Object;
             frontDoorLcu.LcuSirenController.Siren= frontDoorSirenMock.Object;
             frontDoorLcu.StartSurveillance();
 
-            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 3, "(1)Front door LCU does not have 3 remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 1, "(1)Front door LCU does not have correct number of remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
 
             // Back door
             backDoorLcu = new LocalCentralUnit(configHandlerBackDoor);
@@ -196,7 +248,11 @@ LcuDoorController = frontDoorControllerMock.Object;
             backDoorLcu.LcuSirenController.Siren = backDoorSirenMock.Object;
             backDoorLcu.StartSurveillance();
 
-            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 3, "(2)Front door LCU does not have 3 remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+            Logger.Logg(testName, Logger.Test_Cat, "Surveillance started on both LCU:s, wainting 3 sec");
+            Task.Delay(3000).Wait();
+
+            Assert.IsTrue(backDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 1, "(2)Back door LCU does not have correct number of remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+            Logger.Logg(testName, Logger.Test_Cat, "Assert 203");
 
             // Altanen door
             //altanenDoorLcu = new LocalCentralUnit();
@@ -206,12 +262,15 @@ LcuDoorController = frontDoorControllerMock.Object;
 
             Task.Delay(2000).Wait();
 
-            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 3, "(3)Front door LCU does not have 3 remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
-            Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.VerifyContact(), "Front door LCU does not have contact with all the other remote LCU:s.");
+            //Assert.IsTrue(altanenDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 1, "(3)Altanen door LCU does not have correct number of  remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
+            //Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.VerifyContact(), "Altanen door LCU does not have contact with all the other remote LCU:s.");
 
             // Activate alarm. Activating it at the front door shall activate the alarm on all lcu:s.
-            frontDoorLcu.ActivateAlarm(0);
-            Task.Delay(2000).Wait();
+            Logger.Logg(testName, Logger.Test_Cat, "Alarm will be scheduled for activation");
+            frontDoorLcu.ActivateAlarm(500);
+            Logger.Logg(testName, Logger.Test_Cat, "Alarm scheduled for activation, sleeping");
+            Task.Delay(3000).Wait();
+
 
             // Check that alarm really is active on all LCU:s now.
             Assert.IsTrue(frontDoorLcu.LcuAlarmHandler.IsAlarmActive, "Alarm not active for front door LCU");
@@ -224,6 +283,7 @@ LcuDoorController = frontDoorControllerMock.Object;
 
             // Setup intrusion.
             backDoorLcu.LcuAlarmHandler.EntranceDelayMs = 0;
+            Logger.Logg(testName, Logger.Test_Cat, "Opening back door");
             backDoorMock.Setup(f => f.IsOpen).Returns(true);
             Task.Delay(2000).Wait();
 
@@ -231,7 +291,7 @@ LcuDoorController = frontDoorControllerMock.Object;
                 "Intrusion at back door but controller does not think so.");
 
             // Verify that backdoor lcu is alarming
-            Assert.IsTrue(backDoorLcu.LcuAlarmHandler.CurrentStatus == AlarmHandler.AlarmActivityStatus.Siren, "Back dorr LCU is not alarming");
+            Assert.IsTrue(backDoorLcu.LcuAlarmHandler.CurrentLocalStatus == AlarmHandler.AlarmActivityStatus.Siren, "Back door LCU is not alarming");
 
             // Verify that siren is turned on all LCU:s.
             frontDoorSirenControllerMock.Verify(f => f.TurnOn(), Times.AtLeastOnce, "Siren not turned on at front door"); // Will be called many times...

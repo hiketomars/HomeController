@@ -11,8 +11,8 @@ namespace HomeController.utils
     public class Definition
     {
         public const string RemoteLcuPIAddress = "192.168.11.2";
-        public const string OwnPortNumber = "1337";
-        public const string RemoteLcuPortNumber = "1338";
+        //public const string OwnPortNumber = "1337";
+        //public const string RemoteLcuPortNumber = "1338";
 
 
         public delegate void LoggInGui(string text);

@@ -87,19 +87,19 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
@@ -131,7 +131,7 @@ namespace UnitTestProject
             //rcuBackDoor.Verify(f => f.HasIntrusionOccurred(), Times.AtLeastOnce);
             //rcuAltanenDoor.Verify(f => f.HasIntrusionOccurred(), Times.AtLeastOnce);
 
-            Assert.IsFalse(lcu.LcuAlarmHandler.HasIntrusionOccurred,
+            Assert.IsFalse(lcu.LcuAlarmHandler.HasIntrusionOccurredLocally,
                 "No intrusion at any door but controller does not think so.");
         }
 
@@ -149,19 +149,19 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.HasIntrusionOccurred()).Returns(true);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
@@ -210,19 +210,19 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.HasIntrusionOccurred()).Returns(true);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.HasIntrusionOccurred()).Returns(true);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.HasIntrusionOccurred()).Returns(true);
@@ -265,19 +265,19 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
@@ -329,19 +329,19 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.IsDoorUnlocked()).Returns(true);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
@@ -389,21 +389,21 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
             rcuFrontDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.IsDoorUnlocked()).Returns(true);
             rcuBackDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
@@ -456,21 +456,21 @@ namespace UnitTestProject
 
             // Mocked remote central unit proxys.
             var rcuFrontDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuFrontDoor.Setup(f => f.SendCommand(lcuFrontdoorIp, It.IsAny<string>()))
+            rcuFrontDoor.Setup(f => f.SendCommandSpecific(lcuFrontdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuFrontDoor.Setup(f => f.Name).Returns(lcuFrontdoorName);
             rcuFrontDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
             rcuFrontDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuBackDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuBackDoor.Setup(f => f.SendCommand(lcuBackdoorIp, It.IsAny<string>()))
+            rcuBackDoor.Setup(f => f.SendCommandSpecific(lcuBackdoorIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuBackDoor.Setup(f => f.Name).Returns(lcuBackdoorName);
             rcuBackDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
             rcuBackDoor.Setup(f => f.HasIntrusionOccurred()).Returns(false);
 
             var rcuAltanenDoor = new Mock<IRemoteCentralUnitProxy>();
-            rcuAltanenDoor.Setup(f => f.SendCommand(lcuAltanenIp, It.IsAny<string>()))
+            rcuAltanenDoor.Setup(f => f.SendCommandSpecific(lcuAltanenIp, It.IsAny<string>()))
                 .ReturnsAsync((string ip, string cmd) => RemoteCentralUnitProxy.MessageACK + cmd);
             rcuAltanenDoor.Setup(f => f.Name).Returns(lcuAltanenName);
             rcuAltanenDoor.Setup(f => f.IsDoorUnlocked()).Returns(false);
@@ -488,10 +488,10 @@ namespace UnitTestProject
             //var configHandlerMock = new Mock<IConfigHandler>();
             //configHandlerMock.Setup(f => f.GetRemoteLcus()).Returns(remoteCentralUnits);
             var rcuController = new RemoteCentralUnitsController(remoteCentralUnits);
-            var sirenController = new SirenController();
+            var sirenController = new SirenController(null);
             lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenController);
-
+            sirenController.lcu = lcu;
             //SirenController.SetInstance(sirenControllerMock.Object);
             lcu.LcuSirenController.Siren = sirenMock.Object;
             lcu.LcuDoorController.Door = doorMock.Object;

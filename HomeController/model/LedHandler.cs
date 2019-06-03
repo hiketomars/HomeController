@@ -19,7 +19,7 @@ namespace HomeController.model
 
         public void SetLedCorrectly()
         {
-            if (lcu.LcuAlarmHandler.HasIntrusionOccurred)
+            if (lcu.LcuAlarmHandler.HasIntrusionOccurredLocally)
             {
                 lcu.LcuLedController.SetLed_IntrusionHasOccurred();
             }

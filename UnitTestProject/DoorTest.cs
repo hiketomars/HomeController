@@ -63,7 +63,7 @@ namespace UnitTestProject
         [TestCleanup]
         public void DoClean()
         {
-            lcu.Reset();
+            lcu?.Reset();
         }
 
         // Door

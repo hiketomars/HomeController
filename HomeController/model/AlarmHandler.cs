@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Capture.Frames;
 using Windows.System.Threading;
+using Windows.UI.Core;
 using HomeController.comm;
 using Windows.UI.Xaml;
+using HomeController.utils;
 
 namespace HomeController.model
 {
-    public class AlarmHandler
+    public class AlarmHandler : IAlarmHandler
     {
         private readonly LocalCentralUnit lcu;
         public const int EntranceDelayDefaultMs = 6000;
@@ -31,7 +33,17 @@ namespace HomeController.model
             SirenOff
         }
 
-        public AlarmActivityStatus CurrentStatus { get; set; }
+        private AlarmActivityStatus alarmActivityStatus;
+
+        public AlarmActivityStatus CurrentLocalStatus
+        {
+            get { return alarmActivityStatus; }
+            set
+            {
+                alarmActivityStatus = value;
+                Logger.Logg(lcu.Name, Logger.LCU_Cat, "Status changed into " + alarmActivityStatus);
+            }
+        }
 
         private static AlarmHandler instance;
 
@@ -47,7 +59,7 @@ namespace HomeController.model
         public AlarmHandler(LocalCentralUnit lcu)
         {
             this.lcu = lcu;
-            CurrentStatus = AlarmHandler.AlarmActivityStatus.Undefined;
+            CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.Undefined;
             //EntranceTimer = new DispatcherTimer();
             //EntranceTimer.Interval = TimeSpan.FromMilliseconds(EntranceDelayMs);
             //EntranceTimer.Tick += EntranceTimer_Tick;
@@ -65,89 +77,97 @@ namespace HomeController.model
 
             EntranceDelayMs = EntranceDelayDefaultMs;
             SirenDuranceMs = SirenDuranceDefaultMs;
-            CurrentStatus = AlarmHandler.AlarmActivityStatus.Off;
+            CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.Off;
 
         }
 
         public int EntranceDelayMs { get; set; }
 
         public int SirenDuranceMs { get; set; } 
-        //private void WaitAndCheck()
-        //{
-        //    Task.Delay(1).Wait();
-
-        //}
-
-        //private void ActivationTimer_Tick(object sender, object e)
-        //{
-        //    IsAlarmActive = true;
-        //}
 
         private void ActivationPoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
-            IsAlarmActive = true;
-            CurrentStatus = AlarmHandler.AlarmActivityStatus.Active;
+            Logger.Logg(lcu.Name, Logger.LCU_Cat, "Entering AH.ActivationPoolTimerElapsedHandler.");
+            SetAlarmActive();
+        }
+
+        private void SetAlarmActive()
+        {
+            CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.Active;
+
         }
 
 
-        internal void DeactivateAlarm()
+        public void DeactivateAlarm()
         {
+            Logger.Logg(lcu.Name, Logger.LCU_Cat, "Entering AH.DeactivateAlarm.");
+
             EntrancePoolTimer?.Cancel();
             SirenPoolTimer?.Cancel();
 
-            IsEntrancePeriodOngoing = false;
+            IsEntrancePeriodOngoingLocally = false;
             //HasIntrusionOccurred = false;
-            IsAlarmActive = false;
-            CurrentStatus = AlarmHandler.AlarmActivityStatus.Off;
+            CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.Off;
 
         }
 
-        internal void ActivateAlarm(int delayInMs)
+        public void ActivateAlarm(int delayInMs)
         {
+            Logger.Logg(lcu.Name, Logger.LCU_Cat, "Entering AH.ActivateAlarm.");
+
             //ActivationDelayMs = delayInMs;
             TimeSpan delay = new TimeSpan(0, 0, 0, 0, delayInMs);
             ActivationPoolTimer = ThreadPoolTimer.CreateTimer(ActivationPoolTimerElapsedHandler, delay);
 
+            Logger.Logg(lcu.Name, Logger.LCU_Cat, "Timer start: ActivationPoolTimer.");
+
             //ActivationPoolTimer.Period = delay;
             //ActivationTimer.Start();
-            SetStatus(AlarmHandler.AlarmActivityStatus.Activating);
+            CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.Activating;
+            Logger.Logg(lcu.Name, Logger.LCU_Cat, "Leaving AH.ActivateAlarm.");
+
         }
 
-        private void SetStatus(AlarmActivityStatus newStatus)
+        //private void SetStatus(AlarmActivityStatus newStatus)
+        //{
+        //    //CurrentStatus = AlarmHandler.AlarmActivityStatus.Activating;
+        //    CurrentStatus = newStatus;
+        //    Logger.Logg(lcu.Name, Logger.LCU_Cat, "Status changed into "+CurrentStatus);
+
+        //    /* Behöver inte tala om att status har ändrats. Remote LCU:er får fråga oss så svarar vi.
+        //    // Tell other LCU:s about our new status.
+        //    lcu.LcuRemoteCentralUnitsController.StatusHasChanged(CurrentStatus);
+        //    */
+        //}
+
+        public bool IsAlarmActive
         {
-            CurrentStatus = AlarmHandler.AlarmActivityStatus.Activating;
-
-            /* Behöver inte tala om att status har ändrats. Remote LCU:er får fråga oss så svarar vi.
-            // Tell other LCU:s about our new status.
-            lcu.LcuRemoteCentralUnitsController.StatusHasChanged(CurrentStatus);
-            */
+            get { return CurrentLocalStatus == AlarmActivityStatus.Active; }
         }
 
-        public bool IsAlarmActive { get; private set; }
 
+        //private void SirenPoolTimerElapsedHandler(ThreadPoolTimer timer)
+        //{
+        //    SirenPoolTimer.Cancel();
+        //    //SirenController.GetInstance().TurnOff();
+        //    lcu.LcuSirenController.TurnOff();
+        //    CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.SirenOff;
 
-        private void SirenPoolTimerElapsedHandler(ThreadPoolTimer timer)
-        {
-            SirenPoolTimer.Cancel();
-            //SirenController.GetInstance().TurnOff();
-            lcu.LcuSirenController.TurnOff();
-            CurrentStatus = AlarmHandler.AlarmActivityStatus.SirenOff;
-
-        }
+        //}
 
         private void EntrancePoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
-            IsEntrancePeriodOngoing = false;
+            IsEntrancePeriodOngoingLocally = false;
             EntrancePoolTimer.Cancel();
             if(IsAlarmActive)
             {
                 // Intrusion! Turn on siren. 
-                HasIntrusionOccurred = true;
+                HasIntrusionOccurredLocally = true;
                 //SirenController.GetInstance().TurnOn();
-                lcu.LcuSirenController.TurnOn();
-                SirenPoolTimer = ThreadPoolTimer.CreateTimer(SirenPoolTimerElapsedHandler,
-                    TimeSpan.FromMilliseconds(SirenDuranceMs));
-                CurrentStatus = AlarmHandler.AlarmActivityStatus.Siren;
+                lcu.LcuSirenController.TurnOn(SirenDuranceDefaultMs);
+                //SirenPoolTimer = ThreadPoolTimer.CreateTimer(SirenPoolTimerElapsedHandler,
+                //    TimeSpan.FromMilliseconds(SirenDuranceMs));
+                CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.Siren;
 
             }
         }
@@ -166,19 +186,32 @@ namespace HomeController.model
 
 
         // Local intrusion.
-        public bool HasIntrusionOccurred { get; set; }
+        public bool HasIntrusionOccurredLocally { get; set; }
 
-        public bool IsEntrancePeriodOngoing { get; set; }
+        public bool IsEntrancePeriodOngoingLocally { get; set; }
 
+        public DateTime OverallAlarmStateTime { get; set; }
+        public enum OverallAlarmState
+        {
+            AlarmDeactivated,
+            AlarmActivating,
+            AlarmActivated,
+            Siren
+        }
+
+        public OverallAlarmState CurrentOverallAlarmState;
+
+
+        // This method will set the status based on the local and remote conditions.
         public void CheckSituation()
         {
             if(lcu.LcuDoorController.IsDoorOpen())
             {
-                if(IsAlarmActive && CurrentStatus == AlarmActivityStatus.Active)
+                if(IsAlarmActive /*&& CurrentStatus == AlarmActivityStatus.Active*/)
                 {
-                    IsEntrancePeriodOngoing = true;
+                    IsEntrancePeriodOngoingLocally = true;
                     EntrancePoolTimer = ThreadPoolTimer.CreateTimer(EntrancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(EntranceDelayMs));
-                    CurrentStatus = AlarmHandler.AlarmActivityStatus.EntranceOngoing;
+                    CurrentLocalStatus = AlarmHandler.AlarmActivityStatus.EntranceOngoing;
 
                     //EntranceTimer.Stop(); //todo kolla om det är en bra ide att stoppa den först i fall den redan var igång.
                     //EntranceTimer.Start();
@@ -189,12 +222,68 @@ namespace HomeController.model
                 }
             }
 
-            if (lcu.LcuRemoteCentralUnitsController.HasIntrusionOccurred())
+            //todo Kanske inte bästa sättet att göra detta på; Ovan sätter jag i vissa situationer statusen till
+            // ett nytt värde men nedan kommer jag kanske direkt sätta om det igen pga att en remote lcu har ett nyare status...
+
+            var mostRecentRcuStatus = lcu.LatestCompoundStatus.MostRecentChangedLcu.RcuCurrentStatusMessage.ReceivedOverallAlarmState;
+            switch (mostRecentRcuStatus)
             {
-                //LcuRemoteCentralUnitsController.
-                //SirenController.GetInstance().TurnOn();
-                lcu.LcuSirenController.TurnOn();
+                case OverallAlarmState.AlarmDeactivated:
+                    DeactivateAlarm();
+                    CurrentOverallAlarmState = OverallAlarmState.AlarmDeactivated;
+                    break;
+
+                case OverallAlarmState.AlarmActivating:
+                    ActivateAlarm(0);
+                    CurrentOverallAlarmState = OverallAlarmState.AlarmActivating;
+                    break;
+
+                case OverallAlarmState.AlarmActivated:
+                    SetAlarmActive();
+                    CurrentOverallAlarmState = OverallAlarmState.AlarmActivated;
+                    break;
+                case OverallAlarmState.Siren:
+                    CurrentOverallAlarmState = OverallAlarmState.Siren;
+
+                    if(!lcu.LcuSirenController.IsOn)
+                    {
+                        lcu.LcuSirenController.TurnOn(SirenDuranceMs);
+                    }
+
+                    break;
+                default:
+                    break;
+
             }
+
+            //if(lcu.LatestCompoundStatus.AlarmStatus == AlarmActivityStatus.Active)
+            //{
+            //    lcu.LcuAlarmHandler.SetAlarmActive();
+            //}
+            //else
+            //{
+            //    lcu.LcuSirenController.TurnOff();
+            //}
+
+
+            //if(totalStatus == AlarmActivityStatus.Siren)
+            //{
+            //    lcu.LcuSirenController.TurnOn();
+            //}
+            //else
+            //{
+            //    lcu.LcuSirenController.TurnOff();
+            //}
+
+
+            //if(lcu.LcuRemoteCentralUnitsController.HasIntrusionOccurred())
+            //{
+            //    //LcuRemoteCentralUnitsController.
+            //    //SirenController.GetInstance().TurnOn();
+            //    lcu.LcuSirenController.TurnOn();
+            //}
+
+
         }
     }
 }

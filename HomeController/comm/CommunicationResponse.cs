@@ -15,7 +15,7 @@ namespace HomeController.comm
         public string GetAckResponse()
         {
             return RemoteCentralUnitProxy.MessageACK
-                   + RemoteMessage.MessagPartsDelimeter;
+                   + RemoteCentralUnitProxy.MessagPartsDelimeter;
         }
     }
 
