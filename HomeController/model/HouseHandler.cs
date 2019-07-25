@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomeController.config;
 using HomeController.utils;
 
 namespace HomeController.model
 {
     /// <summary>
-    /// The one and only instance of the HouseController class represents the house, ie not a specific LCU.
+    /// The one and only instance of the HouseHandler class represents the house, ie not a specific LCU.
     /// Alarm and status are summarized in this class.
     /// </summary>
     public class HouseHandler : IHouseModel
@@ -17,13 +18,19 @@ namespace HomeController.model
         //private readonly LocalCentralUnit lcu;
         public bool AlarmIsActive { get; set; }
 
-        //private RemoteCentralUnit BackdoorRemoteCentralUnit;
+        private LocalCentralUnit lcu;
 
         /// <summary>
         /// Constructs the one and only HouseHandler which is the model in the MVP.
         /// </summary>
         public HouseHandler()
         {
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
+                {
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340", "1341"),
+                }
+            );
+            lcu = new LocalCentralUnit(configHandlerFrontDoor);
         }
 
         public void InitHouseHandler() { 
@@ -101,9 +108,16 @@ namespace HomeController.model
             //todo BackdoorRemoteCentralUnit.GetColorForLED();
         }
 
+        // This is mainly intended for debug purpose.
+        // This is called when the user clicks on a direct Connect-button to test the connection.
         public void ConnectToRemoteLCU()
         {
-            //lcu.SetupRemoteLCUCommunication();
+            lcu.LcuRemoteCentralUnitsController.ConnectToOnlyRcu();
+        }
+
+        public void ListenToRemoteLCU()
+        {
+            lcu.LcuRemoteCentralUnitsController.ListenToTheOnlyRcu();
         }
 
         private static HouseHandler houseHandler;

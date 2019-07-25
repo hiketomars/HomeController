@@ -18,13 +18,13 @@ namespace HomeController.model
         void ActivateCommunication();
         string Name { set; get; }
         string IpAddress { get; set; }
-        //string PortNumber { get; set; }
         CurrentStatusMessage RcuCurrentStatusMessage { get; set; }
         bool SendPingMessage();
-        void SendRequestRcuStatusMessage();
-        //void SendCurrentStatusMessage(AlarmHandler.AlarmActivityStatus currentStatus);
-        void StartReceiver();
-        //void InformAboutNewAlarmStatus();
+        //void SendRequestOfRcuStatusMessage();
+
+        // For debugging.
+        void StartListeningToRemoteLcu();
+        void ConnectToRemoteLcu();
     }
 
     public interface IRemoteCentralUnitConfiguration

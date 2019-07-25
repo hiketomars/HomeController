@@ -54,5 +54,10 @@ namespace HomeController.view
         {
             houseModel.ConnectToRemoteLCU();
         }
+
+        public void ListenBtn_Click()
+        {
+            houseModel.ListenToRemoteLCU();
+        }
     }
 }

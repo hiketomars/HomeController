@@ -13,11 +13,40 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using HomeController.model;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace HomeController
 {
+    public class FakeLcu : ILocalCentralUnit
+    {
+        public string Name {
+            get => "FakeLcu";
+        }
+        public IAlarmHandler LcuAlarmHandler { get; }
+    }
+
+    public class FakeAlarmHandler : IAlarmHandler {
+        public void CheckSituation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ActivateAlarm(int delayInMs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AlarmHandler.AlarmActivityStatus CurrentLocalStatus { get; set; }
+        public bool HasIntrusionOccurredLocally { get; set; }
+        public bool IsAlarmActive { get; }
+        public int EntranceDelayMs { get; set; }
+        public void DeactivateAlarm()
+        {
+            throw new NotImplementedException();
+        }
+    }
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -32,11 +61,25 @@ namespace HomeController
         // For this example, we'll choose an arbitrary port number.
         static string PortNumber = "1337";
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             // Detta använder jag inte nu. Istället finns Clienten i LocalCentralUnit-klassen.
-            //this.StartServer();
-            //this.StartClient();
+            // this.StartServer();
+            // this.StartClient();
+
+            // Nedan finns kod som inte heller används men som kan användas för att testa kommunikationsdelen separat.
+            // Denna delen motsvarar att starta servern.
+            var fakeLcu2 = new FakeLcu();
+            var rcu2 = new RemoteCentralUnitProxy(fakeLcu2, "theRemoteLcu", 22, "localhost", "-1", PortNumber);
+            rcu2.StartListeningToRemoteLcu();
+
+            // Denna delen motsvarar att starta klienten.
+            var fakeLcu1 = new FakeLcu();
+            var rcu1 = new RemoteCentralUnitProxy(fakeLcu1, "theRemoteLcu", 23, "localhost", PortNumber, "-1");
+
+            var r = await rcu1.SendCommandSpecific("localhost","hi there");
+
+
         }
 
         //private async void StartServer()
@@ -53,89 +96,89 @@ namespace HomeController
 
         //        this.serverListBox.Items.Add("server is listening...");
         //    }
-        //    catch (Exception ex)
+        //    catch(Exception ex)
         //    {
         //        Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
         //        this.serverListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
         //    }
         //}
 
-        private async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
-        {
-            string request;
-            using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
-            {
-                request = await streamReader.ReadLineAsync();
-            }
-
-            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server received the request: \"{0}\"", request)));
-
-            // Echo the request back as the response.
-            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
-            {
-                using (var streamWriter = new StreamWriter(outputStream))
-                {
-                    await streamWriter.WriteLineAsync(request);
-                    await streamWriter.FlushAsync();
-                }
-            }
-
-            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server sent back the response: \"{0}\"", request)));
-
-            sender.Dispose();
-
-            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add("server closed its socket"));
-        }
-
-        //private async void StartClient()
+        //private async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         //{
-        //    try
+        //    string request;
+        //    using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
         //    {
-        //        // Create the StreamSocket and establish a connection to the echo server.
-        //        using (var streamSocket = new Windows.Networking.Sockets.StreamSocket())
+        //        request = await streamReader.ReadLineAsync();
+        //    }
+
+        //    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server received the request: \"{0}\"", request)));
+
+        //    // Echo the request back as the response.
+        //    using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+        //    {
+        //        using (var streamWriter = new StreamWriter(outputStream))
         //        {
-        //            // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
-        //            var hostName = new Windows.Networking.HostName("localhost");
-
-        //            this.clientListBox.Items.Add("client is trying to connect...");
-
-        //            await streamSocket.ConnectAsync(hostName, StreamSocketAndListenerPage.PortNumber);
-
-        //            this.clientListBox.Items.Add("client connected");
-
-        //            // Send a request to the echo server.
-        //            string request = "Hello, World!";
-        //            using (Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
-        //            {
-        //                using (var streamWriter = new StreamWriter(outputStream))
-        //                {
-        //                    await streamWriter.WriteLineAsync(request);
-        //                    await streamWriter.FlushAsync();
-        //                }
-        //            }
-
-        //            this.clientListBox.Items.Add(string.Format("client sent the request: \"{0}\"", request));
-
-        //            // Read data from the echo server.
-        //            string response;
-        //            using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
-        //            {
-        //                using (StreamReader streamReader = new StreamReader(inputStream))
-        //                {
-        //                    response = await streamReader.ReadLineAsync();
-        //                }
-        //            }
-
-        //            this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
+        //            await streamWriter.WriteLineAsync(request);
+        //            await streamWriter.FlushAsync();
         //        }
+        //    }
 
-        //        this.clientListBox.Items.Add("client closed its socket");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-        //        this.clientListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-        //    }
+        //    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server sent back the response: \"{0}\"", request)));
+
+        //    sender.Dispose();
+
+        //    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add("server closed its socket"));
         //}
+
+        private async void StartClient()
+        {
+            try
+            {
+                // Create the StreamSocket and establish a connection to the echo server.
+                using(var streamSocket = new Windows.Networking.Sockets.StreamSocket())
+                {
+                    // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
+                    var hostName = new Windows.Networking.HostName("localhost");
+
+                    this.clientListBox.Items.Add("client is trying to connect...");
+
+                    await streamSocket.ConnectAsync(hostName, StreamSocketAndListenerPage.PortNumber);
+
+                    this.clientListBox.Items.Add("client connected");
+
+                    // Send a request to the echo server.
+                    string request = "Hello, World!";
+                    using(Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
+                    {
+                        using(var streamWriter = new StreamWriter(outputStream))
+                        {
+                            await streamWriter.WriteLineAsync(request);
+                            await streamWriter.FlushAsync();
+                        }
+                    }
+
+                    this.clientListBox.Items.Add(string.Format("client sent the request: \"{0}\"", request));
+
+                    // Read data from the echo server.
+                    string response;
+                    using(Stream inputStream = streamSocket.InputStream.AsStreamForRead())
+                    {
+                        using(StreamReader streamReader = new StreamReader(inputStream))
+                        {
+                            response = await streamReader.ReadLineAsync();
+                        }
+                    }
+
+                    this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
+                }
+
+                this.clientListBox.Items.Add("client closed its socket");
+            }
+            catch(Exception ex)
+            {
+                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                this.clientListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+            }
+        }
     }
 }

@@ -16,5 +16,6 @@ namespace HomeController.model
         List<string> GetLoggings();
         void GetColorForBackdoorLED();
         void ConnectToRemoteLCU();
+        void ListenToRemoteLCU();
     }
 }

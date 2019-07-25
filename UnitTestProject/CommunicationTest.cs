@@ -121,21 +121,26 @@ namespace UnitTestProject
         [TestMethod]
         public void C0_CommunicatingProxies()
         {
+            string ip = "127.0.0.1";
             var lcuMock1 = new Mock<ILocalCentralUnit>();
             var ah1 = new Mock<IAlarmHandler>();
             lcuMock1.Setup(f => f.LcuAlarmHandler).Returns(ah1.Object);
-            var remoteCentralUnitProxy1A = new RemoteCentralUnitProxy(lcuMock1.Object, "remoteLcuB", 2, "localhost", "1330", "1331");
+            var remoteCentralUnitProxy1A = new RemoteCentralUnitProxy(lcuMock1.Object, "remoteLcuB", 2, ip, "1330", "1331");
 
             var lcuMock2 = new Mock<ILocalCentralUnit>();
             var ah2 = new Mock<IAlarmHandler>();
             lcuMock2.Setup(f => f.LcuAlarmHandler).Returns(ah2.Object);
             ah2.Setup(f => f.CurrentLocalStatus).Returns(AlarmHandler.AlarmActivityStatus.EntranceOngoing);
 
-            var remoteCentralUnitProxy2B = new RemoteCentralUnitProxy(lcuMock2.Object, "remoteLcuA", 1, "localhost", "1331", "1330");
+            var remoteCentralUnitProxy2B = new RemoteCentralUnitProxy(lcuMock2.Object, "remoteLcuA", 1, ip, "1331", "1330");
+
+            remoteCentralUnitProxy1A.ActivateCommunication();
+            remoteCentralUnitProxy2B.ActivateCommunication();
+
+            Task.Delay(3000).Wait();
 
             Assert.IsTrue(remoteCentralUnitProxy1A.RcuCurrentStatusMessage.AlarmStatus ==
                           AlarmHandler.AlarmActivityStatus.EntranceOngoing);
-
         }
 
         [TestMethod]
@@ -185,6 +190,9 @@ namespace UnitTestProject
             //LocalCentralUnit.LcuConfigHandler = configHandlerMock.Object;
             //remoteCentralUnitsController.Setup(lcu);
             //frontDoorLcu.ActivateAlarm(0);
+
+            
+
             Task.Delay(3000).Wait();
 
 

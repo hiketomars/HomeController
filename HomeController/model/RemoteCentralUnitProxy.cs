@@ -15,8 +15,11 @@ using HomeController.utils;
 
 namespace HomeController.model
 {
-    // This class is a proxy for a remote central unit.
-    // It regularly checks status for the real remote lcu using various communication methods.
+    
+    /// <summary>
+    /// This class is a proxy for a remote central unit.
+    /// It regularly checks status for the real remote lcu using various communication methods.
+    /// </summary>
     public class RemoteCentralUnitProxy : IRemoteCentralUnitProxy
     {
         public const string MessageStartToken = "Msg";
@@ -24,15 +27,17 @@ namespace HomeController.model
         public const string MessageCurrentStatus = "msgCurrentStatus"; // Delivery of current status from RCU.
         public const string MessagePing = "msgPing";
         public const string MessageGetStatus = "msgGetStatus"; // A request for the LCU:s status.
+        public const string MessageUnknown = "msgUnknown"; // A request that was not recognized as a valid message.
 
 
         private readonly ILocalCentralUnit lcu;
         private readonly string nameOfRemoteLcu;
         private readonly string ipAddress;
-        private readonly string initiatorPortNumber;
+        private string initiatorPortNumber;
         private readonly string responderPortNumber;
         private ThreadPoolTimer periodicTimer;
         public string IpAddress { get; set; }
+        public string Name { get; set; }
 
         //private const string MessageLcuStarting = "msgLcuStarting";
         //private const string MessageIsDoorUnlocked = "msgIsDoorUnlocked";
@@ -76,54 +81,18 @@ namespace HomeController.model
                 Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Created RCU Proxy for " + nameOfRemoteLcu);
         }
 
-        public void StartReceiver()
-        {
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "StartReceiver for "+nameOfRemoteLcu);
-            int period = 1000;
-            periodicTimer = ThreadPoolTimer.CreatePeriodicTimer(timerElapsedHandler, TimeSpan.FromMilliseconds(period));
-        }
-
+        /// <summary>
+        /// Starts listener listen for commands from the RCU and also starts requesting status message from the RCU regularly.
+        /// </summary>
         public void ActivateCommunication()
         {
-            StartListeningOnRemoteLcu();
+            StartListeningToRemoteLcu();
+            StartPeriodicRequestForRcuStatusMessage();
         }
 
-        private void timerElapsedHandler(ThreadPoolTimer timer)
-        {
-            // Ask for status of remote lcu. The response will be handled elsewhere. 
-            // Maybe I need to check if I get any answer....?
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Sending GetStatus to " + nameOfRemoteLcu);
-
-            SendRequestRcuStatusMessage();
-        }
-
-        public string Name { get; set; }
-
-        // Sending messages.
-        public bool SendPingMessage()
-        {
-            var response = SendCommand(ipAddress, (string)RemoteCentralUnitProxy.MessagePing);
-            var interpretedResult = InterpretResponse(response);
-            return interpretedResult.Response;
-        }
-
-        //public void SendCurrentStatusMessage(AlarmHandler.AlarmActivityStatus currentStatus)
-        //{
-        //    var remoteMessage = new RemoteMessage() { Id = GetNewMessageId(), Message = MessageStartUp + RemoteMessage.MessagPartsDelimeter + currentStatus + RemoteMessage.MessagPartsDelimeter };
-
-        //    var response = SendCommand(ipAddress, remoteMessage.TotalMessage);
-        //    var interpretedResult = InterpretResponse(response);
-        //    // todo Jag måste väl kolla att jag får ett acc här?
-        //}
-
-        // Sends a request to the RCU to get its status.
-        // The answer is send as a new message and not as a direct response.
-        public void SendRequestRcuStatusMessage()
-        {
-            var getRcuStatusMessage = new RequestRcuStatusMessage(GetNewMessageId());
-            var response = SendCommand(ipAddress, getRcuStatusMessage);
-        }
-
+        /// <summary>
+        /// Sends a message to the RCU indicating that this LCU has started.
+        /// </summary>
         public void SendStartUpMessage()
         {
             var response = SendCommand(ipAddress, MessageStartUp);
@@ -131,53 +100,108 @@ namespace HomeController.model
             //interpretedResult.Response;
         }
 
-
-        // Static method that translates the specified read data from a port into the correct ITransferObject.
-        // Returns null if the string could not be interpreted as a known ITransferObject.
-        // Example 1:
-        // "Msg;3412413414515;msgGetStatus;
-        // Interpretation;
-        // This is a message with id 3412413414515 and is about that the sending lcu wants to know the status of the RCU.
-        //
-        // Example 2:
-        // "Msg;3412413414516;msgCurrentStatus;2;
-        // Interpretation;
-        // This is a message with id 3412413414516 and is the alarm status of the RCU sending the message. 2 is an enum value meaning 'Activating'.
-        // 190530
-        public static ITransferObject BuildTransferObjectFromPortStringMessage(string readPortData)
+        /// <summary>
+        /// Sends a ping to the RCU.
+        /// </summary>
+        /// <returns></returns>
+        public bool SendPingMessage()
         {
-            var parts = readPortData.Split(MessagPartsDelimeter[0]);
-            if(parts[0] != MessageStartToken)
-            {
-                Logger.Logg("", Logger.RCUProxy_Cat, "Illegal start of command: " + parts[0]);
-                return null;
-            }
-
-            if(parts[2] == MessageGetStatus)
-            {
-                return new RequestRcuStatusMessage(parts[1]);
-            }
-            else if(parts[2] == MessageCurrentStatus)
-            {
-                var currentAlarmStatusForRcu = (AlarmHandler.AlarmActivityStatus)Int32.Parse(parts[3]);
-                var rcuCurrentStatus = new CurrentStatusMessage(currentAlarmStatusForRcu);
-                rcuCurrentStatus.Id = parts[1];
-                return rcuCurrentStatus;
-            }
-            throw new Exception("Unknown message: " + parts[2]);
+            var response = SendCommand(ipAddress, (string)RemoteCentralUnitProxy.MessagePing);
+            var interpretedResult = InterpretResponse(response);
+            return interpretedResult.Response;
         }
 
-        public static string GetNewMessageId()
+        /// <summary>
+        /// Checks the intrusion status in the latest status message from the RCU.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasIntrusionOccurred()
         {
-            return DateTime.Now.Ticks.ToString();
+            return RcuCurrentStatusMessage.HasIntrusionOccurred;
         }
 
-        public async Task<string> SendCommand(string hostIp, string command)
+        /// <summary>
+        /// Checks the 'remotely intrusion' status in the latest status message from the RCU.
+        /// This means that this LCU can find out if the RCU has registered the status that this LCU has.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasIntrusionOccurredRemotely()
         {
-            return await SendCommandSpecific(hostIp, MessageStartToken + MessagPartsDelimeter + command);
+            return RcuCurrentStatusMessage.HasIntrusionOccurredRemotely;
         }
 
+        public bool IsDoorUnlocked()
+        {
+            return RcuCurrentStatusMessage.IsDoorLocked;
+        }
+
+        object IRemoteCentralUnitProxy.RemoteLcuStatusHasChanged
+        {
+            get => remoteLcuStatusHasChanged;
+            set => remoteLcuStatusHasChanged = value;
+        }
+
+        // For debug purpose.
+        public void ConnectToRemoteLcu()
+        {
+            initiatorPortNumber = "1341";
+            //Task<string> t = SendCommandSpecific(ipAddress, "hejsan");
+            //Task<string> t = SendCommand(ipAddress, MessageGetStatus);
+            SendRequestOfRcuStatusMessage();
+            //Task<string> t = SendCommand(ipAddress, MessageGetStatus);
+
+        }
+
+        // For debug purpose and original client-server code that I don't use any longer but is not removed yet.
+        // This "server" method starts listening on port for calls from remote lcu.
+        // This is public now to be able to start listening separately from 
+        public async void StartListeningToRemoteLcu()
+        {
+            try
+            {
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "RemoteCentralUnitProxy.StartListeningOnRemoteLcu: LCU with name " + lcu.Name + " starts to listen to RCU " + nameOfRemoteLcu + " on responderPortNumber " + responderPortNumber);
+                var streamSocketListener = new StreamSocketListener();
+
+                // The ConnectionReceived event is raised when connections are received.
+                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
+
+                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
+                await streamSocketListener.BindServiceNameAsync(responderPortNumber);
+                #region alternatives
+                /*
+                     Alternative from UWP Samples Scenario1.
+                    // Try to bind to a specific address.
+                    await listener.BindEndpointAsync(selectedLocalHost.LocalHost, ServiceNameForListener.Text);
+                    rootPage.NotifyUser(
+
+                   Yet another alternative:
+                    // Try to limit traffic to the selected adapter.
+                    // This option will be overridden by interfaces with weak-host or forwarding modes enabled.
+                    NetworkAdapter selectedAdapter = selectedLocalHost.LocalHost.IPInformation.NetworkAdapter; 
+
+                    // For demo purposes, ensure that we use the same adapter in the client connect scenario.
+                    CoreApplication.Properties.Add("adapter", selectedAdapter);
+
+                    await listener.BindServiceNameAsync(
+                        ServiceNameForListener.Text, 
+                        SocketProtectionLevel.PlainSocket,
+                        selectedAdapter);
+                 */
+                #endregion
+                //lcu.AddLogging("The server is listening on port " + Definition.OwnPortNumber + "...");
+            }
+            catch(Exception ex)
+            {
+                var webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Exception in RCUP.StartListeningOnRemoteLcu " + ex);
+
+                //lcu.AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+            }
+        }
+
+        
         // Sends exactly the specified command without adding anything.
+        // Parameter port only needs to be specified when called from a debug method since client and server are on the same machine then.
         public async Task<string> SendCommandSpecific(string hostIp, string exactCommand)
         {
             // Create the StreamSocket and establish a connection to the echo server.
@@ -191,6 +215,8 @@ namespace HomeController.model
 
                 Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Connecting " + hostName + " " + initiatorPortNumber);
                 await streamSocket.ConnectAsync(hostName, initiatorPortNumber);
+
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: After await ConnectAsync to " + hostName + " " + initiatorPortNumber);
 
                 //lcu.AddLogging("The client connected");
 
@@ -210,7 +236,7 @@ namespace HomeController.model
                 {
                     using(var streamWriter = new StreamWriter(outputStream))
                     {
-                        Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Writing to " + hostName + " " + initiatorPortNumber);
+                        Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Writing to " + hostName + " " + initiatorPortNumber);
 
                         await streamWriter.WriteLineAsync(exactCommand);
                         await streamWriter.FlushAsync();
@@ -237,6 +263,105 @@ namespace HomeController.model
         }
 
 
+
+
+
+        #region private_methods
+
+        /* *********************************************************************************************
+         * Private methods
+         ********************************************************************************************* */
+
+        private void StartPeriodicRequestForRcuStatusMessage()
+        {
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "StartReceiver for "+nameOfRemoteLcu);
+            int period = 1000;
+            periodicTimer = ThreadPoolTimer.CreatePeriodicTimer(timerElapsedHandler, TimeSpan.FromMilliseconds(period));
+        }
+
+        private void timerElapsedHandler(ThreadPoolTimer timer)
+        {
+            // Ask for status of remote lcu. The response will be handled elsewhere. 
+            // Maybe I need to check if I get any answer....?
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Sending GetStatus to " + nameOfRemoteLcu);
+
+            SendRequestOfRcuStatusMessage();
+        }
+
+
+
+        //public void SendCurrentStatusMessage(AlarmHandler.AlarmActivityStatus currentStatus)
+        //{
+        //    var remoteMessage = new RemoteMessage() { Id = GetNewMessageId(), Message = MessageStartUp + RemoteMessage.MessagPartsDelimeter + currentStatus + RemoteMessage.MessagPartsDelimeter };
+
+        //    var response = SendCommand(ipAddress, remoteMessage.TotalMessage);
+        //    var interpretedResult = InterpretResponse(response);
+        //    // todo Jag måste väl kolla att jag får ett acc här?
+        //}
+
+        // Sends a request to the RCU to get its status.
+        // The answer is send as a new message and not as a direct response.
+        private void SendRequestOfRcuStatusMessage()
+        {
+            var getRcuStatusMessage = new RequestRcuStatusMessage(GetNewMessageId());
+            var response = SendCommand(ipAddress, getRcuStatusMessage);
+        }
+
+
+
+        // Static method that translates the specified read data from a port into the correct ITransferObject.
+        // Returns null if the string could not be interpreted as a known ITransferObject.
+        // Example 1:
+        // "Msg;3412413414515;msgGetStatus;
+        // Interpretation;
+        // This is a message with id 3412413414515 and is about that the sending lcu wants to know the status of the RCU.
+        //
+        // Example 2:
+        // "Msg;3412413414516;msgCurrentStatus;2;
+        // Interpretation;
+        // This is a message with id 3412413414516 and is the alarm status of the RCU sending the message. 2 is an enum value meaning 'Activating'.
+        // 190530
+        private static ITransferObject BuildTransferObjectFromPortStringMessage(string readPortData)
+        {
+            var parts = readPortData.Split(MessagPartsDelimeter[0]);
+            if (parts.Length < 3)
+            {
+                throw new Exception("Unknown message syntax. Command much contain \"Msg\";<Id>;<Msg> at least!");
+            }
+            if(parts[0] != MessageStartToken)
+            {
+                Logger.Logg("", Logger.RCUProxy_Cat, "Illegal start of command: " + parts[0]);
+
+                var unknownMessage = new UnknownMessage(readPortData);
+                return unknownMessage;
+            }
+
+            if(parts[2] == MessageGetStatus)
+            {
+                return new RequestRcuStatusMessage(parts[1]);
+            }
+            else if(parts[2] == MessageCurrentStatus)
+            {
+                var currentAlarmStatusForRcu = (AlarmHandler.AlarmActivityStatus)Int32.Parse(parts[3]);
+                var rcuCurrentStatus = new CurrentStatusMessage(currentAlarmStatusForRcu);
+                rcuCurrentStatus.Id = parts[1];
+                return rcuCurrentStatus;
+            }
+            throw new Exception("Unknown message: " + parts[2]);
+        }
+
+        private static string GetNewMessageId()
+        {
+            return DateTime.Now.Ticks.ToString();
+        }
+
+        private async Task<string> SendCommand(string hostIp, string command)
+        {
+            return await SendCommandSpecific(hostIp, MessageStartToken + MessagPartsDelimeter + command);
+        }
+
+
+
         //private RemoteLcuPingResponse InterpretResponse(Task<string> response)
 
         private RemoteLcuResponse InterpretResponse(Task<string> response)
@@ -251,26 +376,7 @@ namespace HomeController.model
             return await SendCommandSpecific(hostIp, command.CompleteMessageStringToSend);
         }
 
-        public bool HasIntrusionOccurred()
-        {
-            return RcuCurrentStatusMessage.HasIntrusionOccurred;
-        }
 
-        public bool HasIntrusionOccurredRemotely()
-        {
-            return RcuCurrentStatusMessage.HasIntrusionOccurredRemotely;
-        }
-
-        public bool IsDoorUnlocked()
-        {
-            return RcuCurrentStatusMessage.IsDoorLocked;
-        }
-
-        object IRemoteCentralUnitProxy.RemoteLcuStatusHasChanged
-        {
-            get => remoteLcuStatusHasChanged;
-            set => remoteLcuStatusHasChanged = value;
-        }
 
         //        // This "client" method sets up the socket each time. Maybe we could save it and only create socket first time or when needed.
         //        public async Task<string> SendCommandToRemoteLcu(string command)
@@ -336,7 +442,7 @@ namespace HomeController.model
         //#endregion
 
 
-        //            }
+        //            } 
         //            catch(Exception ex)
         //            {
         //                var webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
@@ -346,51 +452,11 @@ namespace HomeController.model
         //            return "exception";
         //        }
 
-        // This "server" method starts listening on port for calls from remote lcu.
-        private async void StartListeningOnRemoteLcu()
-        {
-            try
-            {
-                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "RemoteCentralUnitProxy.StartListeningOnRemoteLcu: LCU with name " + lcu.Name + " starts to listen to RCU " + nameOfRemoteLcu + " on responderPortNumber " + responderPortNumber);
-                var streamSocketListener = new StreamSocketListener();
 
-                // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
-
-                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
-                await streamSocketListener.BindServiceNameAsync(responderPortNumber);
-                /*
-                     Alternative from UWP Samples Scenario1.
-                    // Try to bind to a specific address.
-                    await listener.BindEndpointAsync(selectedLocalHost.LocalHost, ServiceNameForListener.Text);
-                    rootPage.NotifyUser(
-
-                   Yet another alternative:
-                    // Try to limit traffic to the selected adapter.
-                    // This option will be overridden by interfaces with weak-host or forwarding modes enabled.
-                    NetworkAdapter selectedAdapter = selectedLocalHost.LocalHost.IPInformation.NetworkAdapter; 
-
-                    // For demo purposes, ensure that we use the same adapter in the client connect scenario.
-                    CoreApplication.Properties.Add("adapter", selectedAdapter);
-
-                    await listener.BindServiceNameAsync(
-                        ServiceNameForListener.Text, 
-                        SocketProtectionLevel.PlainSocket,
-                        selectedAdapter);
-                 */
-
-                //lcu.AddLogging("The server is listening on port " + Definition.OwnPortNumber + "...");
-            }
-            catch(Exception ex)
-            {
-                var webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                //lcu.AddLogging(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
-            }
-        }
 
         private async void StreamSocketListener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Received something!");
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, Name + " received something!");
 
             string request;
             using(var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
@@ -440,6 +506,9 @@ namespace HomeController.model
             {
                 // We've got the status of the RCU, store it here for future use.
                 RcuCurrentStatusMessage = (CurrentStatusMessage)transferObject;
+            }else if (transferObject.MessageType == MessageUnknown)
+            {
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Could not interpret unknown message");
             }
 
                 // Display the string on the screen. The event is invoked on a non-UI thread, so we need to marshal
@@ -498,5 +567,6 @@ namespace HomeController.model
         {
             return new CommunicationResponse(){AckedMessaged = receivedMessage.MessageType, Id = receivedMessage.Id};
         }
+        #endregion private_methods
     }
 }

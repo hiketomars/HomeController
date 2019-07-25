@@ -67,7 +67,8 @@ namespace HomeController
                     // configuring the new page by passing required information as a navigation
                     // parameter
                     //rootFrame.Navigate(typeof(StreamSocketAndListenerPage), e.Arguments); //makl: Set start up page here.
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments); //makl: Set start up page here.
+rootFrame.Navigate(typeof(MainPage), e.Arguments); //makl: Set start up page here.
+//rootFrame.Navigate(typeof(StreamSocketAndListenerPage), e.Arguments); //makl: Set start up page here.
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();

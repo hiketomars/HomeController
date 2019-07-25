@@ -338,6 +338,11 @@ namespace UnitTestProject
         {
             throw new NotImplementedException();
         }
+
+        public void ListenToRemoteLCU()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class TestMainView : IMainView

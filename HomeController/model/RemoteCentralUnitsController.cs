@@ -47,11 +47,37 @@ namespace HomeController.model
 
         //}
 
-        public void StartReceiverOnAllProxys()
+
+        // For debug purpose.
+        public void ConnectToOnlyRcu()
+        {
+            if (remoteCentralUnitProxies.Count != 1)
+            {
+                throw new Exception("ConnectToOnlyRcu only available when you have a single RCU.");
+            }
+
+            remoteCentralUnitProxies[0].ConnectToRemoteLcu();
+        }
+
+        public void ListenToTheOnlyRcu()
+        {
+            if(remoteCentralUnitProxies.Count != 1)
+            {
+                throw new Exception("ListenToOnlyRcu only available when you have a single RCU.");
+            }
+
+            remoteCentralUnitProxies[0].StartListeningToRemoteLcu();
+        }
+
+
+
+
+
+        public void ActivateCommunicationOnAllProxys()
         {
             foreach (var configuredRemoteCentralUnit in remoteCentralUnitProxies)
             {
-                configuredRemoteCentralUnit.StartReceiver();
+                configuredRemoteCentralUnit.ActivateCommunication();
             }
         }
 
@@ -121,7 +147,7 @@ namespace HomeController.model
                 IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(lcu, remoteCentralUnitConfiguration.Name, remoteCentralUnitConfiguration.Id, remoteCentralUnitConfiguration.IpAddress, remoteCentralUnitConfiguration.InitiatorPortNumber, remoteCentralUnitConfiguration.ResponderPortNumber);
                 //remoteCentralUnit.RemoteLcuStatusHasChanged += remoteCentralUnit_RemoteLcuStatusHasChanged;
                 remoteCentralUnitProxies.Add(remoteCentralUnit);
-                remoteCentralUnit.ActivateCommunication(); // StartListeningOnRemoteLcu();
+                //remoteCentralUnit.ActivateCommunication(); // StartListeningOnRemoteLcu();
 
             }
 

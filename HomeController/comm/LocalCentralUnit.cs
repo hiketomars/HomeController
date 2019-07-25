@@ -106,7 +106,7 @@ LcuRemoteCentralUnitsController.Setup(this);
             var lcuSirenController = new SirenController(this);
 
             SetupLcu(door, doorLed, ledController, LcuRemoteCentralUnitsController, lcuSiren, lcuSirenController);
-            LcuRemoteCentralUnitsController.SendStartUpMessage();
+            //LcuRemoteCentralUnitsController.SendStartUpMessage();
         }
 
         // Constructor for unit tests.
@@ -152,24 +152,25 @@ LcuRemoteCentralUnitsController.Setup(this);
 
         public ISirenController LcuSirenController { get; set; }
 
-        public void StartSurveillance(bool startReceivers = true)
+        public void StartSurveillance(bool activateCommunications = true)
         {
             // Start never ending timer loop
             SurveillancePoolTimer = ThreadPoolTimer.CreatePeriodicTimer(SurveillancePoolTimerElapsedHandler, TimeSpan.FromMilliseconds(1000));
-            if (startReceivers)
+            if (activateCommunications)
             {
-                StartReceivers();
-                Logger.Logg(Name,Logger.LCU_Cat, "Starting surveillance and receivers.");
+                ActivateCommunication();
+
+                Logger.Logg(Name,Logger.LCU_Cat, "Starting surveillance and activating communications.");
             }
             else
             {
-                Logger.Logg(Name, Logger.LCU_Cat, "Starting surveillance but NOT receivers.");
+                Logger.Logg(Name, Logger.LCU_Cat, "Starting surveillance but NOT activating communications.");
             }
         }
 
-        public void StartReceivers()
+        public void ActivateCommunication()
         {
-            LcuRemoteCentralUnitsController.StartReceiverOnAllProxys();
+            LcuRemoteCentralUnitsController.ActivateCommunicationOnAllProxys();
         }
 
         public void StopSurveillance()

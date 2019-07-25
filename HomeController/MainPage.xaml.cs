@@ -165,6 +165,11 @@ namespace HomeController
         {
             mainPresenter.ConnectBtn_Click();
         }
+
+        private void ListenBtn_OnClickBtn_OnClickBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.ListenBtn_Click();
+        }
     }
 }
 

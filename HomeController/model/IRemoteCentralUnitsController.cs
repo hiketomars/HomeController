@@ -18,7 +18,11 @@ namespace HomeController.model
         //void StatusHasChanged(AlarmHandler.AlarmActivityStatus currentStatus);
         int RemoteCentralUnitsCount { get; }
         LocalCentralUnit Lcu { get; set; }
-        void StartReceiverOnAllProxys();
+        void ActivateCommunicationOnAllProxys();
         CompoundStatus GetCompoundStatus();
+
+        // FOr Debug puspose
+        void ConnectToOnlyRcu();
+        void ListenToTheOnlyRcu();
     }
 }
