@@ -10,5 +10,6 @@ namespace HomeController.model
     {
         string Name { get; }
         IAlarmHandler LcuAlarmHandler { get; }
-    }
+        IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; }
+}
 }

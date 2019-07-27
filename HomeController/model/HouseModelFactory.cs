@@ -23,7 +23,7 @@ namespace HomeController.model
 
             if(!TestMode)
             {
-                return HouseHandler.GetInstance();
+                return LcuHandler.GetInstance();
             }
 
             return HouseModel;// todo return mock here.

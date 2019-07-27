@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Media;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Core;
+using HomeController.userControl;
 using HomeController.utils;
 using HomeController.view;
 
@@ -38,7 +39,7 @@ namespace HomeController
         private SolidColorBrush grayBrush = new SolidColorBrush(Windows.UI.Colors.LightGray);
         private SolidColorBrush yellowBrush = new SolidColorBrush(Windows.UI.Colors.Yellow);
         private Door door;
-        private HouseHandler houseHandler; // Representerar andra RPi vid andra dörrar.
+        private LcuHandler houseHandler; // Representerar andra RPi vid andra dörrar.
         private MainPresenter mainPresenter;
         public MainPage()
         {
@@ -127,6 +128,17 @@ namespace HomeController
             else
             {
                 LED.Fill = grayBrush;
+            }
+        }
+
+        public void SetLcus(List<ILocalCentralUnit> lcus)
+        {
+            foreach(var lcu in lcus)
+            {
+                var lcuUserControl = new LcuUserControl();
+                lcuUserControl.NameText = lcu.Name;
+                lcuUserControl.AddTextToOutput("Lcu " + lcu.Name + " created.");
+                LcuStackPanel.Children.Add(lcuUserControl);
             }
         }
 

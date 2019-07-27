@@ -24,6 +24,17 @@ namespace HomeController.view
             houseModel = HouseModelFactory.GetHouseModel();
             houseModel.ModelHasChanged += new Definition.VoidEventHandler(ModelEventHandler_ModelHasChanged);
             houseModel.LCULedHasChanged += new Definition.LEDChangedEventHandler(ModelEventHandler_LCULedHasChanged);
+            houseModel.LcuInstancesHasChanged += new Definition.VoidEventHandler(ModelEventHandler_LcuInstancesHasChanged);
+
+            ModelEventHandler_LcuInstancesHasChanged();
+        }
+
+        // The number of Lcu:s that the model handles has changed.
+        // Normally it is 1 but can be many if the application is run in that mode.
+        private void ModelEventHandler_LcuInstancesHasChanged()
+        {
+            var lcus = houseModel.GetLcuList();
+            mainView.SetLcus(lcus);
         }
 
         // This is the handler method for the event ModelHasChanged that comes from the model.

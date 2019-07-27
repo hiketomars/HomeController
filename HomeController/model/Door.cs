@@ -36,7 +36,7 @@ namespace HomeController.model
 
         // CHecks the statuses on the door and houseAlarm and sets the LED pattern that signals the found status.
         // todo alla statusar tas ej hänsyn till just nu.
-        internal void SetAppropriteLedPattern(HouseHandler houseHandler)
+        internal void SetAppropriteLedPattern(LcuHandler houseHandler)
         {
             if (houseHandler.AlarmIsActive)
             {

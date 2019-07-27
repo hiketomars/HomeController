@@ -8,8 +8,8 @@ namespace HomeController.model
 {
     public class RemoteCentralUnitConfiguration : IRemoteCentralUnitConfiguration
     {
-        // rcuPort is the port that the LCU will use to write to the RCU.
-        // rcuRespondPort is the port that the LCU will listen to for incoming messages from the RCU.
+        // initiatorPortNumber is the port that the LCU will use to write to the RCU.
+        // responderPortNumber is the port that the LCU will listen to for incoming messages from the RCU.
         public RemoteCentralUnitConfiguration(string name, string id, string ip, string initiatorPortNumber, string responderPortNumber)
         {
             Name = name;

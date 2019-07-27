@@ -10,30 +10,50 @@ using HomeController.utils;
 namespace HomeController.model
 {
     /// <summary>
-    /// The one and only instance of the HouseHandler class represents the house, ie not a specific LCU.
+    /// The one and only instance of the LcuHandler class.
     /// Alarm and status are summarized in this class.
     /// </summary>
-    public class HouseHandler : IHouseModel
+    public class LcuHandler : IHouseModel
     {
         //private readonly LocalCentralUnit lcu;
         public bool AlarmIsActive { get; set; }
 
-        private LocalCentralUnit lcu;
+        private List<ILocalCentralUnit> lcuList = new List<ILocalCentralUnit>();
 
         /// <summary>
-        /// Constructs the one and only HouseHandler which is the model in the MVP.
+        /// Constructs the one and only LcuHandler which is the model in the MVP.
         /// </summary>
-        public HouseHandler()
+        public LcuHandler()
         {
+            // Currently the config handlers are construncted from hard coded data but later on this will be read from XML-file(s).
             ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
                 {
                     new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340", "1341"),
                 }
             );
-            lcu = new LocalCentralUnit(configHandlerFrontDoor);
+            var frontDoorLcu = new LocalCentralUnit(configHandlerFrontDoor);
+            lcuList.Add(frontDoorLcu);
+
+            ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLCU", new List<IRemoteCentralUnitConfiguration>()
+                {
+                    new RemoteCentralUnitConfiguration("Framsidan", "1","localhost", "1341", "1340"),
+                }
+            );
+            var backDoorLcu = new LocalCentralUnit(configHandlerBackDoor);
+            lcuList.Add(backDoorLcu);
+
+            //foreach(var lcu in lcuList)
+            //{
+            //    var lcuUserControl = new LcuUserControl();
+            //    lcuUserControl.NameText = lcu.Name;
+            //    lcuUserControl.AddTextToOutput("Lcu " + lcu.Name + " created.");
+            //    //MainStackPanel.Children.Add(lcuUserControl);
+
+            //}
+            SendEventThatLcuInstancesHasChanged();
         }
 
-        public void InitHouseHandler() { 
+        public void InitLcuHandler() { 
             //PerformStartUpLEDFlash();
             // Should read config here but now hard coded to have contact with only one other LCU.
             //BackdoorRemoteCentralUnit = new RemoteCentralUnit("", "", "");//todo
@@ -94,6 +114,7 @@ namespace HomeController.model
         }
 
         public event Definition.VoidEventHandler ModelHasChanged;
+        public event Definition.VoidEventHandler LcuInstancesHasChanged;
         public event Definition.LEDChangedEventHandler LCULedHasChanged;
 
         public List<string> GetLoggings()
@@ -112,23 +133,29 @@ namespace HomeController.model
         // This is called when the user clicks on a direct Connect-button to test the connection.
         public void ConnectToRemoteLCU()
         {
-            lcu.LcuRemoteCentralUnitsController.ConnectToOnlyRcu();
+            lcuList[0].LcuRemoteCentralUnitsController.ConnectToOnlyRcu();//todo Ska inte ha kvar denna ref till 0
         }
 
         public void ListenToRemoteLCU()
         {
-            lcu.LcuRemoteCentralUnitsController.ListenToTheOnlyRcu();
+            lcuList[0].LcuRemoteCentralUnitsController.ListenToTheOnlyRcu();//todo Ska inte ha kvar denna ref till 0
         }
 
-        private static HouseHandler houseHandler;
-        public static HouseHandler GetInstance()
+        // Returns the list of the Lcu:s that this LcuHandler handles.
+        public List<ILocalCentralUnit> GetLcuList()
         {
-            if (houseHandler == null)
+            return lcuList;
+        }
+
+        private static LcuHandler lcuHandler;
+        public static LcuHandler GetInstance()
+        {
+            if (lcuHandler == null)
             {
-                houseHandler = new HouseHandler();
+                lcuHandler = new LcuHandler();
             }
 
-            return houseHandler;
+            return lcuHandler;
         }
 
         public void SendEventThatModelHasChanged()
@@ -136,6 +163,13 @@ namespace HomeController.model
             if (ModelHasChanged != null)
             {
                 ModelHasChanged();
+            }
+        }
+        public void SendEventThatLcuInstancesHasChanged()
+        {
+            if (LcuInstancesHasChanged != null)
+            {
+                LcuInstancesHasChanged();
             }
         }
     }

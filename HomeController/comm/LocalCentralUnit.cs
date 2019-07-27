@@ -412,7 +412,7 @@ Logger.Logg(this.Name, Logger.LCU_Cat, "Leaving Lcu.ActivateAlarm.");
         {
             Logger.Logg(Name, text);
             loggings.Add(text);
-            HouseHandler.GetInstance().SendEventThatModelHasChanged();
+            LcuHandler.GetInstance().SendEventThatModelHasChanged();
         }
 
  

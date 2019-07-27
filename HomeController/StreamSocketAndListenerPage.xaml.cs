@@ -25,6 +25,7 @@ namespace HomeController
             get => "FakeLcu";
         }
         public IAlarmHandler LcuAlarmHandler { get; }
+        public IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; }
     }
 
     public class FakeAlarmHandler : IAlarmHandler {

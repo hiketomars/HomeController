@@ -142,7 +142,7 @@
     <Compile Include="model\AlarmHandler.cs" />
     <Compile Include="model\Door.cs" />
     <Compile Include="model\DoorController.cs" />
-    <Compile Include="model\HouseHandler.cs" />
+    <Compile Include="model\LcuHandler.cs" />
     <Compile Include="model\HouseModelFactory.cs" />
     <Compile Include="model\IDoor.cs" />
     <Compile Include="model\IDoorController.cs" />
@@ -167,6 +167,9 @@
     <Compile Include="service\RemoteMockService.cs" />
     <Compile Include="StreamSocketAndListenerPage.xaml.cs">
       <DependentUpon>StreamSocketAndListenerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="userControl\LcuUserControl.xaml.cs">
+      <DependentUpon>LcuUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="utils\Definition.cs" />
     <Compile Include="utils\Logger.cs" />
@@ -204,6 +207,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="StreamSocketAndListenerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="userControl\LcuUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

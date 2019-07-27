@@ -32,6 +32,10 @@
 
 
         </StackPanel>
+        <StackPanel Name ="LcuStackPanel" Background="BurlyWood" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10,0" Width="1480">
+            <TextBlock x:Name="LcusHeading" Text="Configured LCUs" Margin="10" TextAlignment="Center" FontSize="26.667" />
+
+        </StackPanel>
     </Grid>
 
 

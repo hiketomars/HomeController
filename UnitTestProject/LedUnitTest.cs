@@ -322,6 +322,7 @@ namespace UnitTestProject
     class TestHouseModel : IHouseModel
     {
         public event Definition.VoidEventHandler ModelHasChanged;
+        public event Definition.VoidEventHandler LcuInstancesHasChanged;
         public event Definition.LEDChangedEventHandler LCULedHasChanged;
 
         public List<string> GetLoggings()
@@ -343,6 +344,11 @@ namespace UnitTestProject
         {
             throw new NotImplementedException();
         }
+
+        public List<ILocalCentralUnit> GetLcuList()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class TestMainView : IMainView
@@ -358,6 +364,11 @@ namespace UnitTestProject
         }
 
         public void SetColorForBackdoorLED(RGBValue rgbValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLcus(List<ILocalCentralUnit> lcus)
         {
             throw new NotImplementedException();
         }

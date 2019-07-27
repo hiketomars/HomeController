@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HomeController.model;
 using HomeController.utils;
 
 namespace HomeController.view
@@ -15,5 +16,6 @@ namespace HomeController.view
         void AddLoggItem(string text);
         void SetLoggItems(List<string> loggings);
         void SetColorForBackdoorLED(RGBValue rgbValue);
+        void SetLcus(List<ILocalCentralUnit> lcus);
     }
 }

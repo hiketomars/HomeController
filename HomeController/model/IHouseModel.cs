@@ -12,10 +12,12 @@ namespace HomeController.model
     public interface IHouseModel
     {
         event Definition.VoidEventHandler ModelHasChanged;
+        event Definition.VoidEventHandler LcuInstancesHasChanged;
         event Definition.LEDChangedEventHandler LCULedHasChanged;
         List<string> GetLoggings();
         void GetColorForBackdoorLED();
         void ConnectToRemoteLCU();
         void ListenToRemoteLCU();
+        List<ILocalCentralUnit> GetLcuList();
     }
 }
