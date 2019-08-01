@@ -41,10 +41,16 @@ namespace HomeController
         private Door door;
         private LcuHandler houseHandler; // Representerar andra RPi vid andra dörrar.
         private MainPresenter mainPresenter;
+
+
+
+
+
         public MainPage()
         {
             InitializeComponent();
             mainPresenter = new MainPresenter(this);
+            mainPresenter.ModelEventHandler_LcuInstancesHasChanged(); // Update/Initialize.
         }
 
         private void GpioStatus_SelectionChanged(object sender, RoutedEventArgs e)
@@ -131,15 +137,43 @@ namespace HomeController
             }
         }
 
+        //private List<ILocalCentralUnit> lcus = new List<ILocalCentralUnit>();
+        private List<LcuUserControl> lcuUserControls = new List<LcuUserControl>();
+
         public void SetLcus(List<ILocalCentralUnit> lcus)
         {
-            foreach(var lcu in lcus)
+            foreach (var lcu in lcus)
             {
-                var lcuUserControl = new LcuUserControl();
+                var lcuUserControl = new LcuUserControl(mainPresenter);
+                lcuUserControl.LcuName = lcu.Name;
                 lcuUserControl.NameText = lcu.Name;
                 lcuUserControl.AddTextToOutput("Lcu " + lcu.Name + " created.");
+                foreach (var rcu in lcu.LcuRemoteCentralUnitsController.RcuList)
+                {
+                    lcuUserControl.AddRcu(rcu.NameOfRemoteLcu);
+                }
+
                 LcuStackPanel.Children.Add(lcuUserControl);
+                //this.lcus.Add(lcu);
+                lcuUserControls.Add(lcuUserControl);
             }
+
+
+        }
+
+        // Adds text to rcu log.
+        public void AddLoggText(string lcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.AddTextToOutput(text);
+        }
+
+        // Adds text to rcu logg (within an lcu).
+        public void AddLoggText(string lcuName, string rcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
+            rcuUserControl.AddTextToOutput(text);
         }
 
         // Not used right now since I'm having another method that takes RGBValue as an argument instead.
@@ -175,12 +209,12 @@ namespace HomeController
         // When the user clicks this button the LCU makes a connection to the other LCU.
         private void ConnectBtn_OnClickBtn_Click(object sender, RoutedEventArgs e)
         {
-            mainPresenter.ConnectBtn_Click();
+            //mainPresenter.ConnectBtn_Click("Inget namn satt");
         }
 
         private void ListenBtn_OnClickBtn_OnClickBtn_Click(object sender, RoutedEventArgs e)
         {
-            mainPresenter.ListenBtn_Click();
+            //mainPresenter.ListenBtn_Click("Inget LCU-namn satt", "Inget RCU-namn satt");
         }
     }
 }

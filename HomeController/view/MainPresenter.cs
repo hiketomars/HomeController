@@ -26,12 +26,12 @@ namespace HomeController.view
             houseModel.LCULedHasChanged += new Definition.LEDChangedEventHandler(ModelEventHandler_LCULedHasChanged);
             houseModel.LcuInstancesHasChanged += new Definition.VoidEventHandler(ModelEventHandler_LcuInstancesHasChanged);
 
-            ModelEventHandler_LcuInstancesHasChanged();
+            
         }
 
         // The number of Lcu:s that the model handles has changed.
         // Normally it is 1 but can be many if the application is run in that mode.
-        private void ModelEventHandler_LcuInstancesHasChanged()
+        public void ModelEventHandler_LcuInstancesHasChanged()
         {
             var lcus = houseModel.GetLcuList();
             mainView.SetLcus(lcus);
@@ -61,14 +61,31 @@ namespace HomeController.view
             mainView.AddLoggItem("Info button clicked.");
         }
 
-        public void ConnectBtn_Click()
+
+
+        public void ListenBtn_Click(string lcuName, string rcuName)
         {
-            houseModel.ConnectToRemoteLCU();
+            houseModel.ListenToRCU(lcuName, rcuName);
+            mainView.AddLoggText(lcuName, rcuName, lcuName + " listens to " + rcuName);
+        }
+        public void ConnectBtn_Click(string lcuName, string rcuName)
+        {
+            houseModel.ConnectToLCU(lcuName, rcuName);
+            mainView.AddLoggText(lcuName, rcuName, lcuName + " connected to " + rcuName);
         }
 
-        public void ListenBtn_Click()
+
+
+        public void ConnectAllBtn_Click(string lcuName)
         {
-            houseModel.ListenToRemoteLCU();
+            houseModel.ConnectToAllRCU(lcuName);
+            mainView.AddLoggText(lcuName, lcuName + " connected to all rcu:s");
+        }
+
+        public void ListenAllBtn_Click(string lcuName)
+        {
+            houseModel.ListenToAllRCU(lcuName);
+            mainView.AddLoggText(lcuName, lcuName + " listens to all rcu:s");
         }
     }
 }

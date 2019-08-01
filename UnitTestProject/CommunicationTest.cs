@@ -118,7 +118,7 @@ namespace UnitTestProject
             altanenDoorLcu?.Reset();
         }
 
-        [TestMethod]
+        //makl 19028 [TestMethod]
         public void C0_CommunicatingProxies()
         {
             string ip = "127.0.0.1";
@@ -143,7 +143,7 @@ namespace UnitTestProject
                           AlarmHandler.AlarmActivityStatus.EntranceOngoing);
         }
 
-        [TestMethod]
+        //makl 19028 [TestMethod]
         public void
             C1_ReadingIsDoorUnlockedFromRemoteControlUnits_WhenAllButOneRemoteDoorsAreLocked_Expect_CorrectResponse()
         {
@@ -216,7 +216,7 @@ namespace UnitTestProject
 
         }
 
-        [UITestMethod]
+        //makl 19028 [UITestMethod]
         public void C20_IntrusionOccursAtOneRemoteLcu_When_AlarmIsActive_Expect_SirenTurnedOnAtLocalCentralUnit()
         {
             testName = "C20v1";

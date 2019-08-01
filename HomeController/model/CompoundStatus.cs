@@ -41,5 +41,28 @@ namespace HomeController.model
 
             return AlarmHandler.AlarmActivityStatus.Undefined;
         }
+
+        public override string ToString()
+        {
+            LocalLcuStatus localLcuStatus = GetLocalStatus();
+            string localLcuStatusString = localLcuStatus != null ? localLcuStatus.ToString() : "No LocalLcuStatus. ";
+            return "CompoundStatus: " + localLcuStatusString + "todo vad vill jag visa här?";
+        }
+
+        private LocalLcuStatus GetLocalStatus()
+        {
+            if(LcuStatuses != null)
+            {
+                foreach (var lcuStatus in LcuStatuses)
+                {
+                    if(lcuStatus is LocalLcuStatus)
+                    {
+                        return lcuStatus as LocalLcuStatus;
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }

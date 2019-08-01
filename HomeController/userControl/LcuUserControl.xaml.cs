@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using HomeController.view;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -19,10 +20,16 @@ namespace HomeController.userControl
 {
     public sealed partial class LcuUserControl : UserControl
     {
-        public LcuUserControl()
+        private readonly MainPresenter mainPresenter;
+        private List<RcuRowUserControl> rcuUserControlList = new List<RcuRowUserControl>();
+
+        public LcuUserControl(MainPresenter mainPresenter)
         {
+            this.mainPresenter = mainPresenter;
             this.InitializeComponent();
         }
+
+        public string LcuName { get; set; } 
 
         public string NameText
         {
@@ -36,17 +43,23 @@ namespace HomeController.userControl
             }
         }
 
-        private TextBlock output;
-        public TextBlock Output
+        // Adds an RCU GUI-row to this LCU-GUI.
+        public void AddRcu(string rcuName)
         {
-            get
-            {
-                return output;
-            }
-            set
-            {
-                output = value;
-            }
+            var rcuUserControl = new RcuRowUserControl(mainPresenter);
+            rcuUserControl.LcuName = LcuName;
+            rcuUserControl.Name = rcuName;
+            rcuUserControl.NameText= rcuName;
+            rcuUserControl.RcuName = rcuName;
+            rcuUserControl.AddTextToOutput("Rcu " + rcuName + " created.");
+            rcuUserControlList.Add(rcuUserControl);
+            RcuStackPanel.Children.Add(rcuUserControl);
+        }
+
+        // Returns all RcuUserControls that is part of this LcuUserControl.
+        public List<RcuRowUserControl> GetRcuUserControls()
+        {
+            return rcuUserControlList;
         }
 
         public void AddTextToOutput(string text)
@@ -54,14 +67,16 @@ namespace HomeController.userControl
             InfoTextBlock.Text += text;
         }
 
-        private void ListenBtn_Click(object sender, RoutedEventArgs e)
+        private void ListenAllBtn_Click(object sender, RoutedEventArgs e)
         {
-            InfoTextBlock.Text += "Listen button is not implemented yet.";
+            InfoTextBlock.Text += "";
+            mainPresenter.ListenAllBtn_Click(LcuName);
         }
 
-        private void ConnectBtn_Click(object sender, RoutedEventArgs e)
+        private void ConnectAllBtn_Click(object sender, RoutedEventArgs e)
         {
-            InfoTextBlock.Text += "Connect button is not implemented yet.";
+            InfoTextBlock.Text += "";
+            mainPresenter.ConnectAllBtn_Click(LcuName);
         }
     }
 }

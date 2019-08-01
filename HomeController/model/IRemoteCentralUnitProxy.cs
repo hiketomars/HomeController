@@ -16,7 +16,8 @@ namespace HomeController.model
         void SendStartUpMessage();
         object RemoteLcuStatusHasChanged { get; set; }
         void ActivateCommunication();
-        string Name { set; get; }
+        //string Name { set; get; }
+        string NameOfRemoteLcu { set; get; }
         string IpAddress { get; set; }
         CurrentStatusMessage RcuCurrentStatusMessage { get; set; }
         bool SendPingMessage();

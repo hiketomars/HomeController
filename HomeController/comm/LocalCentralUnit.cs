@@ -180,13 +180,14 @@ LcuRemoteCentralUnitsController.Setup(this);
         }
 
         // This is the central surveillance loop.
-        // It is typcally called once a second or more and checks for local and remote statuses and might start actions as a reaction of that.
+        // It is typically called once a second or more and checks for local and remote statuses and might start actions as a reaction of that.
         private void SurveillancePoolTimerElapsedHandler(ThreadPoolTimer timer)
         {
             Logger.Logg(Name, Logger.LCU_Cat, "Time to do surveillance!");
 
             // First we need to find out the current overall (compound) status of the home.
             var compoundStatus = LcuRemoteCentralUnitsController.GetCompoundStatus();
+            Logger.Logg(configHandler.GetLCUName(), Logger.LCU_Cat, "CompoundStatus is " + compoundStatus);
             var localLcuStatus = GetLocalStatus();
             compoundStatus.AddLocalStatus(localLcuStatus);
             // The compound status is now ready.

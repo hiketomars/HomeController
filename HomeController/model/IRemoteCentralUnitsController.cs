@@ -20,9 +20,12 @@ namespace HomeController.model
         LocalCentralUnit Lcu { get; set; }
         void ActivateCommunicationOnAllProxys();
         CompoundStatus GetCompoundStatus();
-
+        List<IRemoteCentralUnitProxy> RcuList { get; }
         // FOr Debug puspose
         void ConnectToOnlyRcu();
-        void ListenToTheOnlyRcu();
+        void ListenToRcu(string rcuName);
+
+        void ListenToAllRcus();
+        void ConnectToAllRcus();
     }
 }

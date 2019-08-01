@@ -95,19 +95,26 @@ namespace UnitTestProject
                 d.Create();
             }
 
-            Logger.Logg("L1", Logger.Test_Cat, "Running test L1.");
+            Logger.Logg("L1", Logger.Test_Cat, "Running test.");
             // Door is closed and unlocked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);
+            int delay = 2000;
+            Logger.Logg("L1", Logger.Test_Cat, "Will wait "+delay);
 
-            Task.Delay(2000).Wait();
+            Task.Delay(delay).Wait();
+            Logger.Logg("L1", Logger.Test_Cat, "Have waited "+delay);
+
 
             // Verify that door is checked.
             doorControllerMock.Verify(f => f.IsDoorOpen(), Times.AtLeastOnce());
             doorControllerMock.Verify(f => f.IsDoorLocked(), Times.AtLeastOnce());
 
+            Logger.Logg("L1", Logger.Test_Cat, "Verified that door is checked.");
+
             // Verify that green light turned on.
             ledControllerMock.Verify(f => f.SetLed_AlarmIsInactiveAndDoorIsUnlockedButAllOthersAreLocked(), Times.AtLeastOnce);
+            Logger.Logg("L1", Logger.Test_Cat, "Verified that LED is set correctly.");
 
             // Verify that siren is not turned on.
             sirenControllerMock.Verify(f => f.TurnOn(), Times.Never());
@@ -117,6 +124,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L2_Generally_When_AlarmIsInactiveAndDoorIsUnlockedAndNotAllOthersAreLocked_Expect_CorrectLedLight()
         {
+            Logger.Logg("L2", Logger.Test_Cat, "Running test.");
+
             // Door is closed and unlocked. One or more remote doors are unlocked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);
@@ -141,6 +150,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L3_Normally_When_AlarmIsInactiveAndDoorIsLockedAndSoAreAllTheOthers_Expect_CorrectLedLight()
         {
+            Logger.Logg("L3", Logger.Test_Cat, "Running test.");
+
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
             remoteCentralUnitsControllerMock.Setup(f => f.IsAnyRemoteDoorUnlocked()).Returns(false);
@@ -166,6 +177,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L4_Normally_When_AlarmIsInactiveAndDoorIsLockedButNotAllTheOthersAreLocked_Expect_CorrectLedLight()
         {
+            Logger.Logg("L4", Logger.Test_Cat, "Running test.");
+
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
             remoteCentralUnitsControllerMock.Setup(f => f.IsAnyRemoteDoorUnlocked()).Returns(true);
@@ -190,6 +203,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L5_Normally_When_AlarmIsActiveAndDoorIsLockedAndAllTheOthersAsWell_Expect_FlashingRedLED()
         {
+            Logger.Logg("L5", Logger.Test_Cat, "Running test.");
+
             // Door is closed and locked. All remote doors are locked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
@@ -216,6 +231,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L6_Normally_When_AlarmIsActiveAndDoorIsLockedButNotAllTheOthersAreLocked_Expect_FlashingFlickeringRedLED()
         {
+            Logger.Logg("L6", Logger.Test_Cat, "Running test.");
+
             // Door is closed and locked. All remote doors are locked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(true);
@@ -242,6 +259,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L7_Normally_When_AlarmIsActiveAndDoorIsUnlockedButAllTheOthersAreLocked_Expect_CorrectLedLight()
         {
+            Logger.Logg("L7", Logger.Test_Cat, "Running test.");
+
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);
             remoteCentralUnitsControllerMock.Setup(f => f.IsAnyRemoteDoorUnlocked()).Returns(false);
@@ -267,6 +286,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L8_Normally_When_AlarmIsActiveAndDoorIsUnlockedAndNotAllTheOthersAreLocked_Expect_FlashingFlickeringRedAndGreenLED()
         {
+            Logger.Logg("L8", Logger.Test_Cat, "Running test.");
+
             // Door is closed but not locked. All remote doors are locked.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(false);
             doorControllerMock.Setup(f => f.IsDoorLocked()).Returns(false);
@@ -292,6 +313,8 @@ namespace UnitTestProject
         [TestMethod]
         public void L9_DoorIsOpenAndThenClosed_When_AlarmIsInactiveAndAllOthersAreLocked_Expect_CorrectLedLightInBothSituations()
         {
+            Logger.Logg("L9", Logger.Test_Cat, "Running test.");
+
             // Door is open.
             doorControllerMock.Setup(f => f.IsDoorOpen()).Returns(true);
 
@@ -335,17 +358,27 @@ namespace UnitTestProject
             throw new NotImplementedException();
         }
 
-        public void ConnectToRemoteLCU()
+        public void ConnectToLCU(string lcuName, string rcuName)
         {
             throw new NotImplementedException();
         }
 
-        public void ListenToRemoteLCU()
+        public void ListenToRCU(string lcuName, string rcuName)
         {
             throw new NotImplementedException();
         }
 
         public List<ILocalCentralUnit> GetLcuList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConnectToAllRCU(string lcuName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ListenToAllRCU(string lcuName)
         {
             throw new NotImplementedException();
         }
@@ -369,6 +402,16 @@ namespace UnitTestProject
         }
 
         public void SetLcus(List<ILocalCentralUnit> lcus)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddLoggText(string lcuName, string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddLoggText(string lcuName, string rcuName, string text)
         {
             throw new NotImplementedException();
         }

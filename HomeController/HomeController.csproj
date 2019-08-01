@@ -171,6 +171,9 @@
     <Compile Include="userControl\LcuUserControl.xaml.cs">
       <DependentUpon>LcuUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="userControl\RcuRowUserControl.xaml.cs">
+      <DependentUpon>RcuRowUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="utils\Definition.cs" />
     <Compile Include="utils\Logger.cs" />
     <Compile Include="utils\RGBValue.cs" />
@@ -211,6 +214,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="userControl\LcuUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="userControl\RcuRowUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

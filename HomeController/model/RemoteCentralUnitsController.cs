@@ -59,18 +59,37 @@ namespace HomeController.model
             remoteCentralUnitProxies[0].ConnectToRemoteLcu();
         }
 
-        public void ListenToTheOnlyRcu()
-        {
-            if(remoteCentralUnitProxies.Count != 1)
-            {
-                throw new Exception("ListenToOnlyRcu only available when you have a single RCU.");
-            }
+        //public void ListenToTheOnlyRcu()
+        //{
+        //    if(remoteCentralUnitProxies.Count != 1)
+        //    {
+        //        throw new Exception("ListenToOnlyRcu only available when you have a single RCU.");
+        //    }
 
-            remoteCentralUnitProxies[0].StartListeningToRemoteLcu();
+        //    remoteCentralUnitProxies[0].StartListeningToRemoteLcu();
+        //}
+
+        public void ListenToRcu(string rcuName)
+        {
+            var rcu = remoteCentralUnitProxies.Find(e=>e.NameOfRemoteLcu == rcuName);
+            rcu.StartListeningToRemoteLcu();
         }
 
+        public void ListenToAllRcus()
+        {
+            foreach (var rcu in remoteCentralUnitProxies)
+            {
+                rcu.StartListeningToRemoteLcu();
+            }
+        }
 
-
+        public void ConnectToAllRcus()
+        {
+            foreach(var rcu in remoteCentralUnitProxies)
+            {
+                rcu.ConnectToRemoteLcu();
+            }
+        }
 
 
         public void ActivateCommunicationOnAllProxys()
@@ -103,6 +122,13 @@ namespace HomeController.model
             return compoundStatus;
         }
 
+        public List<IRemoteCentralUnitProxy> RcuList
+        {
+            get
+            {
+                return remoteCentralUnitProxies;
+            }
+        }
         public LocalCentralUnit Lcu { get; set; }
         private List<IRemoteCentralUnitConfiguration> remoteCentralUnitConfigurations;
 
@@ -162,7 +188,7 @@ namespace HomeController.model
                 var contact = remoteCentralUnitProxy.SendPingMessage();
                 if (!contact)
                 {
-                    Logger.Logg(Lcu.Name, Logger.RCUCtrl_Cat, "VerifyContact: No contact with " + remoteCentralUnitProxy.Name);
+                    Logger.Logg(Lcu.Name, Logger.RCUCtrl_Cat, "VerifyContact: No contact with " + remoteCentralUnitProxy.NameOfRemoteLcu);
                     return false;
                 }
             }

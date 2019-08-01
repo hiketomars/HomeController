@@ -31,13 +31,13 @@ namespace HomeController.model
 
 
         private readonly ILocalCentralUnit lcu;
-        private readonly string nameOfRemoteLcu;
+        public string NameOfRemoteLcu { get; set; }
         private readonly string ipAddress;
         private string initiatorPortNumber;
         private readonly string responderPortNumber;
         private ThreadPoolTimer periodicTimer;
         public string IpAddress { get; set; }
-        public string Name { get; set; }
+        //public string Name { get; set; }
 
         //private const string MessageLcuStarting = "msgLcuStarting";
         //private const string MessageIsDoorUnlocked = "msgIsDoorUnlocked";
@@ -50,11 +50,13 @@ namespace HomeController.model
         public CurrentStatusMessage RcuCurrentStatusMessage { get; set; }
         private object remoteLcuStatusHasChanged;
         public event Definition.RemoteLcuStatusChangedEventHandler RemoteLcuStatusHasChanged;
+        //public event Definition.RcuInfoEventHandler NewRcuInfo;
+        
 
         public RemoteCentralUnitProxy(ILocalCentralUnit lcu, string nameOfRemoteLcu, int idOfRemoteLcu, string ipAddress, string initiatorPortNumber, string responderPortNumber)
         {
             this.lcu = lcu;
-            this.nameOfRemoteLcu = nameOfRemoteLcu; // This is our name of the remote LCU which might not be exactly the same as it calls itself.
+            this.NameOfRemoteLcu = nameOfRemoteLcu; // This is our name of the remote LCU which might not be exactly the same as it calls itself.
             this.ipAddress = ipAddress;
             this.initiatorPortNumber = initiatorPortNumber;
             this.responderPortNumber = responderPortNumber;
@@ -159,7 +161,7 @@ namespace HomeController.model
         {
             try
             {
-                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "RemoteCentralUnitProxy.StartListeningOnRemoteLcu: LCU with name " + lcu.Name + " starts to listen to RCU " + nameOfRemoteLcu + " on responderPortNumber " + responderPortNumber);
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "RemoteCentralUnitProxy.StartListeningOnRemoteLcu: LCU with name " + lcu.Name + " starts to listen to RCU " + NameOfRemoteLcu + " on responderPortNumber " + responderPortNumber);
                 var streamSocketListener = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
@@ -167,7 +169,11 @@ namespace HomeController.model
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
                 await streamSocketListener.BindServiceNameAsync(responderPortNumber);
+
+                //OnNewRcuInfo(lcu.Name + " listens to " + NameOfRemoteLcu + " on rPort " + responderPortNumber);
+
                 #region alternatives
+
                 /*
                      Alternative from UWP Samples Scenario1.
                     // Try to bind to a specific address.
@@ -187,7 +193,9 @@ namespace HomeController.model
                         SocketProtectionLevel.PlainSocket,
                         selectedAdapter);
                  */
+
                 #endregion
+
                 //lcu.AddLogging("The server is listening on port " + Definition.OwnPortNumber + "...");
             }
             catch(Exception ex)
@@ -199,7 +207,14 @@ namespace HomeController.model
             }
         }
 
-        
+        //private void OnNewRcuInfo(string info)
+        //{
+        //    if(NewRcuInfo != null)
+        //    {
+        //        NewRcuInfo(lcu.Name, NameOfRemoteLcu, info);
+        //    }
+        //}
+
         // Sends exactly the specified command without adding anything.
         // Parameter port only needs to be specified when called from a debug method since client and server are on the same machine then.
         public async Task<string> SendCommandSpecific(string hostIp, string exactCommand)
@@ -274,7 +289,7 @@ namespace HomeController.model
 
         private void StartPeriodicRequestForRcuStatusMessage()
         {
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "StartReceiver for "+nameOfRemoteLcu);
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "StartReceiver for "+NameOfRemoteLcu);
             int period = 1000;
             periodicTimer = ThreadPoolTimer.CreatePeriodicTimer(timerElapsedHandler, TimeSpan.FromMilliseconds(period));
         }
@@ -283,7 +298,7 @@ namespace HomeController.model
         {
             // Ask for status of remote lcu. The response will be handled elsewhere. 
             // Maybe I need to check if I get any answer....?
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Sending GetStatus to " + nameOfRemoteLcu);
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Sending GetStatus to " + NameOfRemoteLcu);
 
             SendRequestOfRcuStatusMessage();
         }
@@ -456,7 +471,7 @@ namespace HomeController.model
 
         private async void StreamSocketListener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, Name + " received something!");
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, " received something!");
 
             string request;
             using(var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
@@ -470,7 +485,7 @@ namespace HomeController.model
 
 
             var transferObject = BuildTransferObjectFromPortStringMessage(request);
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat,"Got message " + transferObject.MessageType+ "with id "+transferObject.Id + " from " + nameOfRemoteLcu);
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat,"Got message " + transferObject.MessageType+ "with id "+transferObject.Id + " from " + NameOfRemoteLcu);
 
             var communicationResponse = CreateCommunicationResponseObject(transferObject);
             if (communicationResponse == null)

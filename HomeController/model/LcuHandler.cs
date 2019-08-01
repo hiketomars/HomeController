@@ -12,6 +12,7 @@ namespace HomeController.model
     /// <summary>
     /// The one and only instance of the LcuHandler class.
     /// Alarm and status are summarized in this class.
+    /// Can handles a number of LCU:s during "PC-mode" but will only have one LCU in normal production mode.
     /// </summary>
     public class LcuHandler : IHouseModel
     {
@@ -20,12 +21,20 @@ namespace HomeController.model
 
         private List<ILocalCentralUnit> lcuList = new List<ILocalCentralUnit>();
 
+
+
+        //public event Definition.RcuInfoEventHandler NewRcuInfo;
+
+
+
+
+
         /// <summary>
         /// Constructs the one and only LcuHandler which is the model in the MVP.
         /// </summary>
         public LcuHandler()
         {
-            // Currently the config handlers are construncted from hard coded data but later on this will be read from XML-file(s).
+            // Currently the config handlers are constructed from hard coded data but later on this will be read from XML-file(s).
             ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
                 {
                     new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340", "1341"),
@@ -131,20 +140,34 @@ namespace HomeController.model
 
         // This is mainly intended for debug purpose.
         // This is called when the user clicks on a direct Connect-button to test the connection.
-        public void ConnectToRemoteLCU()
+        public void ConnectToLCU(string lcuName, string rcuName)
         {
-            lcuList[0].LcuRemoteCentralUnitsController.ConnectToOnlyRcu();//todo Ska inte ha kvar denna ref till 0
+            var lcu = lcuList.Find(e => e.Name == lcuName);
+            lcu.LcuRemoteCentralUnitsController.ConnectToOnlyRcu();
         }
 
-        public void ListenToRemoteLCU()
+        public void ListenToRCU(string lcuName, string rcuName)
         {
-            lcuList[0].LcuRemoteCentralUnitsController.ListenToTheOnlyRcu();//todo Ska inte ha kvar denna ref till 0
+            var lcu = lcuList.Find(e => e.Name == lcuName);
+            lcu.LcuRemoteCentralUnitsController.ListenToRcu(rcuName);
         }
 
         // Returns the list of the Lcu:s that this LcuHandler handles.
         public List<ILocalCentralUnit> GetLcuList()
         {
             return lcuList;
+        }
+
+        public void ConnectToAllRCU(string lcuName)
+        {
+            var lcu = lcuList.Find(e => e.Name == lcuName);
+            lcu.LcuRemoteCentralUnitsController.ConnectToAllRcus();
+        }
+
+        public void ListenToAllRCU(string lcuName)
+        {
+            var lcu = lcuList.Find(e => e.Name == lcuName);
+            lcu.LcuRemoteCentralUnitsController.ListenToAllRcus();
         }
 
         private static LcuHandler lcuHandler;

@@ -11,5 +11,10 @@ namespace HomeController.model
         public bool IsDoorLocked { get; set; }
         public AlarmHandler.AlarmActivityStatus AlarmActivity { get; set; }
         public bool IsDoorOpen { get; set; }
+        public override string ToString()
+        {
+            return "LocalLcuStatus: IsDoorOpen=" + IsDoorOpen + "; IsDoorLocked=" + IsDoorLocked + "AlarmActivity=" +
+                   AlarmActivity;
+        }
     }
 }

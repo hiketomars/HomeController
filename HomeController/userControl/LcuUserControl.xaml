@@ -13,10 +13,11 @@
             <ColumnDefinition/>
             <ColumnDefinition Width="400*"/>
         </Grid.ColumnDefinitions>
-        <Button Name="ListenBtn" Content="Listen" Click="ListenBtn_Click"  HorizontalAlignment="Left" Margin="10.5,42,0,0" VerticalAlignment="Top" Grid.Column="1" Width="75"/>
-        <Button Name="ConnectBtn" Content="Connect" Click="ConnectBtn_Click"  HorizontalAlignment="Left" Margin="10.5,79,0,0" VerticalAlignment="Top" Grid.Column="1"/>
         <TextBlock Name = "LcuNameTextBlock" HorizontalAlignment="Left" Margin="9.5,10,0,0" TextWrapping="Wrap" Text="Name of LCU" VerticalAlignment="Top" Width="190" Grid.Column="1"/>
-        <TextBlock Name="InfoTextBlock" HorizontalAlignment="Left" Margin="9.5,116,0,0" TextWrapping="Wrap" Text="..." VerticalAlignment="Top" Width="255" Grid.Column="1" Height="51"/>
-
+        <TextBlock Name="RcuNameTextBlock" Grid.Column="1" HorizontalAlignment="Left" Margin="10.5,48,0,0" TextWrapping="Wrap" Text="Rcu Name" VerticalAlignment="Top" Width="89"/>
+        <Button Name="ListenAllBtn" Content="Listen to All" Click="ListenAllBtn_Click"  HorizontalAlignment="Left" Margin="104.5,42,0,0" VerticalAlignment="Top" Grid.Column="1" Width="75"/>
+        <Button Name="ConnectAllBtn" Content="Connect to All" Click="ConnectAllBtn_Click"  HorizontalAlignment="Left" Margin="184.5,42,0,0" VerticalAlignment="Top" Grid.Column="1"/>
+        <StackPanel Name="RcuStackPanel" Grid.Column="1" HorizontalAlignment="Left" Height="58" Margin="10.5,79,0,0" VerticalAlignment="Top" Width="249"/>
+        <TextBlock Name="InfoTextBlock" HorizontalAlignment="Left" Margin="9.5,142,0,0" TextWrapping="Wrap" Text="..." VerticalAlignment="Top" Width="255" Grid.Column="1" Height="25"/>
     </Grid>
 </UserControl>

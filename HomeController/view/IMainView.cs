@@ -17,5 +17,7 @@ namespace HomeController.view
         void SetLoggItems(List<string> loggings);
         void SetColorForBackdoorLED(RGBValue rgbValue);
         void SetLcus(List<ILocalCentralUnit> lcus);
+        void AddLoggText(string lcuName, string text);
+        void AddLoggText(string lcuName, string rcuName, string text);
     }
 }
