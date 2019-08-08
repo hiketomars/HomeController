@@ -6,37 +6,53 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="Beige" >
-            <Button x:Name="StopBtn"  Content="Stop" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopBtn_Click" />
+    Background="DeepPink"  Width="1429.5">
+    <Grid Background="DarkGreen" >
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition  />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Background="DarkOrange" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
             <TextBlock x:Name="HouseControllerHeading" Text="House Controler." Margin="10" TextAlignment="Center" FontSize="30" />
-            <ListBox x:Name="houseControllerListBox" Grid.Row="1" Margin="9.6"/>
         </StackPanel>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock x:Name="LocalCentralUnitHeading" Text="LCU" Margin="10" TextAlignment="Center" FontSize="26.667" />
-            <Button x:Name="ListenBtn"  Content="Listen" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ListenBtn_OnClickBtn_OnClickBtn_Click" />
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Height="130" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="3">
+            <Button x:Name="StopBtn"  Content="Stop" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopBtn_Click" />
             <Button x:Name="InfoBtn"  Content="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Click="InfoBtn_Click" />
             <Button x:Name="ConnectBtn"  Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ConnectBtn_OnClickBtn_Click" />
-            <CheckBox x:Name="ListenOnPort" Content="Listen on Port" HorizontalAlignment="Left" Checked="ListenOnPort_Checked"></CheckBox>
-            <CheckBox x:Name="xyz" Content="xyz" HorizontalAlignment="Left"></CheckBox>
             <Ellipse x:Name="LED" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
-            <TextBlock x:Name="DelayText" Text="" Margin="10" TextAlignment="Center" FontSize="26.667" />
-            <TextBlock x:Name="GpioStatus" Text="Waiting to initialize the GPIO..." Margin="10,50,10,10" TextAlignment="Center" FontSize="26.667" SelectionChanged="GpioStatus_SelectionChanged" />
 
             <TextBlock Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="client"/>
-            <ListBox x:Name="loggListBox" Grid.Row="1" Margin="9.6"/>
             <TextBlock Grid.Column="1" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="server"/>
-            <ListBox x:Name="serverListBox" Grid.Column="1" Grid.Row="1" Margin="9.6"/>
-
-
         </StackPanel>
-        <StackPanel Name ="LcuStackPanel" Background="BurlyWood" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10,0" Width="1480">
-            <TextBlock x:Name="LcusHeading" Text="Configured LCUs" Margin="10" TextAlignment="Center" FontSize="26.667" />
-
+        <ListBox x:Name="loggListBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="9.6" Height="150"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="LcusHeading" Text="Configured LCUs" Margin="10" TextAlignment="Left" FontSize="26.667" Height="150" />
+        <StackPanel Name ="LcuStackPanel" Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="DarkSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Stretch" MinHeight="100" Margin="10,5" Width="1480">
         </StackPanel>
+
     </Grid>
 
 
 </Page>
+
+
+<!--<Grid Name ="LcuStackPanel" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="DarkSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Center" MinHeight="100" Margin="10,5" Width="1480">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+</Grid>-->
+
+<!--<StackPanel Name ="LcuStackPanel" Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="DarkSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Center" MinHeight="100" Margin="10,5" Width="1480">
+</StackPanel>-->
+
+
+<!--<ScrollViewer Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="DarkSalmon" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">-->

@@ -87,5 +87,10 @@ namespace HomeController.view
             houseModel.ListenToAllRCU(lcuName);
             mainView.AddLoggText(lcuName, lcuName + " listens to all rcu:s");
         }
+
+        public void ClearAllBtn_Click(string lcuName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

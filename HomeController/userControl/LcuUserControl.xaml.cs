@@ -78,5 +78,11 @@ namespace HomeController.userControl
             InfoTextBlock.Text += "";
             mainPresenter.ConnectAllBtn_Click(LcuName);
         }
+
+        private void ClearAllBtn_Click(object sender, RoutedEventArgs e)
+        {
+            InfoTextBlock.Text += "";
+            mainPresenter.ClearAllBtn_Click(LcuName);
+        }
     }
 }
