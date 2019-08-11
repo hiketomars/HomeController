@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="DeepPink"  Width="1429.5">
+    Background="DeepPink">
     <Grid Background="DarkGreen" >
 
         <Grid.RowDefinitions>
@@ -18,25 +18,35 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
-            <ColumnDefinition />
-            <ColumnDefinition />
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Background="DarkOrange" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
-            <TextBlock x:Name="HouseControllerHeading" Text="House Controler." Margin="10" TextAlignment="Center" FontSize="30" />
+            <TextBlock x:Name="HouseControllerHeading" Text="House Controller." Margin="10" TextAlignment="Center" FontSize="30" />
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Height="130" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.ColumnSpan="3">
-            <Button x:Name="StopBtn"  Content="Stop" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopBtn_Click" />
-            <Button x:Name="InfoBtn"  Content="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Click="InfoBtn_Click" />
-            <Button x:Name="ConnectBtn"  Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ConnectBtn_OnClickBtn_Click" />
-            <Ellipse x:Name="LED" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
+        <Grid Background="Bisque" Grid.Row="1" Grid.Column="0"  Height="130" VerticalAlignment="Center" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="StopBtn"  Grid.Row="0" Grid.Column="0" Content="Stop" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopBtn_Click" />
+            <Button x:Name="InfoBtn"  Grid.Row="0" Grid.Column="1" Content="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Click="InfoBtn_Click" />
+            <Button x:Name="ConnectBtn"  Grid.Row="0" Grid.Column="2" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ConnectBtn_OnClickBtn_Click" />
+            <Ellipse x:Name="LED" Grid.Row="0" Grid.Column="3" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
 
-            <TextBlock Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="client"/>
-            <TextBlock Grid.Column="1" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="server"/>
-        </StackPanel>
-        <ListBox x:Name="loggListBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="9.6" Height="150"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="LcusHeading" Text="Configured LCUs" Margin="10" TextAlignment="Left" FontSize="26.667" Height="150" />
-        <StackPanel Name ="LcuStackPanel" Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="DarkSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Stretch" MinHeight="100" Margin="10,5" Width="1480">
+            <TextBlock Grid.Row="0" Grid.Column="4" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="client"/>
+            <TextBlock  Grid.Row="0" Grid.Column="5" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="server"/>
+            <TextBlock Grid.Row="0" Grid.Column="6" x:Name="HouseTextBox" />
+        </Grid>
+        
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="LcusHeading" Text="Configured LCUs" Margin="10" TextAlignment="Left" FontSize="26.667"  />
+        <StackPanel Name ="LcuStackPanel" Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="DarkSeaGreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="100" Margin="10,5" >
         </StackPanel>
 
     </Grid>

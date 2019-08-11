@@ -127,6 +127,7 @@
     <Compile Include="model\CompoundStatus.cs" />
     <Compile Include="model\CurrentStatusMessage.cs" />
     <Compile Include="model\IAlarmHandler.cs" />
+    <Compile Include="model\ILcuHandler.cs" />
     <Compile Include="model\ILocalCentralUnit.cs" />
     <Compile Include="model\RequestRcuStatusMessage.cs" />
     <Compile Include="model\HomeStatus.cs" />

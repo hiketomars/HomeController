@@ -5,47 +5,35 @@
     xmlns:local="using:HomeController.userControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Height="141" Width="605.5">
-    <Grid>
+    mc:Ignorable="d" >
+    <Grid Width="800"> <!-- todo Jag vet inte hurn jag ska få LCU-panelerna att växa i sidled dynamiskt och fylla ut. Sätter därför en fix bredd så länge att att få dem lite bredare. /190811 -->
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0"  Name="TextAndButtonStackPanel"  Background="CadetBlue" >
-            <TextBlock Name="RcuNameTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="Rcu Name" />
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="TextAndButtonStackPanel"  Background="CadetBlue" >
             <StackPanel Orientation="Horizontal">
-                <Button Name="ListenBtn" Width="60" Content="Listen" Click="ListenBtn_Click" Margin="5" />
-                <Button x:Name ="ConnectBtn" Width="80" Content="Connect" Click="ConnectBtn_Click" />
+                <TextBlock Name="RcuNameTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="RcuName" Margin="5,0" />
+                <TextBlock Name="RcuSendCounterTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="#Sent" Margin="5,0" ToolTipService.ToolTip="Number of sent requests."/>
+                <TextBlock Name="RcuReceiveCounterTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="#Received" Margin="5,0" ToolTipService.ToolTip="Number of received incoming messages."/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Name="ListenBtn" Width="60" Content="Listen" Click="ListenBtn_Click" Margin="5" ToolTipService.ToolTip="Listens to incoming messages from this RCU." />
+                <Button x:Name ="ReqStatusBtn" Width="100" Content="Req status" Click="RequestStatusBtn_Click" Margin="5"/>
+                <Button x:Name ="ClearBtn" Width="80" Content="Clear" Click="ClearBtn_Click" Margin="5"/>
             </StackPanel>
         </StackPanel>
-        <Grid Grid.Row="1" Grid.Column="0" Background="Aquamarine" >
-            <TextBlock Name="InfoTextBlock"  RelativePanel.Below="TextAndButtonStackPanel" TextWrapping="Wrap" Text="Output" />
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="Aquamarine" >
+            <ScrollViewer VerticalScrollBarVisibility="Visible">
+            <TextBlock Name="InfoTextBlock"  RelativePanel.Below="TextAndButtonStackPanel" TextWrapping="Wrap" Text="Output regarding this RCU." />
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>
 
-<!--<UserControl
-    x:Class="HomeController.userControl.RcuRowUserControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:HomeController.userControl"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Height="107.5" Width="568.5">
-    <RelativePanel Margin="0,0,-44.5,-98">
-        <StackPanel Name="TextAndButtonStackPanel" Height="60" Background="CadetBlue" HorizontalAlignment="Stretch" Margin="0,0,-0.5,-63" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignLeftWithPanel="True">
-            <TextBlock Name="RcuNameTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="Rcu Name" />
-            <StackPanel Orientation="Horizontal">
-                <Button Name="ListenBtn" Width="60" Content="Listen" Click="ListenBtn_Click" Margin="5" />
-                <Button x:Name ="ConnectBtn" Width="80" Content="Connect" Click="ConnectBtn_Click" />
-            </StackPanel>
-        </StackPanel>
-        <Grid Background="Aquamarine" RelativePanel.AlignTopWithPanel="True"  RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignLeftWithPanel="True" Margin="0,60,0,0">
-            <TextBlock Name="InfoTextBlock"  RelativePanel.Below="TextAndButtonStackPanel" TextWrapping="Wrap" Text="Output" />
-        </Grid>
-    </RelativePanel>
-</UserControl>-->
+
     

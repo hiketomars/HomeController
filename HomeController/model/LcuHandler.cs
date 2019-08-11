@@ -14,8 +14,9 @@ namespace HomeController.model
     /// Alarm and status are summarized in this class.
     /// Can handles a number of LCU:s during "PC-mode" but will only have one LCU in normal production mode.
     /// </summary>
-    public class LcuHandler : IHouseModel
+    public class LcuHandler : IHouseModel, ILcuHandler
     {
+
         //private readonly LocalCentralUnit lcu;
         public bool AlarmIsActive { get; set; }
 
@@ -34,13 +35,15 @@ namespace HomeController.model
         /// </summary>
         public LcuHandler()
         {
+            
+
             // Currently the config handlers are constructed from hard coded data but later on this will be read from XML-file(s).
             ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
                 {
                     new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340", "1341"),
                 }
             );
-            var frontDoorLcu = new LocalCentralUnit(configHandlerFrontDoor);
+            var frontDoorLcu = new LocalCentralUnit(this, configHandlerFrontDoor);
             lcuList.Add(frontDoorLcu);
 
             ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLCU", new List<IRemoteCentralUnitConfiguration>()
@@ -48,9 +51,12 @@ namespace HomeController.model
                     new RemoteCentralUnitConfiguration("Framsidan", "1","localhost", "1341", "1340"),
                 }
             );
-            var backDoorLcu = new LocalCentralUnit(configHandlerBackDoor);
+            var backDoorLcu = new LocalCentralUnit(this, configHandlerBackDoor);
             lcuList.Add(backDoorLcu);
 
+            // Funkar inte att skicka event i detta läget... OnHomeReceivedMessage(Definition.MessageType.Logg, "Numbers of configured LCU:s: " + lcuList.Count);
+            // OnHomeReceivedMessage(Definition.MessageType.Logg, "Last used log path: " + Logger.LastUsedLogPath);
+            
             //foreach(var lcu in lcuList)
             //{
             //    var lcuUserControl = new LcuUserControl();
@@ -61,6 +67,24 @@ namespace HomeController.model
             //}
             SendEventThatLcuInstancesHasChanged();
         }
+
+
+        public void OnRcuReceivedMessage(ILocalCentralUnit lcu, IRemoteCentralUnitProxy rcu, Definition.MessageType messageType, string message)
+        {
+            if (RcuReceivedMessage != null)
+            {
+                RcuReceivedMessage(lcu, rcu, messageType, message); // Event!
+            }
+        }
+
+        public void OnHomeReceivedMessage(Definition.MessageType messageType, string message)
+        {
+            if(HomeReceivedMessage != null)
+            {
+                HomeReceivedMessage(messageType, message); // Event!
+            }
+        }
+
 
         public void InitLcuHandler() { 
             //PerformStartUpLEDFlash();
@@ -125,6 +149,10 @@ namespace HomeController.model
         public event Definition.VoidEventHandler ModelHasChanged;
         public event Definition.VoidEventHandler LcuInstancesHasChanged;
         public event Definition.LEDChangedEventHandler LCULedHasChanged;
+        public event Definition.RcuMessageReceivedEventHandler RcuReceivedMessage;
+        public event Definition.HomeMessageReceivedEventHandler HomeReceivedMessage; // Event about a message that concerns the hole Home Controller application, ie not a specific LCU.
+
+       
 
         public List<string> GetLoggings()
         {
@@ -139,11 +167,11 @@ namespace HomeController.model
         }
 
         // This is mainly intended for debug purpose.
-        // This is called when the user clicks on a direct Connect-button to test the connection.
-        public void ConnectToLCU(string lcuName, string rcuName)
+        // This is called when the user clicks on a Request status-button to test the connection.
+        public void RequestStatusFromRCU(string lcuName, string rcuName)
         {
             var lcu = lcuList.Find(e => e.Name == lcuName);
-            lcu.LcuRemoteCentralUnitsController.ConnectToOnlyRcu();
+            lcu.LcuRemoteCentralUnitsController.RequestStatusFromRcu();
         }
 
         public void ListenToRCU(string lcuName, string rcuName)
@@ -195,5 +223,6 @@ namespace HomeController.model
                 LcuInstancesHasChanged();
             }
         }
+
     }
 }

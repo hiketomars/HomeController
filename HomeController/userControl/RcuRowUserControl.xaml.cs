@@ -43,6 +43,11 @@ namespace HomeController.userControl
             }
         }
 
+        public void ClearOutput()
+        {
+            InfoTextBlock.Text = "";
+        }
+
         public void AddTextToOutput(string text)
         {
             InfoTextBlock.Text += text;
@@ -54,10 +59,24 @@ namespace HomeController.userControl
             mainPresenter.ListenBtn_Click(LcuName, RcuName);
         }
 
-        private void ConnectBtn_Click(object sender, RoutedEventArgs e)
+        private void RequestStatusBtn_Click(object sender, RoutedEventArgs e)
         {
-            InfoTextBlock.Text += "";
-            mainPresenter.ConnectBtn_Click(LcuName, RcuName);
+            mainPresenter.RequestStatusBtn_Click(LcuName, RcuName);
+        }
+
+        private void ClearBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.ClearBtn_Click(LcuName, RcuName);
+        }
+
+        public void SetSendCounterText(string text)
+        {
+            RcuSendCounterTextBlock.Text = text;
+        }
+
+        public void SetReceiveCounterText(string text)
+        {
+            RcuReceiveCounterTextBlock.Text = text;
         }
     }
 }

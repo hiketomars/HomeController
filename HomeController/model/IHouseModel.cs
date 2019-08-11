@@ -14,9 +14,13 @@ namespace HomeController.model
         event Definition.VoidEventHandler ModelHasChanged;
         event Definition.VoidEventHandler LcuInstancesHasChanged;
         event Definition.LEDChangedEventHandler LCULedHasChanged;
+        event Definition.RcuMessageReceivedEventHandler RcuReceivedMessage;
+        event Definition.HomeMessageReceivedEventHandler HomeReceivedMessage; // Event about a message that concerns the hole Home Controller application, ie not a specific LCU.
+
+
         List<string> GetLoggings();
         void GetColorForBackdoorLED();
-        void ConnectToLCU(string lcuName, string rcuName);
+        void RequestStatusFromRCU(string lcuName, string rcuName);
         void ListenToRCU(string lcuName, string rcuName);
         List<ILocalCentralUnit> GetLcuList();
         void ConnectToAllRCU(string lcuName);

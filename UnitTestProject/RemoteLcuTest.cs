@@ -26,6 +26,8 @@ namespace UnitTestProject
         private LocalCentralUnit lcu;
         private RemoteCentralUnitProxy rcu;
         private Mock<IRemoteCentralUnitProxy> remoteCentralUnitProxy1;
+        private TestLcuHandler testLcuHandler;
+
 
         // Test LCU.
         [TestInitialize]
@@ -62,6 +64,7 @@ namespace UnitTestProject
 
             //lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, doorControllerMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
             //rcu = new RemoteCentralUnitProxy(lcu, "Backdoor", "192.168.11.2", "1011");
+            testLcuHandler = new TestLcuHandler();
 
         }
 
@@ -114,7 +117,7 @@ namespace UnitTestProject
             //var remoteCentralUnitsController = new RemoteCentralUnitsController(remoteCentralUnits);
             //LocalCentralUnit.xxxxxSetInstance(remoteCentralUnitsController);
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 null, sirenMock.Object, sirenControllerMock.Object);
 
             lcu.LcuDoorController = doorControllerMock.Object;
@@ -177,7 +180,7 @@ namespace UnitTestProject
             //var configHandlerMock = new Mock<IConfigHandler>();
             //configHandlerMock.Setup(f => f.GetRemoteLcus()).Returns(remoteCentralUnits);
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenControllerMock.Object);
 
             //LocalCentralUnit.LcuConfigHandler = configHandlerMock.Object;
@@ -234,7 +237,7 @@ namespace UnitTestProject
 
             var rcuController = new RemoteCentralUnitsController(remoteCentralUnits);
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenControllerMock.Object);
 
             //remoteCentralUnitsController.Setup(lcu);
@@ -293,7 +296,7 @@ namespace UnitTestProject
 
             var rcuController = new RemoteCentralUnitsController(remoteCentralUnits);
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenControllerMock.Object);
 
             //LocalCentralUnit.LcuConfigHandler = configHandlerMock.Object;
@@ -357,7 +360,7 @@ namespace UnitTestProject
 
             var rcuController = new RemoteCentralUnitsController(remoteCentralUnits);
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenControllerMock.Object);
 
             //LocalCentralUnit.LcuConfigHandler = configHandlerMock.Object;
@@ -419,7 +422,7 @@ namespace UnitTestProject
             //configHandlerMock.Setup(f => f.GetRemoteLcus()).Returns(remoteCentralUnits);
             var rcuController = new RemoteCentralUnitsController(remoteCentralUnits);
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenControllerMock.Object);
 
             //SirenController.SetInstance(sirenControllerMock.Object);
@@ -489,7 +492,7 @@ namespace UnitTestProject
             //configHandlerMock.Setup(f => f.GetRemoteLcus()).Returns(remoteCentralUnits);
             var rcuController = new RemoteCentralUnitsController(remoteCentralUnits);
             var sirenController = new SirenController(null);
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object,
                 rcuController, sirenMock.Object, sirenController);
             sirenController.lcu = lcu;
             //SirenController.SetInstance(sirenControllerMock.Object);

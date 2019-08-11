@@ -42,6 +42,7 @@ namespace UnitTestProject
         private Mock<ILEDController> altanenDoorLedControllerMock;
         private LocalCentralUnit altanenDoorLcu;
         private string testName = "?";
+        private TestLcuHandler testLcuHandler;
 
         // Test LCU.
         [TestInitialize]
@@ -107,6 +108,7 @@ namespace UnitTestProject
             altanenDoorSirenControllerMock = new Mock<ISirenController>();
             altanenDoorSirenControllerMock.SetupAllProperties();
 
+            testLcuHandler = new TestLcuHandler();
         }
 
 
@@ -164,10 +166,10 @@ namespace UnitTestProject
             var backDoorLcuRemoteCentralUnitsController = new RemoteCentralUnitsController(null, configHandlerBackDoor.GetRemoteLcus());
 
 
-            frontDoorLcu = new LocalCentralUnit(frontDoorRgbLedMock.Object, frontDoorLedControllerMock.Object, frontDoorMock.Object,
+            frontDoorLcu = new LocalCentralUnit(testLcuHandler, frontDoorRgbLedMock.Object, frontDoorLedControllerMock.Object, frontDoorMock.Object,
                 frontDoorLcuRemoteCentralUnitsController, frontDoorSirenMock.Object, frontDoorSirenControllerMock.Object);
 
-            backDoorLcu = new LocalCentralUnit(backDoorRgbLedMock.Object, backDoorLedControllerMock.Object, backDoorMock.Object,
+            backDoorLcu = new LocalCentralUnit(testLcuHandler, backDoorRgbLedMock.Object, backDoorLedControllerMock.Object, backDoorMock.Object,
                 backDoorLcuRemoteCentralUnitsController, backDoorSirenMock.Object, backDoorSirenControllerMock.Object);
 
             /* 190602 Väntar lite med att blanda in även altanen.
@@ -243,7 +245,7 @@ namespace UnitTestProject
             //string lcuAltanenIp = "192.168.11.3";
 
             // Front door
-            frontDoorLcu = new LocalCentralUnit(configHandlerFrontDoor);
+            frontDoorLcu = new LocalCentralUnit(testLcuHandler, configHandlerFrontDoor);
             frontDoorLcu.LcuDoorController.Door = frontDoorMock.Object;
             frontDoorLcu.LcuSirenController.Siren= frontDoorSirenMock.Object;
             frontDoorLcu.StartSurveillance();
@@ -251,7 +253,7 @@ namespace UnitTestProject
             Assert.IsTrue(frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount == 1, "(1)Front door LCU does not have correct number of remote LCU:s, it has " + frontDoorLcu.LcuRemoteCentralUnitsController.RemoteCentralUnitsCount + " remote LCU:s.");
 
             // Back door
-            backDoorLcu = new LocalCentralUnit(configHandlerBackDoor);
+            backDoorLcu = new LocalCentralUnit(testLcuHandler, configHandlerBackDoor);
             backDoorLcu.LcuDoorController.Door = backDoorMock.Object;
             backDoorLcu.LcuSirenController.Siren = backDoorSirenMock.Object;
             backDoorLcu.StartSurveillance();

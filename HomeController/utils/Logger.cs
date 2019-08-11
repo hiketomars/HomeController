@@ -63,6 +63,8 @@ namespace HomeController.utils
             Logg(instance, category, text, "rpi.txt");
         }
 
+        public static string LastUsedLogPath { get; set; }
+
         public static async void Logg(string instance, string category, string text, string fileName)
         {
             #region Unused Code
@@ -143,7 +145,9 @@ namespace HomeController.utils
 
                         string stringToWrite = now.ToString(Definition.StandardDateTimeFormat + ".ff") + countString +
                                                ": " + text + "\r\n";
-                        File.AppendAllText(Path.Combine(Logger.loggFolder.FullName, fileName), stringToWrite);
+                        string fullFileName = Path.Combine(Logger.loggFolder.FullName, fileName);
+                        LastUsedLogPath = fullFileName;
+                        File.AppendAllText(fullFileName, stringToWrite);
                         Debug.WriteLine(stringToWrite);
                         break;
                     }

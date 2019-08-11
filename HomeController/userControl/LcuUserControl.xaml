@@ -5,10 +5,10 @@
     xmlns:local="using:HomeController.userControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Width="389"
+    mc:Ignorable="d" 
     Background="Blue">
 
-    <Grid Name="LCUGrid" Background="AliceBlue" Margin="10">
+    <Grid Name="LCUGrid" Background="DarkCyan" Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="44"/>
             <RowDefinition Height="44"/>
@@ -18,44 +18,22 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
             <ColumnDefinition Width="120"/>
-            <ColumnDefinition />
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <TextBlock  Name = "LcuNameTextBlock" Grid.Row="0" Grid.Column="0" Width="190"               Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Name of LCU"   />
-        <Button     Name="ListenAllBtn"       Grid.Row="1" Grid.Column="0"                       Content="Listen to All" Click="ListenAllBtn_Click"  />
-        <Button     Name="ConnectAllBtn"      Grid.Row="1" Grid.Column="1"                       Content="Connect to All" Click="ConnectAllBtn_Click"  />
-        <Button     Name="ClearAllBtn"        Grid.Row="1" Grid.Column="2"                       Content="Clear All" Click="ClearAllBtn_Click"  />
-        <StackPanel Name="RcuStackPanel"      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="CornflowerBlue"/>
-        <TextBlock  Name="InfoTextBlock"      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"                       TextWrapping="Wrap" Text="..." />
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="4">
+            <Button     Name="ListenAllBtn"       Grid.Row="1" Grid.Column="0"                       Content="Listen to All" Click="ListenAllBtn_Click" Margin="10,0" />
+            <Button     Name="ConnectAllBtn"      Grid.Row="1" Grid.Column="1"                       Content="Connect to All" Click="ConnectAllBtn_Click " Margin="10,0" />
+            <Button     Name="ClearAllBtn"        Grid.Row="1" Grid.Column="2"                       Content="Clear All" Click="ClearAllBtn_Click"  Margin="10,0"/>
+            <Button     Name="XxBtn"        Grid.Row="1" Grid.Column="2"                       Content="Status" Click="ClearAllBtn_Click"  Margin="10,0"/>
+        </StackPanel>
+        <Grid Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4">
+            <StackPanel Name="RcuStackPanel"   Orientation="Horizontal"  HorizontalAlignment="Stretch"  Background="CornflowerBlue" Margin="10"/>
+        </Grid>
+        <!--<Grid Name="RcuStackPanel"      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="CornflowerBlue" Margin="10"/>-->
+        <TextBlock  Name="InfoTextBlock"      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"                       TextWrapping="Wrap" Text="..." Margin="10,0"/>
 
     </Grid>
 </UserControl>
-<!--
-    <TextBlock  Name = "LcuNameTextBlock" Grid.Row="0" Grid.Column="0" Width="190"               Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Name of LCU"   />
-        <Button     Name="ListenAllBtn"       Grid.Row="1" Grid.Column="0"                       Content="Listen to All" Click="ListenAllBtn_Click"  />
-        <Button     Name="ConnectAllBtn"      Grid.Row="1" Grid.Column="1"                       Content="Connect to All" Click="ConnectAllBtn_Click"  />
-        <Button     Name="ClearAllBtn"        Grid.Row="1" Grid.Column="2"                       Content="Connect to All" Click="ConnectAllBtn_Click"  />
-        <StackPanel Name="RcuStackPanel"      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"/>
-        <TextBlock  Name="InfoTextBlock"      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"                       TextWrapping="Wrap" Text="..." />
-    -->
-
-<!--<Grid  Background="AliceBlue">
-    <Grid.RowDefinitions>
-        <RowDefinition Height="44"/>
-        <RowDefinition Height="44"/>
-        <RowDefinition />
-        <RowDefinition Height="44"/>
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="44"/>
-        <ColumnDefinition Width="44"/>
-        <ColumnDefinition />
-    </Grid.ColumnDefinitions>
-    <Rectangle Grid.Row="0" Grid.Column="0" Fill="BlueViolet" Grid.ColumnSpan="3" />
-    <Rectangle Grid.Row="1" Grid.Column="0" Fill="Red" />
-    <Rectangle Grid.Row="1" Grid.Column="1" Fill="Green" />
-    <Rectangle Grid.Row="1" Grid.Column="2" Fill="Blue" />
-
-    <Rectangle Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Fill="Orange" />
-    <Rectangle Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Fill="Chartreuse" />
-
-</Grid>-->    
+  

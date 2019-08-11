@@ -72,49 +72,49 @@ namespace HomeController
         }
 
         /// <summary>        
-        /// Loggs text in a listbox in the GUI.
+        /// Loggs text in the house part of the GUI.
         /// </summary>
         /// <param name="text"></param>
-        public void AddLoggItem(string text)
+        public void AddHouseLoggText(string text)
         {
-            this.loggListBox.Items.Add(text);
+            this.HouseTextBox.Text += text;
         }
 
-        // Called from the presenter to set all logg items in this view.
-        // From IMainView.
-        public async void SetLoggItems(List<string> loggings)
-        {
-            // Since this method might be called from another thread other than the GUI-thread we need to use the Dispatcher.
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
+        //// Called from the presenter to set all logg items in this view.
+        //// From IMainView.
+        //public async void AddHouseLoggText(List<string> loggings)
+        //{
+        //    // Since this method might be called from another thread other than the GUI-thread we need to use the Dispatcher.
+        //    //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear());
 
-            //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear()).GetResults();
-            //foreach (var logging in loggings)
-            //{
-            //    //this.loggListBox.Items.Add(logging);
-            //    this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Add(logging)).GetResults();
-            //}
+        //    //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Clear()).GetResults();
+        //    //foreach (var logging in loggings)
+        //    //{
+        //    //    //this.loggListBox.Items.Add(logging);
+        //    //    this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Add(logging)).GetResults();
+        //    //}
        
-                //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings))
-                //    .GetResults();
+        //        //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings))
+        //        //    .GetResults();
 
-                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings));
+        //        await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings));
 
             
 
-        }
+        //}
 
         // Keeps clear and add of items together in a synchronous call.
-        private void ClearAndUpdateLoggItems(List<string> loggings)
-        {
-            lock (this) // Don't know if this is needed...
-            {
-                this.loggListBox.Items.Clear();
-                foreach (var logging in loggings)
-                {
-                    this.loggListBox.Items.Add(logging);
-                }
-            }
-        }
+        //private void ClearAndUpdateLoggItems(List<string> loggings)
+        //{
+        //    lock (this) // Don't know if this is needed...
+        //    {
+        //        this.HouseTextBox.Items.Clear();
+        //        foreach (var logging in loggings)
+        //        {
+        //            this.HouseTextBox.Items.Add(logging);
+        //        }
+        //    }
+        //}
 
         // Called from presenter to set the GUI color of the backdoor LED.
         // From IMainView.
@@ -140,15 +140,24 @@ namespace HomeController
         //private List<ILocalCentralUnit> lcus = new List<ILocalCentralUnit>();
         private List<LcuUserControl> lcuUserControls = new List<LcuUserControl>();
 
+        // ---------------------------- LCU ------------------------------------------------
+        // Adds text to rcu log.
+
+        public void AddLcuLoggText(string lcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.AddTextToOutput(text);
+        }
+
         public void SetLcus(List<ILocalCentralUnit> lcus)
         {
-            foreach (var lcu in lcus)
+            foreach(var lcu in lcus)
             {
                 var lcuUserControl = new LcuUserControl(mainPresenter);
                 lcuUserControl.LcuName = lcu.Name;
                 lcuUserControl.NameText = lcu.Name;
                 lcuUserControl.AddTextToOutput("Lcu " + lcu.Name + " created.");
-                foreach (var rcu in lcu.LcuRemoteCentralUnitsController.RcuList)
+                foreach(var rcu in lcu.LcuRemoteCentralUnitsController.RcuList)
                 {
                     lcuUserControl.AddRcu(rcu.NameOfRemoteLcu);
                 }
@@ -157,23 +166,36 @@ namespace HomeController
                 //this.lcus.Add(lcu);
                 lcuUserControls.Add(lcuUserControl);
             }
-
-
         }
 
-        // Adds text to rcu log.
-        public void AddLoggText(string lcuName, string text)
-        {
-            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
-            lcuUserControl.AddTextToOutput(text);
-        }
-
+        // ---------------------------- RCU ------------------------------------------------
         // Adds text to rcu logg (within an lcu).
-        public void AddLoggText(string lcuName, string rcuName, string text)
+        public void AddRcuLoggText(string lcuName, string rcuName, string text)
         {
             var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
             var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
             rcuUserControl.AddTextToOutput(text);
+        }
+
+        public void AddRcuSendCounterText(string lcuName, string rcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
+            rcuUserControl.SetSendCounterText(text);
+        }
+
+        public void AddRcuReceiveCounterText(string lcuName, string rcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
+            rcuUserControl.SetReceiveCounterText(text);
+        }
+
+        public void ClearRcuText(string lcuName, string rcuName)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
+            rcuUserControl.ClearOutput();
         }
 
         // Not used right now since I'm having another method that takes RGBValue as an argument instead.

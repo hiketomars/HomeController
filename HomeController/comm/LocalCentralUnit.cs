@@ -52,6 +52,11 @@ namespace HomeController.comm {
             set { lcuRemoteCentralUnitsController = value; }
         }
 
+        public void OnRcuReceivedMessage(IRemoteCentralUnitProxy rcu, Definition.MessageType messageType, string loggMessage)
+        {
+            lcuHandler.OnRcuReceivedMessage(this, rcu, messageType, loggMessage);
+        }
+
         //public ConfigHandler LcuConfigHandler;
 
         //private static LocalCentralUnit instance;
@@ -79,13 +84,15 @@ namespace HomeController.comm {
         //{
         //}
 
+        private readonly ILcuHandler lcuHandler;
         private IConfigHandler configHandler;
 
-        public LocalCentralUnit(IConfigHandler configHandler)
+        public LocalCentralUnit(ILcuHandler lcuHandler, IConfigHandler configHandler)
         {
             Logger.Logg(configHandler.GetLCUName(), Logger.LCU_Cat,
                 "Creating Lcu with name " + configHandler.GetLCUName());
 
+            this.lcuHandler = lcuHandler;
             this.configHandler = configHandler;
             SetName();
 
@@ -110,8 +117,9 @@ LcuRemoteCentralUnitsController.Setup(this);
         }
 
         // Constructor for unit tests.
-        public LocalCentralUnit(IRgbLed doorLed, ILEDController ledController, IDoor door, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
+        public LocalCentralUnit(ILcuHandler lcuHandler, IRgbLed doorLed, ILEDController ledController, IDoor door, IRemoteCentralUnitsController remoteCentralUnitsController, ISiren siren, ISirenController sirenController)
         {
+            this.lcuHandler = lcuHandler;
             SetupLcu(door, doorLed, ledController, remoteCentralUnitsController, siren, sirenController);
         }
 

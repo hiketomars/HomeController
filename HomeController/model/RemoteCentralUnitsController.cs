@@ -49,14 +49,14 @@ namespace HomeController.model
 
 
         // For debug purpose.
-        public void ConnectToOnlyRcu()
+        public void RequestStatusFromRcu()
         {
             if (remoteCentralUnitProxies.Count != 1)
             {
-                throw new Exception("ConnectToOnlyRcu only available when you have a single RCU.");
+                throw new Exception("RequestStatusFromRcu only available when you have a single RCU.");
             }
 
-            remoteCentralUnitProxies[0].ConnectToRemoteLcu();
+            remoteCentralUnitProxies[0].RequestStatusFromRcu();
         }
 
         //public void ListenToTheOnlyRcu()
@@ -87,7 +87,7 @@ namespace HomeController.model
         {
             foreach(var rcu in remoteCentralUnitProxies)
             {
-                rcu.ConnectToRemoteLcu();
+                rcu.RequestStatusFromRcu();
             }
         }
 

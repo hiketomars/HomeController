@@ -10,6 +10,7 @@ using Windows.Media.Devices;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.System.Threading;
+using Castle.Components.DictionaryAdapter;
 using HomeController.comm;
 using HomeController.utils;
 
@@ -79,8 +80,10 @@ namespace HomeController.model
             //    throw new Exception("LCU:s have the same id " + lcu.Id);
             //}
 
-
+            
                 Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "Created RCU Proxy for " + nameOfRemoteLcu);
+                //lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Created RCU Proxy for " + nameOfRemoteLcu); // todo Här använder jag ett event som är tänkt för något annat men kanske jag bara byta namn på eventet och ha det till lite mer generell kommunikation till presentern...
+
         }
 
         /// <summary>
@@ -144,7 +147,7 @@ namespace HomeController.model
         }
 
         // For debug purpose.
-        public void ConnectToRemoteLcu()
+        public void RequestStatusFromRcu()
         {
             initiatorPortNumber = "1341";
             //Task<string> t = SendCommandSpecific(ipAddress, "hejsan");
@@ -154,6 +157,8 @@ namespace HomeController.model
 
         }
 
+        private static StreamSocketListener streamSocketListener;
+
         // For debug purpose and original client-server code that I don't use any longer but is not removed yet.
         // This "server" method starts listening on port for calls from remote lcu.
         // This is public now to be able to start listening separately from 
@@ -161,16 +166,19 @@ namespace HomeController.model
         {
             try
             {
-                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "RemoteCentralUnitProxy.StartListeningOnRemoteLcu: LCU with name " + lcu.Name + " starts to listen to RCU " + NameOfRemoteLcu + " on responderPortNumber " + responderPortNumber);
-                var streamSocketListener = new StreamSocketListener();
+                string message = lcu.Name + " now listen on rpn " + responderPortNumber + " expecting messages from " + NameOfRemoteLcu;
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, message);
+                streamSocketListener = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
                 streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
+                //streamSocketListener.Control.KeepAlive = false;
 
-                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currentlycommunicatio in use.
+                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
                 await streamSocketListener.BindServiceNameAsync(responderPortNumber);
 
-                //OnNewRcuInfo(lcu.Name + " listens to " + NameOfRemoteLcu + " on rPort " + responderPortNumber);
+                lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, message);
+
 
                 #region alternatives
 
@@ -215,10 +223,12 @@ namespace HomeController.model
         //    }
         //}
 
+        private int sendCounter;
         // Sends exactly the specified command without adding anything.
         // Parameter port only needs to be specified when called from a debug method since client and server are on the same machine then.
         public async Task<string> SendCommandSpecific(string hostIp, string exactCommand)
         {
+            sendCounter++;
             // Create the StreamSocket and establish a connection to the echo server.
             using(var streamSocket = new StreamSocket())
             {
@@ -226,12 +236,21 @@ namespace HomeController.model
                 ////var hostName = new Windows.Networking.HostName("localhost");
                 var hostName = new HostName(hostIp);
 
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Pos20");
+                lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Pos20");
+
                 //lcu.AddLogging("The client is trying to connect to remote lcu at IP " + Definition.RemoteLcuPIAddress + "...");
 
-                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Connecting " + hostName + " " + initiatorPortNumber);
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Connecting async " + hostName + " " + initiatorPortNumber);
                 await streamSocket.ConnectAsync(hostName, initiatorPortNumber);
 
-                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: After await ConnectAsync to " + hostName + " " + initiatorPortNumber);
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Pos30");
+                lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Pos30");
+
+
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Connected async to " + hostName + " " + initiatorPortNumber);
+                lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Connected async to " + hostName + " " + initiatorPortNumber);
+
 
                 //lcu.AddLogging("The client connected");
 
@@ -251,10 +270,12 @@ namespace HomeController.model
                 {
                     using(var streamWriter = new StreamWriter(outputStream))
                     {
-                        Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Writing to " + hostName + " " + initiatorPortNumber);
+                        Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Writing to ipn " + initiatorPortNumber + " on " + hostName);
 
                         await streamWriter.WriteLineAsync(exactCommand);
                         await streamWriter.FlushAsync();
+                        lcu.OnRcuReceivedMessage(this, Definition.MessageType.SendCounter, sendCounter.ToString());
+                        lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Writing to ipn " + initiatorPortNumber + " on " + hostName+":\r\n   "+exactCommand);
                     }
                 }
 
@@ -264,14 +285,15 @@ namespace HomeController.model
                 {
                     using(var streamReader = new StreamReader(inputStream))
                     {
-                        Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Waiting for response...");
-
+                        Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Waiting for Ack...");
+                        lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Waiting for Ack...");
                         response = await streamReader.ReadLineAsync();
                     }
                 }
                 //lcu.AddLogging(string.Format("client received the response: \"{0}\" ", response));
                 //lcu.AddLogging("The client closed its socket");
-                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Received response: " + response);
+                Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommand: Received Ack: " + response);
+                lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Received Ack: " + response);
 
                 return response;
             }
@@ -367,7 +389,10 @@ namespace HomeController.model
 
         private static string GetNewMessageId()
         {
-            return DateTime.Now.Ticks.ToString();
+            //return DateTime.Now.Ticks.ToString();
+            string longId = DateTime.Now.Ticks.ToString();
+            const int diseredIdLength = 4; // Using short Id:s during development for easier log readings, eg 4.
+            return longId.Substring(longId.Length - diseredIdLength);
         }
 
         private async Task<string> SendCommand(string hostIp, string command)
@@ -469,9 +494,13 @@ namespace HomeController.model
 
 
 
+        private List<ITransferObject> receivedObjects = new EditableList<ITransferObject>();
+        private int receiveCounter;
         private async void StreamSocketListener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
+            receiveCounter++;
             Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, " received something!");
+            lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, " received something!");
 
             string request;
             using(var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
@@ -479,13 +508,14 @@ namespace HomeController.model
                 request = await streamReader.ReadLineAsync();
             }
 
-            // todo Hur ska jag göra detta på ett bra och asynkront sätt? Nu låter jag MVP sköta detta som vanligt.
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.serverListBox.Items.Add(string.Format("server received the request: \"{0}\"", request)));
-            //lcu.AddLogging(string.Format("The server received the request: \"{0}\"", request));
-
-
             var transferObject = BuildTransferObjectFromPortStringMessage(request);
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat,"Got message " + transferObject.MessageType+ "with id "+transferObject.Id + " from " + NameOfRemoteLcu);
+            string loggMessage = "Got message " + transferObject.MessageType + "with id " + transferObject.Id + " on rpn " +responderPortNumber + " probably from " + NameOfRemoteLcu;
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, loggMessage);
+            receivedObjects.Add(transferObject);
+
+            lcu.OnRcuReceivedMessage(this, Definition.MessageType.ReceiveCounter, receiveCounter.ToString());
+            lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, loggMessage);
+
 
             var communicationResponse = CreateCommunicationResponseObject(transferObject);
             if (communicationResponse == null)
@@ -539,6 +569,7 @@ namespace HomeController.model
 
 
         }
+
 
         private async Task SendCurrentStatusAsync()
         {

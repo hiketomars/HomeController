@@ -22,7 +22,7 @@ namespace HomeController.model
         CompoundStatus GetCompoundStatus();
         List<IRemoteCentralUnitProxy> RcuList { get; }
         // FOr Debug puspose
-        void ConnectToOnlyRcu();
+        void RequestStatusFromRcu();
         void ListenToRcu(string rcuName);
 
         void ListenToAllRcus();

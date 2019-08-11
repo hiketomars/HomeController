@@ -51,7 +51,8 @@ namespace HomeController.userControl
             rcuUserControl.Name = rcuName;
             rcuUserControl.NameText= rcuName;
             rcuUserControl.RcuName = rcuName;
-            rcuUserControl.AddTextToOutput("Rcu " + rcuName + " created.");
+            rcuUserControl.ClearOutput();
+            rcuUserControl.AddTextToOutput("Rcu " + rcuName + " created.\r\n");
             rcuUserControlList.Add(rcuUserControl);
             RcuStackPanel.Children.Add(rcuUserControl);
         }

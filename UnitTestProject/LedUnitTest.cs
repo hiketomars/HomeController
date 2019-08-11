@@ -31,7 +31,8 @@ namespace UnitTestProject
         private Mock<ILEDController> ledControllerMock;
         private Mock<IRemoteCentralUnitsController> remoteCentralUnitsControllerMock;
         private LocalCentralUnit lcu;
-        
+        private TestLcuHandler testLcuHandler;
+
 
         // Test LCU.
         [TestInitialize]
@@ -65,8 +66,9 @@ namespace UnitTestProject
             // Create objects
             //doorController = new Mock<IDoorController>().Object;
             //doorController.Door = door;
+            testLcuHandler = new TestLcuHandler();
 
-            lcu = new LocalCentralUnit(rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
+            lcu = new LocalCentralUnit(testLcuHandler, rgbLedMock.Object, ledControllerMock.Object, doorMock.Object, remoteCentralUnitsControllerMock.Object, sirenMock.Object, sirenControllerMock.Object);
             lcu.LcuDoorController = doorControllerMock.Object;
             lcu.StartSurveillance();
         }
@@ -347,6 +349,8 @@ namespace UnitTestProject
         public event Definition.VoidEventHandler ModelHasChanged;
         public event Definition.VoidEventHandler LcuInstancesHasChanged;
         public event Definition.LEDChangedEventHandler LCULedHasChanged;
+        public event Definition.RcuMessageReceivedEventHandler RcuReceivedMessage;
+        public event Definition.HomeMessageReceivedEventHandler HomeReceivedMessage;
 
         public List<string> GetLoggings()
         {
@@ -358,7 +362,7 @@ namespace UnitTestProject
             throw new NotImplementedException();
         }
 
-        public void ConnectToLCU(string lcuName, string rcuName)
+        public void RequestStatusFromRCU(string lcuName, string rcuName)
         {
             throw new NotImplementedException();
         }
@@ -386,12 +390,12 @@ namespace UnitTestProject
 
     class TestMainView : IMainView
     {
-        public void AddLoggItem(string text)
+        public void AddHouseLoggText(string text)
         {
             throw new NotImplementedException();
         }
 
-        public void SetLoggItems(List<string> loggings)
+        public void AddHouseLoggText(List<string> loggings)
         {
             throw new NotImplementedException();
         }
@@ -406,12 +410,27 @@ namespace UnitTestProject
             throw new NotImplementedException();
         }
 
-        public void AddLoggText(string lcuName, string text)
+        public void AddLcuLoggText(string lcuName, string text)
         {
             throw new NotImplementedException();
         }
 
-        public void AddLoggText(string lcuName, string rcuName, string text)
+        public void AddRcuLoggText(string lcuName, string rcuName, string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddRcuSendCounterText(string lcuName, string rcuName, string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddRcuReceiveCounterText(string lcuName, string rcuName, string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearRcuText(string lcuName, string rcuName)
         {
             throw new NotImplementedException();
         }

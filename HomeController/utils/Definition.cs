@@ -22,10 +22,15 @@ namespace HomeController.utils
         public delegate void VoidEventHandler();
 
         public delegate void LEDChangedEventHandler(RGBValue rgbValue);
+        public delegate void RcuMessageReceivedEventHandler(ILocalCentralUnit lcu, IRemoteCentralUnitProxy rcu, MessageType messageType, string message);
+        public delegate void HomeMessageReceivedEventHandler(MessageType messageType, string message);
+
 
         public delegate void RemoteLcuStatusChangedEventHandler(string todoType);
         public delegate void RcuInfoEventHandler(string lcuName, string rcuName, string info);
 
         public enum LEDGraphColor { Red, Green, Blue, Gray }
+
+        public enum MessageType {Logg, SendCounter, ReceiveCounter}
     }
 }

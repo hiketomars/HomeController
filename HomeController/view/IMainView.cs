@@ -13,11 +13,13 @@ namespace HomeController.view
     /// </summary>
     public interface IMainView : IView
     {
-        void AddLoggItem(string text);
-        void SetLoggItems(List<string> loggings);
+        void AddHouseLoggText(string text);
         void SetColorForBackdoorLED(RGBValue rgbValue);
         void SetLcus(List<ILocalCentralUnit> lcus);
-        void AddLoggText(string lcuName, string text);
-        void AddLoggText(string lcuName, string rcuName, string text);
+        void AddLcuLoggText(string lcuName, string text);
+        void AddRcuLoggText(string lcuName, string rcuName, string text);
+        void AddRcuSendCounterText(string lcuName, string rcuName, string text);
+        void AddRcuReceiveCounterText(string lcuName, string rcuName, string text);
+        void ClearRcuText(string lcuName, string rcuName);
     }
 }

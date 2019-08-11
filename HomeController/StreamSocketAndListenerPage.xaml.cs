@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using HomeController.model;
+using HomeController.utils;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -26,6 +27,10 @@ namespace HomeController
         }
         public IAlarmHandler LcuAlarmHandler { get; }
         public IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; }
+        public void OnRcuReceivedMessage(IRemoteCentralUnitProxy rcu, Definition.MessageType messageType,
+            string loggMessage)
+        {
+        }
     }
 
     public class FakeAlarmHandler : IAlarmHandler {
