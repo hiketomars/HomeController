@@ -25,5 +25,6 @@ namespace HomeController.model
         List<ILocalCentralUnit> GetLcuList();
         void ConnectToAllRCU(string lcuName);
         void ListenToAllRCU(string lcuName);
+        void ConnectToRCU(string lcuName, string rcuName);
     }
 }

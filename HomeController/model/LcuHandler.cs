@@ -174,13 +174,21 @@ namespace HomeController.model
             lcu.LcuRemoteCentralUnitsController.RequestStatusFromRcu();
         }
 
+        // The LCU with name lcuName wants to listen to the RCU with name rcuName.
         public void ListenToRCU(string lcuName, string rcuName)
         {
             var lcu = lcuList.Find(e => e.Name == lcuName);
             lcu.LcuRemoteCentralUnitsController.ListenToRcu(rcuName);
         }
 
+        public void ConnectToRCU(string lcuName, string rcuName)
+        {
+            var lcu = lcuList.Find(e => e.Name == lcuName);
+            lcu.LcuRemoteCentralUnitsController.ConnectToRcu(rcuName);
+        }
+
         // Returns the list of the Lcu:s that this LcuHandler handles.
+
         public List<ILocalCentralUnit> GetLcuList()
         {
             return lcuList;

@@ -75,6 +75,12 @@ namespace HomeController.model
             rcu.StartListeningToRemoteLcu();
         }
 
+        public void ConnectToRcu(string rcuName)
+        {
+            var rcu = remoteCentralUnitProxies.Find(e => e.NameOfRemoteLcu == rcuName);
+            rcu.ConnectToRcu();
+        }
+
         public void ListenToAllRcus()
         {
             foreach (var rcu in remoteCentralUnitProxies)

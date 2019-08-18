@@ -386,6 +386,11 @@ namespace UnitTestProject
         {
             throw new NotImplementedException();
         }
+
+        public void ConnectToRCU(string lcuName, string rcuName)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class TestMainView : IMainView

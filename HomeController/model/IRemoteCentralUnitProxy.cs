@@ -25,6 +25,7 @@ namespace HomeController.model
 
         // For debugging.
         void StartListeningToRemoteLcu();
+        void ConnectToRcu();
         void RequestStatusFromRcu();
     }
 

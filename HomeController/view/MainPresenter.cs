@@ -128,27 +128,34 @@ namespace HomeController.view
 
         public void ListenBtn_Click(string lcuName, string rcuName)
         {
-            houseModel.ListenToRCU(lcuName, rcuName);
             mainView.AddRcuLoggText(lcuName, rcuName, "User initiated " + lcuName + " to listen to " + rcuName + "\r\n");
+            houseModel.ListenToRCU(lcuName, rcuName);
         }
+
+        public void ConnectBtn_Click(string lcuName, string rcuName)
+        {
+            mainView.AddRcuLoggText(lcuName, rcuName, "User initiated " + lcuName + " to connect to " + rcuName + "\r\n");
+            houseModel.ConnectToRCU(lcuName, rcuName);
+        }
+
         public void RequestStatusBtn_Click(string lcuName, string rcuName)
         {
-            houseModel.RequestStatusFromRCU(lcuName, rcuName);
             mainView.AddRcuLoggText(lcuName, rcuName, "User initiated "+ lcuName + " to req status from " + rcuName + "\r\n");
+            houseModel.RequestStatusFromRCU(lcuName, rcuName);
         }
 
 
 
         public void ConnectAllBtn_Click(string lcuName)
         {
-            houseModel.ConnectToAllRCU(lcuName);
             mainView.AddLcuLoggText(lcuName, "User initiated " + lcuName + " to connected to all rcu:s");
+            houseModel.ConnectToAllRCU(lcuName);
         }
 
         public void ListenAllBtn_Click(string lcuName)
         {
-            houseModel.ListenToAllRCU(lcuName);
             mainView.AddLcuLoggText(lcuName, "User initiated " + lcuName + " to listens to all rcu:s");
+            houseModel.ListenToAllRCU(lcuName);
         }
 
         public void ClearAllBtn_Click(string lcuName)
@@ -160,5 +167,6 @@ namespace HomeController.view
         {
             mainView.ClearRcuText(lcuName, rcuName);
         }
+
     }
 }

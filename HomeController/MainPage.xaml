@@ -37,11 +37,9 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="StopBtn"  Grid.Row="0" Grid.Column="0" Content="Stop" HorizontalAlignment="Center" VerticalAlignment="Center" Click="StopBtn_Click" />
             <Button x:Name="InfoBtn"  Grid.Row="0" Grid.Column="1" Content="Info" HorizontalAlignment="Center" VerticalAlignment="Center" Click="InfoBtn_Click" />
-            <Button x:Name="ConnectBtn"  Grid.Row="0" Grid.Column="2" Content="Connect" HorizontalAlignment="Left" VerticalAlignment="Center" Click="ConnectBtn_OnClickBtn_Click" />
             <Ellipse x:Name="LED" Grid.Row="0" Grid.Column="3" Fill="LightGray" Stroke="White" Width="100" Height="100" Margin="10"/>
+            
 
-            <TextBlock Grid.Row="0" Grid.Column="4" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="client"/>
-            <TextBlock  Grid.Row="0" Grid.Column="5" Margin="9.6" Style="{StaticResource SubtitleTextBlockStyle}" Text="server"/>
             <TextBlock Grid.Row="0" Grid.Column="6" x:Name="HouseTextBox" />
         </Grid>
         

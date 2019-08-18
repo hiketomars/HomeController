@@ -24,6 +24,7 @@ namespace HomeController.model
         // FOr Debug puspose
         void RequestStatusFromRcu();
         void ListenToRcu(string rcuName);
+        void ConnectToRcu(string rcuName);
 
         void ListenToAllRcus();
         void ConnectToAllRcus();

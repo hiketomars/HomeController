@@ -78,5 +78,10 @@ namespace HomeController.userControl
         {
             RcuReceiveCounterTextBlock.Text = text;
         }
+
+        private void ConnectBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.ConnectBtn_Click(LcuName, RcuName);
+        }
     }
 }
