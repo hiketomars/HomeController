@@ -176,7 +176,7 @@ namespace HomeController.model
         {
             foreach(var remoteCentralUnitConfiguration in remoteCentralUnitConfigurations)
             {
-                IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(lcu, remoteCentralUnitConfiguration.Name, remoteCentralUnitConfiguration.Id, remoteCentralUnitConfiguration.IpAddress, remoteCentralUnitConfiguration.InitiatorPortNumber, remoteCentralUnitConfiguration.ResponderPortNumber);
+                IRemoteCentralUnitProxy remoteCentralUnit = new RemoteCentralUnitProxy(lcu, remoteCentralUnitConfiguration.Name, remoteCentralUnitConfiguration.Id, remoteCentralUnitConfiguration.IpAddress, remoteCentralUnitConfiguration.PortNumber);
                 //remoteCentralUnit.RemoteLcuStatusHasChanged += remoteCentralUnit_RemoteLcuStatusHasChanged;
                 remoteCentralUnitProxies.Add(remoteCentralUnit);
                 //remoteCentralUnit.ActivateCommunication(); // StartListeningOnRemoteLcu();

@@ -34,8 +34,7 @@ namespace HomeController.model
         private readonly ILocalCentralUnit lcu;
         public string NameOfRemoteLcu { get; set; }
         private readonly string ipAddress;
-        private string initiatorPortNumber;
-        private readonly string responderPortNumber;
+        private string portNumber;
         private ThreadPoolTimer periodicTimer;
         public string IpAddress { get; set; }
         //public string Name { get; set; }
@@ -54,13 +53,12 @@ namespace HomeController.model
         //public event Definition.RcuInfoEventHandler NewRcuInfo;
         
 
-        public RemoteCentralUnitProxy(ILocalCentralUnit lcu, string nameOfRemoteLcu, int idOfRemoteLcu, string ipAddress, string initiatorPortNumber, string responderPortNumber)
+        public RemoteCentralUnitProxy(ILocalCentralUnit lcu, string nameOfRemoteLcu, int idOfRemoteLcu, string ipAddress, string portNumber)
         {
             this.lcu = lcu;
             this.NameOfRemoteLcu = nameOfRemoteLcu; // This is our name of the remote LCU which might not be exactly the same as it calls itself.
             this.ipAddress = ipAddress;
-            this.initiatorPortNumber = initiatorPortNumber;
-            this.responderPortNumber = responderPortNumber;
+            this.portNumber = portNumber;
             //this.portNumber = portNumber;co            //this.respondPortNumber = respondPortNumber;
             RcuCurrentStatusMessage = new CurrentStatusMessage(AlarmHandler.AlarmActivityStatus.Undefined); // Initialize.
             //CreateAndStartPeriodicTimer();
@@ -154,7 +152,6 @@ namespace HomeController.model
 
         public void RequestStatusFromRcu()
         {
-            //initiatorPortNumber = "1341";
             //Task<string> t = SendCommandSpecific(ipAddress, "hejsan");
             //Task<string> t = SendCommand(ipAddress, MessageGetStatus);
             SendRequestOfRcuStatusMessage();
@@ -174,7 +171,7 @@ namespace HomeController.model
             try
             {
                 
-                string message = lcu.Name + " now listen on rpn " + responderPortNumber + " expecting messages from " + NameOfRemoteLcu;
+                string message = lcu.Name + " now listen on port " + portNumber+ " expecting messages from " + NameOfRemoteLcu;
                 Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, message);
                 streamSocketListener = new StreamSocketListener();
                 //CoreApplication.Properties.Add("listener", listener);
@@ -185,7 +182,7 @@ namespace HomeController.model
                 //streamSocketListener.Control.KeepAlive = false;
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
-                await streamSocketListener.BindServiceNameAsync(responderPortNumber);
+                await streamSocketListener.BindServiceNameAsync(portNumber);
 
                 lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, message);
 
@@ -250,15 +247,15 @@ namespace HomeController.model
 
             //lcu.AddLogging("The client is trying to connect to remote lcu at IP " + Definition.RemoteLcuPIAddress + "...");
 
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "ConnectToRCU: Connecting async " + hostName + " " + initiatorPortNumber);
-            await streamSocket.ConnectAsync(hostName, initiatorPortNumber);
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "ConnectToRCU: Connecting async " + hostName + " " + portNumber);
+            await streamSocket.ConnectAsync(hostName, portNumber);
 
             Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "ConnectToRCU: Pos30");
             lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Pos30");
 
 
-            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "ConnectToRCU: Connected async to " + hostName + " " + initiatorPortNumber);
-            lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Connected async to " + hostName + " " + initiatorPortNumber);
+            Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "ConnectToRCU: Connected async to " + hostName + " " + portNumber);
+            lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Connected async to " + hostName + " " + portNumber);
 
         }
 
@@ -292,15 +289,11 @@ namespace HomeController.model
 
             ////lcu.AddLogging("The client is trying to connect to remote lcu at IP " + Definition.RemoteLcuPIAddress + "...");
 
-            //Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Connecting async " + hostName + " " + initiatorPortNumber);
-            //await streamSocket.ConnectAsync(hostName, initiatorPortNumber);
 
             //Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Pos30");
             //lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Pos30");
 
 
-            //Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Connected async to " + hostName + " " + initiatorPortNumber);
-            //lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Connected async to " + hostName + " " + initiatorPortNumber);
 
 
             //lcu.AddLogging("The client connected");
@@ -337,12 +330,12 @@ namespace HomeController.model
             var streamWriter = new StreamWriter(outputStream);
             //using(var streamWriter = new StreamWriter(outputStream))
                 //{
-                    Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Writing to ipn " + initiatorPortNumber + " on " + hostName);
+                    Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, "SendCommandSpecific: Writing to port " + portNumber + " on " + hostName);
 
                     await streamWriter.WriteLineAsync(exactCommand);
                     await streamWriter.FlushAsync();
                     lcu.OnRcuReceivedMessage(this, Definition.MessageType.SendCounter, sendCounter.ToString());
-                    lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Writing to ipn " + initiatorPortNumber + " on " + hostName+":\r\n   "+exactCommand);
+                    lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg, "Writing to port " + portNumber + " on " + hostName+":\r\n   "+exactCommand);
                 //}
             //}
 
@@ -580,7 +573,7 @@ namespace HomeController.model
 
                     var transferObject = BuildTransferObjectFromPortStringMessage(request);
                     string loggMessage = "Got message " + transferObject.MessageType + "with id " + transferObject.Id +
-                                         " on rpn " + responderPortNumber + " probably from " + NameOfRemoteLcu;
+                                         " on rpn " + portNumber + " probably from " + NameOfRemoteLcu;
                     Logger.Logg(lcu.Name, Logger.RCUProxy_Cat, loggMessage);
                     receivedObjects.Add(transferObject);
 

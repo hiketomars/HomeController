@@ -40,7 +40,7 @@ namespace HomeController.model
             // Currently the config handlers are constructed from hard coded data but later on this will be read from XML-file(s).
             ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340", "1341"),
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340"),
                 }
             );
             var frontDoorLcu = new LocalCentralUnit(this, configHandlerFrontDoor);
@@ -48,7 +48,7 @@ namespace HomeController.model
 
             ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLCU", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitConfiguration("Framsidan", "1","localhost", "1341", "1340"),
+                    new RemoteCentralUnitConfiguration("Framsidan", "1","localhost", "1341"),
                 }
             );
             var backDoorLcu = new LocalCentralUnit(this, configHandlerBackDoor);

@@ -76,12 +76,12 @@ namespace HomeController
             // Nedan finns kod som inte heller används men som kan användas för att testa kommunikationsdelen separat.
             // Denna delen motsvarar att starta servern.
             var fakeLcu2 = new FakeLcu();
-            var rcu2 = new RemoteCentralUnitProxy(fakeLcu2, "theRemoteLcu", 22, "localhost", "-1", PortNumber);
+            var rcu2 = new RemoteCentralUnitProxy(fakeLcu2, "theRemoteLcu", 22, "localhost", PortNumber);
             rcu2.StartListeningToRemoteLcu();
 
             // Denna delen motsvarar att starta klienten.
             var fakeLcu1 = new FakeLcu();
-            var rcu1 = new RemoteCentralUnitProxy(fakeLcu1, "theRemoteLcu", 23, "localhost", PortNumber, "-1");
+            var rcu1 = new RemoteCentralUnitProxy(fakeLcu1, "theRemoteLcu", 23, "localhost", PortNumber);
 
             var r = await rcu1.SendCommandSpecific("localhost","hi there");
 

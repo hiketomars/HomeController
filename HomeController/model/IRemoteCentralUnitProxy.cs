@@ -35,11 +35,7 @@ namespace HomeController.model
         int Id { set; get; }
         string IpAddress { get; set; }
 
-        string InitiatorPortNumber { get; set; }
-
-        string ResponderPortNumber { get; set; }
-        //string ActingPortNumber { get; set; } // Used for acting part when sending etc.
-        //string ReactingPortNumber { get; set; } // Used for reacting part when receiving etc.
+        string PortNumber { get; set; }
 
     }
 }
