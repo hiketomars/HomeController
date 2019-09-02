@@ -9,6 +9,7 @@ namespace HomeController.model
 {
     public interface IRemoteCentralUnitProxy
     {
+        void QueueIncomingMessage(StatusBaseMessage statusBaseMessage);
         Task<string> SendCommandSpecific(string hostName, string command);
         bool HasIntrusionOccurred();
         bool HasIntrusionOccurredRemotely();
@@ -24,9 +25,12 @@ namespace HomeController.model
         //void SendRequestOfRcuStatusMessage();
 
         // For debugging.
-        void StartListeningToRemoteLcu();
+        //void StartListeningToRemoteLcu();
         void ConnectToRcu();
         void RequestStatusFromRcu();
+        void HandleMessageFromQueue(StatusBaseMessage statusBaseMessage);
+        void HandleFirstMessageInQueue();
+        void Action(string action);
     }
 
     public interface IRemoteCentralUnitConfiguration

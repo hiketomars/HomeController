@@ -23,6 +23,7 @@ namespace HomeController.utils
 
         public delegate void LEDChangedEventHandler(RGBValue rgbValue);
         public delegate void RcuMessageReceivedEventHandler(ILocalCentralUnit lcu, IRemoteCentralUnitProxy rcu, MessageType messageType, string message);
+        public delegate void LcuRelatedMessageEventHandler(ILocalCentralUnit lcu, MessageType messageType, string message);
         public delegate void HomeMessageReceivedEventHandler(MessageType messageType, string message);
 
 
@@ -31,6 +32,11 @@ namespace HomeController.utils
 
         public enum LEDGraphColor { Red, Green, Blue, Gray }
 
-        public enum MessageType {Logg, SendCounter, ReceiveCounter}
+        public enum MessageType {
+            Logg, // Info that change but old info should remain (ie presented in scroll area)
+            SendCounter, // Static number info. "Static" meaning that only last info is displayed since the presented are is in a static place.
+            ReceiveCounter,// Static number info. 
+            StaticInfo // Static text info, e.g. PortNumber for LCU.
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace HomeController.model
         List<IRemoteCentralUnitProxy> RcuList { get; }
         // FOr Debug puspose
         void RequestStatusFromRcu();
-        void ListenToRcu(string rcuName);
+        //void ListenToRcu(string rcuName);
         void ConnectToRcu(string rcuName);
 
         void ListenToAllRcus();

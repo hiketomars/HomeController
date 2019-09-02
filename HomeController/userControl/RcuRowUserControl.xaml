@@ -22,10 +22,13 @@
                 <TextBlock Name="RcuReceiveCounterTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="#Received" Margin="5,0" ToolTipService.ToolTip="Number of received incoming messages."/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Button Name="ListenBtn" Width="60" Content="Listen" Click="ListenBtn_Click" Margin="5" ToolTipService.ToolTip="Listens to incoming messages from this RCU." />
                 <Button Name="ConnectBtn" Width="60" Content="Connect" Click="ConnectBtn_Click" Margin="5" ToolTipService.ToolTip="Connect to the RCU." />
                 <Button x:Name ="ReqStatusBtn" Width="100" Content="Req status" Click="RequestStatusBtn_Click" Margin="5"/>
                 <Button x:Name ="ClearBtn" Width="80" Content="Clear" Click="ClearBtn_Click" Margin="5"/>
+                <Button Name="ActionBtn" Width="60" Content="Go!" Margin="5" ToolTipService.ToolTip="Perform action" Click="ActionBtn_Click" />
+                <ComboBox Name="ActionSelector" Header="" PlaceholderText="Select action" Width="200" VerticalAlignment="Top" SelectionChanged="ActionSelector_OnSelectionChanged" >
+                    <x:String>PopFirstMessageInQueue</x:String>
+                </ComboBox>
             </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="Aquamarine" >

@@ -80,6 +80,13 @@ namespace HomeController
             this.HouseTextBox.Text += text;
         }
 
+        public void SetLcuInfoText(string lcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.LcuInfoTextBlock.Text = text;
+        }
+
+
         //// Called from the presenter to set all logg items in this view.
         //// From IMainView.
         //public async void AddHouseLoggText(List<string> loggings)
@@ -93,13 +100,13 @@ namespace HomeController
         //    //    //this.loggListBox.Items.Add(logging);
         //    //    this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.loggListBox.Items.Add(logging)).GetResults();
         //    //}
-       
+
         //        //this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings))
         //        //    .GetResults();
 
         //        await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ClearAndUpdateLoggItems(loggings));
 
-            
+
 
         //}
 
@@ -143,6 +150,12 @@ namespace HomeController
         // ---------------------------- LCU ------------------------------------------------
         // Adds text to rcu log.
 
+        public void SetLcuLoggText(string lcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.SetTextToOutput(text);
+        }
+
         public void AddLcuLoggText(string lcuName, string text)
         {
             var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
@@ -156,14 +169,12 @@ namespace HomeController
                 var lcuUserControl = new LcuUserControl(mainPresenter);
                 lcuUserControl.LcuName = lcu.Name;
                 lcuUserControl.NameText = lcu.Name;
-                lcuUserControl.AddTextToOutput("Lcu " + lcu.Name + " created.");
                 foreach(var rcu in lcu.LcuRemoteCentralUnitsController.RcuList)
                 {
                     lcuUserControl.AddRcu(rcu.NameOfRemoteLcu);
                 }
 
                 LcuStackPanel.Children.Add(lcuUserControl);
-                //this.lcus.Add(lcu);
                 lcuUserControls.Add(lcuUserControl);
             }
         }

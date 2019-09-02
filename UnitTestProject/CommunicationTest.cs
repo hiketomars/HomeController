@@ -150,16 +150,16 @@ namespace UnitTestProject
             C1_ReadingIsDoorUnlockedFromRemoteControlUnits_WhenAllButOneRemoteDoorsAreLocked_Expect_CorrectResponse()
         {
 
-            ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler("Framsidan", "1341", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitConfiguration("Baksidan", "2","192.168.1.8", "1341"),
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","192.168.1.8", "1348"),
                 }
             );
             var frontDoorLcuRemoteCentralUnitsController = new RemoteCentralUnitsController(null, configHandlerFrontDoor.GetRemoteLcus());
 
-            ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLcu", new List<IRemoteCentralUnitConfiguration>()
+            ConfigHandler configHandlerBackDoor = new ConfigHandler("Baksidan", "1348", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitConfiguration("Framsidan", "1", "192.168.1.8", "1340"),
+                    new RemoteCentralUnitConfiguration("Framsidan", "1", "192.168.1.8", "1341"),
                 }
             );
 
@@ -225,12 +225,12 @@ namespace UnitTestProject
             Logger.Logg(testName, Logger.Test_Cat, "Starting");
             // Sätt upp några remote lcu:er för de olika LCU:erna med mockad siren och dörr.
             // Dess remote controller och dess proxies ska inte vara mockade.
-            ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler("Framsidan", "1341", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitConfiguration("Baksidan", "2","192.168.1.8", "1340"),
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","192.168.1.8", "1348"),
                 }
                 );
-            ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLcu", new List<IRemoteCentralUnitConfiguration>()
+            ConfigHandler configHandlerBackDoor = new ConfigHandler("Baksidan", "1348", new List<IRemoteCentralUnitConfiguration>()
                 {
                     new RemoteCentralUnitConfiguration("Framsidan", "1", "192.168.1.8", "1341"),
                 }

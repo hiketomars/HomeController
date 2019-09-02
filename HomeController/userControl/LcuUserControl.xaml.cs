@@ -63,6 +63,11 @@ namespace HomeController.userControl
             return rcuUserControlList;
         }
 
+        public void SetTextToOutput(string text)
+        {
+            InfoTextBlock.Text = text;
+        }
+
         public void AddTextToOutput(string text)
         {
             InfoTextBlock.Text += text;

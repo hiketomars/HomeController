@@ -11,9 +11,11 @@ namespace HomeController.model
     {
         
         string Name { get; }
+        string PortNumber { get; }
         IAlarmHandler LcuAlarmHandler { get; }
         IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; }
 
         void OnRcuReceivedMessage(IRemoteCentralUnitProxy rcu, Definition.MessageType messageType, string loggMessage); // Called by RCU:s when they receive a message.
+        void Action(string rcuName, string action);
     }
 }

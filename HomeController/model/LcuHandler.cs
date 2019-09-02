@@ -38,15 +38,15 @@ namespace HomeController.model
             
 
             // Currently the config handlers are constructed from hard coded data but later on this will be read from XML-file(s).
-            ConfigHandler configHandlerFrontDoor = new ConfigHandler("FrontLCU", new List<IRemoteCentralUnitConfiguration>()
+            ConfigHandler configHandlerFrontDoor = new ConfigHandler("Framsidan", "1341", new List<IRemoteCentralUnitConfiguration>()
                 {
-                    new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1340"),
+                    new RemoteCentralUnitConfiguration("Baksidan", "2","localhost", "1348"),
                 }
             );
             var frontDoorLcu = new LocalCentralUnit(this, configHandlerFrontDoor);
             lcuList.Add(frontDoorLcu);
 
-            ConfigHandler configHandlerBackDoor = new ConfigHandler("BackLCU", new List<IRemoteCentralUnitConfiguration>()
+            ConfigHandler configHandlerBackDoor = new ConfigHandler("Baksidan", "1348", new List<IRemoteCentralUnitConfiguration>()
                 {
                     new RemoteCentralUnitConfiguration("Framsidan", "1","localhost", "1341"),
                 }
@@ -74,6 +74,14 @@ namespace HomeController.model
             if (RcuReceivedMessage != null)
             {
                 RcuReceivedMessage(lcu, rcu, messageType, message); // Event!
+            }
+        }
+
+        public void OnLcuRelatedMessage(LocalCentralUnit localCentralUnit, Definition.MessageType logg, string message)
+        {
+            if (LcuRelatedMessage != null)
+            {
+                LcuRelatedMessage(localCentralUnit, logg, message); // Event!
             }
         }
 
@@ -150,6 +158,7 @@ namespace HomeController.model
         public event Definition.VoidEventHandler LcuInstancesHasChanged;
         public event Definition.LEDChangedEventHandler LCULedHasChanged;
         public event Definition.RcuMessageReceivedEventHandler RcuReceivedMessage;
+        public event Definition.LcuRelatedMessageEventHandler LcuRelatedMessage;
         public event Definition.HomeMessageReceivedEventHandler HomeReceivedMessage; // Event about a message that concerns the hole Home Controller application, ie not a specific LCU.
 
        
@@ -174,17 +183,24 @@ namespace HomeController.model
             lcu.LcuRemoteCentralUnitsController.RequestStatusFromRcu();
         }
 
-        // The LCU with name lcuName wants to listen to the RCU with name rcuName.
-        public void ListenToRCU(string lcuName, string rcuName)
-        {
-            var lcu = lcuList.Find(e => e.Name == lcuName);
-            lcu.LcuRemoteCentralUnitsController.ListenToRcu(rcuName);
-        }
+        //// The LCU with name lcuName wants to listen to the RCU with name rcuName.
+        //public void ListenToRCU(string lcuName, string rcuName)
+        //{
+        //    var lcu = lcuList.Find(e => e.Name == lcuName);
+        //    lcu.LcuRemoteCentralUnitsController.ListenToRcu(rcuName);
+        //}
 
         public void ConnectToRCU(string lcuName, string rcuName)
         {
             var lcu = lcuList.Find(e => e.Name == lcuName);
             lcu.LcuRemoteCentralUnitsController.ConnectToRcu(rcuName);
+        }
+
+        public void ActionBtn(string lcuName, string rcuName, string action)
+        {
+            var lcu = lcuList.Find(e => e.Name == lcuName);
+
+            lcu.Action(rcuName, action);
         }
 
         // Returns the list of the Lcu:s that this LcuHandler handles.

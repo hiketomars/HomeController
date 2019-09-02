@@ -350,6 +350,7 @@ namespace UnitTestProject
         public event Definition.VoidEventHandler LcuInstancesHasChanged;
         public event Definition.LEDChangedEventHandler LCULedHasChanged;
         public event Definition.RcuMessageReceivedEventHandler RcuReceivedMessage;
+        public event Definition.LcuRelatedMessageEventHandler LcuRelatedMessage;
         public event Definition.HomeMessageReceivedEventHandler HomeReceivedMessage;
 
         public List<string> GetLoggings()
@@ -367,10 +368,10 @@ namespace UnitTestProject
             throw new NotImplementedException();
         }
 
-        public void ListenToRCU(string lcuName, string rcuName)
-        {
-            throw new NotImplementedException();
-        }
+        //public void ListenToRCU(string lcuName, string rcuName)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public List<ILocalCentralUnit> GetLcuList()
         {
@@ -391,11 +392,21 @@ namespace UnitTestProject
         {
             throw new NotImplementedException();
         }
+
+        public void ActionBtn(string lcuName, string rcuName, string actionSelectorSelectValue)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class TestMainView : IMainView
     {
         public void AddHouseLoggText(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLcuInfoText(string lcuName, string text)
         {
             throw new NotImplementedException();
         }
@@ -411,6 +422,11 @@ namespace UnitTestProject
         }
 
         public void SetLcus(List<ILocalCentralUnit> lcus)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetLcuLoggText(string lcuName, string text)
         {
             throw new NotImplementedException();
         }

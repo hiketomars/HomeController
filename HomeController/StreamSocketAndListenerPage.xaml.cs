@@ -25,11 +25,18 @@ namespace HomeController
         public string Name {
             get => "FakeLcu";
         }
+
+        public string PortNumber { get; }
         public IAlarmHandler LcuAlarmHandler { get; }
         public IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; }
         public void OnRcuReceivedMessage(IRemoteCentralUnitProxy rcu, Definition.MessageType messageType,
             string loggMessage)
         {
+        }
+
+        public void Action(string rcuName, string action)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -77,7 +84,7 @@ namespace HomeController
             // Denna delen motsvarar att starta servern.
             var fakeLcu2 = new FakeLcu();
             var rcu2 = new RemoteCentralUnitProxy(fakeLcu2, "theRemoteLcu", 22, "localhost", PortNumber);
-            rcu2.StartListeningToRemoteLcu();
+            //rcu2.StartListeningToRemoteLcu();
 
             // Denna delen motsvarar att starta klienten.
             var fakeLcu1 = new FakeLcu();

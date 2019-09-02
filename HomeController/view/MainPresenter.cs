@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using HomeController.model;
 using HomeController.utils;
 
@@ -28,8 +29,31 @@ namespace HomeController.view
             houseModel.LcuInstancesHasChanged += new Definition.VoidEventHandler(ModelEventHandler_LcuInstancesHasChanged);
             houseModel.RcuReceivedMessage += new Definition.RcuMessageReceivedEventHandler(ModelEventHandler_RcuReceivedMessage);
             houseModel.HomeReceivedMessage += new Definition.HomeMessageReceivedEventHandler(ModelEventHandler_HomeReceivedMessage);
+            houseModel.LcuRelatedMessage += new Definition.LcuRelatedMessageEventHandler(ModelEventHandler_LcuRelatedMessage);
 
             
+        }
+
+        private async void ModelEventHandler_LcuRelatedMessage(ILocalCentralUnit lcu, Definition.MessageType messageType, string message)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    // Your UI update code goes here!
+                    switch(messageType)
+                    {
+                        case Definition.MessageType.Logg:
+                            mainView.AddLcuLoggText(lcu.Name, message + "\r\n");
+                            break;
+                        case Definition.MessageType.StaticInfo:
+                            mainView.SetLcuInfoText(lcu.Name, message);
+                            break;
+                        default:
+                            mainView.AddLcuLoggText(lcu.Name, message + "\r\n");
+                            break;
+                    }
+
+                });
         }
 
         // Event handler for messages concerning the Home Controller as a hole.
@@ -90,6 +114,10 @@ namespace HomeController.view
         {
             var lcus = houseModel.GetLcuList();
             mainView.SetLcus(lcus);
+            foreach (var lcu in lcus)
+            {
+                mainView.SetLcuInfoText(lcu.Name,"Port: "+lcu.PortNumber);
+            }
         }
 
         // This is the handler method for the event ModelHasChanged that comes from the model.
@@ -113,24 +141,24 @@ namespace HomeController.view
 
         internal void StopApplication()
         {
-            mainView.AddHouseLoggText("\r\nStop clicked.");
+            mainView.AddHouseLoggText("\r\nStop clicked.\r\n");
             Application.Current.Exit();
         }
 
         internal void InfoBtn_Click(object sender, RoutedEventArgs e)
         {
-            mainView.AddHouseLoggText("\r\nInfo button clicked.");
+            mainView.AddHouseLoggText("\r\nInfo button clicked.\r\n");
             mainView.AddHouseLoggText("Log path " + Logger.LastUsedLogPath);
 
         }
 
 
 
-        public void ListenBtn_Click(string lcuName, string rcuName)
-        {
-            mainView.AddRcuLoggText(lcuName, rcuName, "User initiated " + lcuName + " to listen to " + rcuName + "\r\n");
-            houseModel.ListenToRCU(lcuName, rcuName);
-        }
+        //public void ListenBtn_Click(string lcuName, string rcuName)
+        //{
+        //    mainView.AddRcuLoggText(lcuName, rcuName, "User initiated " + lcuName + " to listen to " + rcuName + "\r\n");
+        //    houseModel.ListenToRCU(lcuName, rcuName);
+        //}
 
         public void ConnectBtn_Click(string lcuName, string rcuName)
         {
@@ -148,19 +176,19 @@ namespace HomeController.view
 
         public void ConnectAllBtn_Click(string lcuName)
         {
-            mainView.AddLcuLoggText(lcuName, "User initiated " + lcuName + " to connected to all rcu:s");
+            mainView.AddLcuLoggText(lcuName, "User initiated " + lcuName + " to connected to all rcu:s\r\n");
             houseModel.ConnectToAllRCU(lcuName);
         }
 
         public void ListenAllBtn_Click(string lcuName)
         {
-            mainView.AddLcuLoggText(lcuName, "User initiated " + lcuName + " to listens to all rcu:s");
+            mainView.AddLcuLoggText(lcuName, "User initiated " + lcuName + " to listen to all rcu:s\r\n");
             houseModel.ListenToAllRCU(lcuName);
         }
 
         public void ClearAllBtn_Click(string lcuName)
         {
-            throw new NotImplementedException();
+            mainView.SetLcuLoggText(lcuName, "");
         }
 
         public void ClearBtn_Click(string lcuName, string rcuName)
@@ -168,5 +196,13 @@ namespace HomeController.view
             mainView.ClearRcuText(lcuName, rcuName);
         }
 
+        public void ActionSelector_OnSelectionChanged(string lcuName, string selectionChangedEventArgs, object sender, SelectionChangedEventArgs selectionChangedEventArgs1)
+        {
+        }
+
+        public void ActionBtn_Click(string lcuName, string rcuName, string actionSelectorSelectValue)
+        {
+            houseModel.ActionBtn(lcuName, rcuName, actionSelectorSelectValue);
+        }
     }
 }

@@ -13,7 +13,7 @@
             <RowDefinition Height="44"/>
             <RowDefinition Height="44"/>
             <RowDefinition />
-            <RowDefinition Height="44"/>
+            <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
@@ -22,6 +22,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <TextBlock  Name = "LcuNameTextBlock" Grid.Row="0" Grid.Column="0" Width="190"               Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Name of LCU"   />
+        <TextBlock  Name = "LcuInfoTextBlock" Grid.Row="0" Grid.Column="1" Width="190"               Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Port etc"
+                    x:FieldModifier="public" />
         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="4">
             <Button     Name="ListenAllBtn"       Grid.Row="1" Grid.Column="0"                       Content="Listen to All" Click="ListenAllBtn_Click" Margin="10,0" />
             <Button     Name="ConnectAllBtn"      Grid.Row="1" Grid.Column="1"                       Content="Connect to All" Click="ConnectAllBtn_Click " Margin="10,0" />
@@ -31,9 +33,10 @@
         <Grid Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4">
             <StackPanel Name="RcuStackPanel"   Orientation="Horizontal"  HorizontalAlignment="Stretch"  Background="CornflowerBlue" Margin="10"/>
         </Grid>
+        <ScrollViewer Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Visible">
         <!--<Grid Name="RcuStackPanel"      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="CornflowerBlue" Margin="10"/>-->
-        <TextBlock  Name="InfoTextBlock"      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"                       TextWrapping="Wrap" Text="..." Margin="10,0"/>
-
+        <TextBlock  Name="InfoTextBlock"      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"             Height="400"          TextWrapping="Wrap" Text="..." Margin="10,0"/>
+        </ScrollViewer>
     </Grid>
 </UserControl>
   

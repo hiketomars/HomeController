@@ -26,10 +26,12 @@ namespace HomeController.config
     //}
     public class ConfigHandler : IConfigHandler
     {
+        public string LcuPortNumber { get; }
         private List<IRemoteCentralUnitConfiguration> remoteLcus;
         private string LCUName;
-        public ConfigHandler(string lcuName, List<IRemoteCentralUnitConfiguration> remoteLcus)
+        public ConfigHandler(string lcuName, string lcuPortNumber, List<IRemoteCentralUnitConfiguration> remoteLcus)
         {
+            LcuPortNumber = lcuPortNumber;
             this.remoteLcus = remoteLcus;
             LCUName = lcuName;
 

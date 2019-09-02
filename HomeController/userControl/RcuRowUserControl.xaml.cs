@@ -53,11 +53,11 @@ namespace HomeController.userControl
             InfoTextBlock.Text += text;
         }
 
-        private void ListenBtn_Click(object sender, RoutedEventArgs e)
-        {
-            InfoTextBlock.Text += "";
-            mainPresenter.ListenBtn_Click(LcuName, RcuName);
-        }
+        //private void ListenBtn_Click(object sender, RoutedEventArgs e)
+        //{
+        //    InfoTextBlock.Text += "";
+        //    mainPresenter.ListenBtn_Click(LcuName, RcuName);
+        //}
 
         private void RequestStatusBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -82,6 +82,16 @@ namespace HomeController.userControl
         private void ConnectBtn_Click(object sender, RoutedEventArgs e)
         {
             mainPresenter.ConnectBtn_Click(LcuName, RcuName);
+        }
+
+        private void ActionSelector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            mainPresenter.ActionSelector_OnSelectionChanged(LcuName, RcuName, sender, e);
+        }
+
+        private void ActionBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.ActionBtn_Click(LcuName, RcuName, ActionSelector.SelectedValue.ToString());
         }
     }
 }

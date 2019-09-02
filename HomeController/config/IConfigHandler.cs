@@ -10,7 +10,7 @@ namespace HomeController.config
     public interface IConfigHandler
     {
         List<IRemoteCentralUnitConfiguration> GetRemoteLcus();
-
+        string LcuPortNumber { get; }
         string GetLCUName();
     }
 }

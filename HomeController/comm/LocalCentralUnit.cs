@@ -57,6 +57,20 @@ namespace HomeController.comm {
             lcuHandler.OnRcuReceivedMessage(this, rcu, messageType, loggMessage);
         }
 
+        public void Action(string rcuName, string action)
+        {
+            var rcu = lcuRemoteCentralUnitsController.RcuList.Find(r => r.NameOfRemoteLcu == rcuName);
+
+            rcu.Action(action);
+
+
+        }
+
+        public string PortNumber
+        {
+            get => LcuConfigHandler.LcuPortNumber;
+        }
+
         //public ConfigHandler LcuConfigHandler;
 
         //private static LocalCentralUnit instance;
@@ -85,7 +99,6 @@ namespace HomeController.comm {
         //}
 
         private readonly ILcuHandler lcuHandler;
-        private IConfigHandler configHandler;
 
         public LocalCentralUnit(ILcuHandler lcuHandler, IConfigHandler configHandler)
         {
@@ -93,7 +106,7 @@ namespace HomeController.comm {
                 "Creating Lcu with name " + configHandler.GetLCUName());
 
             this.lcuHandler = lcuHandler;
-            this.configHandler = configHandler;
+            this.LcuConfigHandler = configHandler;
             SetName();
 
             // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
@@ -195,7 +208,7 @@ LcuRemoteCentralUnitsController.Setup(this);
 
             // First we need to find out the current overall (compound) status of the home.
             var compoundStatus = LcuRemoteCentralUnitsController.GetCompoundStatus();
-            Logger.Logg(configHandler.GetLCUName(), Logger.LCU_Cat, "CompoundStatus is " + compoundStatus);
+            Logger.Logg(LcuConfigHandler.GetLCUName(), Logger.LCU_Cat, "CompoundStatus is " + compoundStatus);
             var localLcuStatus = GetLocalStatus();
             compoundStatus.AddLocalStatus(localLcuStatus);
             // The compound status is now ready.
@@ -395,9 +408,9 @@ Logger.Logg(this.Name, Logger.LCU_Cat, "Leaving Lcu.ActivateAlarm.");
 
         private string GetNameFromConfig()
         {
-            if (configHandler != null)
+            if (LcuConfigHandler != null)
             {
-                return configHandler.GetLCUName();
+                return LcuConfigHandler.GetLCUName();
             }
             var name = "ErrorReadingLCUName";
             try
@@ -446,6 +459,11 @@ Logger.Logg(this.Name, Logger.LCU_Cat, "Leaving Lcu.ActivateAlarm.");
                 IsDoorOpen = LcuDoorController.IsDoorOpen(),
                 AlarmActivity = LcuAlarmHandler.CurrentLocalStatus
             };
+        }
+
+        public void OnLcuRelatedMessage(Definition.MessageType logg, string message)
+        {
+            lcuHandler.OnLcuRelatedMessage(this, logg, message);
         }
     }
 }

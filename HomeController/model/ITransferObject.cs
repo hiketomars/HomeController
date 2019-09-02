@@ -11,6 +11,7 @@ namespace HomeController.model
         string MessageType { get; }
         string Id { get; set; }
         string CompleteMessageStringToSend { get; }
+        string SendingLcuName { get; }
         string ToString();
     }
 }
