@@ -13,7 +13,7 @@ namespace HomeController.model
         Task<string> SendCommandSpecific(string hostName, string command);
         bool HasIntrusionOccurred();
         bool HasIntrusionOccurredRemotely();
-        bool IsDoorUnlocked();
+        bool? IsDoorUnlocked();
         void SendStartUpMessage();
         object RemoteLcuStatusHasChanged { get; set; }
         void ActivateCommunication();

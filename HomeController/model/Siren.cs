@@ -9,36 +9,53 @@ using HomeController.comm;
 
 namespace HomeController.model
 {
+    /// <summary>
+    /// Represents a siren in the house and can be either on or off.
+    /// Values are normally written to electronics via connection to the GPIO-pin.
+    /// Can also be set to use virtual values (ie software values) instead for the on/off-property.
+    /// </summary>
     public class Siren : GpioConnector, ISiren
     {
+        public bool UseVirtualSirenSignal { get; set; }
+
+        private bool VirtualSirenOn { get; set; }
         private readonly int sirenPinNumber;
         private GpioPin sirenPin;
-
         private GpioController gpio;
+
         public void TurnOn()
         {
-            // todo set pin to activate siren.
-            isOn = true;
+            VirtualSirenOn = true;
+            if(!UseVirtualSirenSignal)
+            {
+                sirenPin.Write(GpioPinValue.High);
+            }
         }
 
         public void TurnOff()
         {
-            // todo set pin to deactivate siren.
-            isOn = false;
+            VirtualSirenOn = false;
+            if(!UseVirtualSirenSignal)
+            {
+                sirenPin.Write(GpioPinValue.Low);
+            }
         }
 
         public bool IsOn()
         {
-            // todo read the pin that activates the siren.
-            return isOn;
+            if (UseVirtualSirenSignal)
+            {
+                return VirtualSirenOn;
+            }
+            return sirenPin.Read() == GpioPinValue.High;
         }
 
-        private bool isOn;
         public sealed override void InitGpio()
         {
             base.InitGpio();
             sirenPin = gpio.OpenPin(sirenPinNumber); ;
         }
+
 
     }
 }

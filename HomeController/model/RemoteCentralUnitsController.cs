@@ -31,7 +31,7 @@ namespace HomeController.model
         public const char MessagPartsDelimeter = ';';
         public const string MessageStartToken = "Msg";
 
-        public const string MessageCurrentStatus = "msgCurrentStatus"; // Delivery of current status from RCU.
+        public const string MessageCurrentStatus = "msgCurrentStatus"; // Current status for an rcu.
         public const string MessagePing = "msgPing";
         public const string MessageGetStatus = "msgGetStatus"; // A request for the LCU:s status.
         public const string MessageUnknown = "msgUnknown"; // A request that was not recognized as a valid message.
@@ -267,7 +267,7 @@ namespace HomeController.model
 
         // Static method that translates the specified read data from a port into the correct ITransferObject.
         // Returns null if the string could not be interpreted as a known ITransferObject.
-        // Example can be found in class StatusBaseMessage.
+        // Example can be found in class StatusBaseMessage. 
         // todo Lägg in den här koden i konstruktorn istället. /190818
         private static StatusBaseMessage BuildTransferObjectFromPortStringMessage(string readPortData)
         {
@@ -297,9 +297,19 @@ namespace HomeController.model
             if(parts[3] == MessageCurrentStatus)
             {
                 string statusParam = parts[4];
+                string isDoorOpenStr = parts[5];
+                string isDoorFloatingStr = parts[6];
+                string isDoorLockedStr = parts[7];
+                string isDoorSabotagedStr = parts[8];
                 // Received RCU status.
                 Enum.TryParse(statusParam, out AlarmHandler.AlarmActivityStatus currentAlarmStatusForRcu);
-                var rcuCurrentStatus = new CurrentStatusMessage(currentAlarmStatusForRcu, sendingLcuName);
+
+                bool? isDoorOpen = Definition.TryParseNullableBool(isDoorOpenStr);
+                bool? isDoorFloating = Definition.TryParseNullableBool(isDoorFloatingStr);
+                bool? isDoorLocked = Definition.TryParseNullableBool(isDoorLockedStr);
+                bool? isDoorSabotaged = Definition.TryParseNullableBool(isDoorSabotagedStr);
+
+                var rcuCurrentStatus = new CurrentStatusMessage(isDoorOpen, isDoorFloating, isDoorLocked, isDoorSabotaged, currentAlarmStatusForRcu, sendingLcuName);
                 rcuCurrentStatus.Id = parts[1];
                 return rcuCurrentStatus;
             }
@@ -473,7 +483,7 @@ namespace HomeController.model
         {
             foreach (var remoteCentralUnitProxy in remoteCentralUnitProxies)
             {
-                if (remoteCentralUnitProxy.IsDoorUnlocked())
+                if (remoteCentralUnitProxy.IsDoorUnlocked() == null || remoteCentralUnitProxy.IsDoorUnlocked() == true)
                 {
                     return true;
                 }

@@ -56,7 +56,7 @@ namespace HomeController.model
             this.ipAddress = ipAddress;
             this.portNumber = portNumber;
             //this.portNumber = portNumber;co            //this.respondPortNumber = respondPortNumber;
-            RcuCurrentStatusMessage = new CurrentStatusMessage(AlarmHandler.AlarmActivityStatus.Undefined, "?"); // Initialize.
+            RcuCurrentStatusMessage = new CurrentStatusMessage(null, null, null, null, AlarmHandler.AlarmActivityStatus.Undefined, "?"); // Initialize.
             //CreateAndStartPeriodicTimer();
 
             //if (lcu.Id < idOfRemoteLcu)
@@ -132,7 +132,7 @@ namespace HomeController.model
             return RcuCurrentStatusMessage.HasIntrusionOccurredRemotely;
         }
 
-        public bool IsDoorUnlocked()
+        public bool? IsDoorUnlocked()
         {
             return RcuCurrentStatusMessage.IsDoorLocked;
         }
@@ -185,7 +185,9 @@ namespace HomeController.model
                         // Got the status for the RCU.
                         lastReceivedRcuStatus = statusBaseMessage;
                         lcu.OnRcuReceivedMessage(this, Definition.MessageType.Logg,
-                            "RCU " + NameOfRemoteLcu + " has status " + rcuStatusMessage.AlarmStatus);
+                            "RCU " + NameOfRemoteLcu + " has status " + rcuStatusMessage.AlarmStatus + ", DO:" + rcuStatusMessage.IsDoorOpen + ", DF:"+rcuStatusMessage.IsDoorFloating + ", DL:"+rcuStatusMessage.IsDoorLocked+", DS:"+rcuStatusMessage.IsSabotaged);
+                        lcu.OnRcuReceivedMessage(this, Definition.MessageType.RcuStatus,
+                            rcuStatusMessage.StatusAsReadableString);
                         break;
 
                     case RequestRcuStatusMessage message:
@@ -555,7 +557,7 @@ namespace HomeController.model
         // Sends our status the the RCU. This could typically be the response to a request for the current status.
         private async Task<string> SendCurrentStatusToRcu()
         {
-            var ourCurrentStatus = new CurrentStatusMessage(lcu.LcuAlarmHandler.CurrentLocalStatus, lcu.Name);
+            var ourCurrentStatus = new CurrentStatusMessage(lcu.Door.IsOpen, lcu.Door.IsFloating, lcu.Door.IsLocked, lcu.IsSabotaged, lcu.LcuAlarmHandler.CurrentLocalStatus, lcu.Name);
 
             return await SendCommand("localhost", ourCurrentStatus);
         }

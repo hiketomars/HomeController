@@ -203,6 +203,7 @@ namespace HomeController.model
             lcu.Action(rcuName, action);
         }
 
+
         // Returns the list of the Lcu:s that this LcuHandler handles.
 
         public List<ILocalCentralUnit> GetLcuList()

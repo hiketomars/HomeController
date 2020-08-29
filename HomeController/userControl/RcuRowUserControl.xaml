@@ -8,27 +8,33 @@
     mc:Ignorable="d" >
     <Grid Width="800"> <!-- todo Jag vet inte hurn jag ska få LCU-panelerna att växa i sidled dynamiskt och fylla ut. Sätter därför en fix bredd så länge att att få dem lite bredare. /190811 -->
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="220"/>
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="TextAndButtonStackPanel"  Background="CadetBlue" >
-            <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal"  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="TextAndButtonStackPanel"  Background="CadetBlue" >
+            <StackPanel Orientation="Vertical" Width="200" HorizontalAlignment="Left">
                 <TextBlock Name="RcuNameTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="RcuName" Margin="5,0" />
                 <TextBlock Name="RcuSendCounterTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="#Sent" Margin="5,0" ToolTipService.ToolTip="Number of sent requests."/>
                 <TextBlock Name="RcuReceiveCounterTextBlock" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="#Received" Margin="5,0" ToolTipService.ToolTip="Number of received incoming messages."/>
+                <TextBlock Name="RcuAlarmStatus" Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" Text="AlarmStatus" Margin="5,0" ToolTipService.ToolTip="Alarm status for the RCU"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Name="ConnectBtn" Width="60" Content="Connect" Click="ConnectBtn_Click" Margin="5" ToolTipService.ToolTip="Connect to the RCU." />
+            <StackPanel Orientation="Vertical">
+                <Button Name="ConnectBtn" Width="100" Content="Connect" Click="ConnectBtn_Click" Margin="5" ToolTipService.ToolTip="Connect to the RCU." />
                 <Button x:Name ="ReqStatusBtn" Width="100" Content="Req status" Click="RequestStatusBtn_Click" Margin="5"/>
-                <Button x:Name ="ClearBtn" Width="80" Content="Clear" Click="ClearBtn_Click" Margin="5"/>
+                <Button x:Name ="ClearBtn" Width="100" Content="Clear" Click="ClearBtn_Click" Margin="5"/>
                 <Button Name="ActionBtn" Width="60" Content="Go!" Margin="5" ToolTipService.ToolTip="Perform action" Click="ActionBtn_Click" />
                 <ComboBox Name="ActionSelector" Header="" PlaceholderText="Select action" Width="200" VerticalAlignment="Top" SelectionChanged="ActionSelector_OnSelectionChanged" >
                     <x:String>PopFirstMessageInQueue</x:String>
                 </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="20">
+                <CheckBox Name="DoorIsOpen" Content="Door open" IsEnabled="False"/>
+                <CheckBox Name="DoorIsUnsealed" Content="Door unsealed" IsEnabled="False"/>
+                <CheckBox Name="DoorIsLocked" Content="Door locked" IsEnabled="False"/>
             </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="Aquamarine" >

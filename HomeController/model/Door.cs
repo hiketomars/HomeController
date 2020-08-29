@@ -3,16 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Gpio;
 using HomeController.comm;
 
 namespace HomeController.model
 {
+    /// <summary>
+    /// Represents a door in the house with sensors for the door being closed, floating and locked.
+    /// Values are normally read from electronic values connected the GPIO-pin.
+    /// Can also be set to use virtual values (ie software values) instead for any of the sensor values.
+    /// </summary>
     public class Door : GpioConnector, IDoor
     {
-        public bool Closed { get; set; }
-        public bool Sealed { get; set; } //Reglad = haspad
-        public bool Locked { get; set; }
-        public bool SabotageIntact { get; set; }
+        public bool UseVirtualDoorClosedSignal { get; set; }
+        public bool UseVirtualDoorFloatingSignal { get; set; }
+        public bool UseVirtualDoorLockedSignal { get; set; }
+
+        public void UseVirtualIoSignals()
+        {
+            UseVirtualDoorClosedSignal = true;
+            UseVirtualDoorFloatingSignal = true;
+            UseVirtualDoorLockedSignal = true;
+        }
+
+        private bool VirtualDoorClosed { get; set; }
+        private bool VirtualDoorFloating { get; set; }
+        private bool VirtualDoorLocked { get; set; }
+
+        private GpioController gpio;
+
+        private readonly int doorOpenPinNumber = 1; // todo what number do I use?
+        private readonly int doorFloatingPinNumber = 2; // todo what number do I use?
+        private readonly int doorLockedPinNumber = 3; // todo what number do I use?
+
+
         public enum LedPattern {
             AlarmActiveAllDoorsLocked,          // Lugnt blinkande rött.
             AlarmActiveDoorNotLocked,           // Lugnt blinkande rött 50%, grönt 50%. 
@@ -26,11 +50,15 @@ namespace HomeController.model
             AlarmInactiveDoorLockedButNotDoor2, // Lyser rött med väldigt korta dubbla släckningar.
             AlarmInactiveDoorLockedButNotDoor3  // Lyser rött med väldigt korta trippelsläckningar.
         };
-       
+
         private LEDController doorLedController;
-        public Door()
-        {
-        }
+
+        private bool locked;
+
+        private GpioPin doorOpenPin;
+        private GpioPin doorFloatingPin;
+        private GpioPin doorLockedPin;
+
 
         public RgbLed DoorLed { get; set; }
 
@@ -40,7 +68,7 @@ namespace HomeController.model
         {
             if (houseHandler.AlarmIsActive)
             {
-                if (Locked)
+                if (IsLocked)
                 {
                     doorLedController.StartLedPattern(LedPatternFactory.CreateFlash1Second50percentRed50PercentBlack());
                 }
@@ -51,7 +79,7 @@ namespace HomeController.model
             }
             else
             {
-                if (Locked)
+                if (IsLocked)
                 {
                     //DoorLed.TheLedPattern = LedPattern.AlarmInactiveDoorLocked;
                 }
@@ -62,27 +90,62 @@ namespace HomeController.model
             }
         }
 
-        internal bool IsDetectedOpenAtThisPoll()
+
+        public bool IsOpen
         {
-            throw new NotImplementedException();
+            get
+            {
+                if (UseVirtualDoorClosedSignal)
+                {
+                    return !VirtualDoorClosed;
+                }
+                return doorOpenPin.Read() == GpioPinValue.Low;
+            } // todo Kan vara tvärtom...
+
+            set { VirtualDoorClosed = !value; } // todo Kan vara tvärtom...
         }
 
-        public void Open()
+        public bool? IsFloating
         {
-            throw new NotImplementedException();
+            get
+            {
+                if(UseVirtualDoorFloatingSignal)
+                {
+                    return VirtualDoorFloating;
+                }
+                return doorFloatingPin.Read() == GpioPinValue.High;
+            } // todo Kan vara tvärtom...
+
+            set
+            {
+                if (value == null)
+                {
+                    throw new Exception("Error: Trying to set null as value for IsFloating");
+                }
+                VirtualDoorFloating = (bool)value;
+            } // todo Kan vara tvärtom...
         }
 
-        public void Close()
+        public bool IsLocked
         {
-            throw new NotImplementedException();
-        }
+            get
+            {
+                if(UseVirtualDoorLockedSignal)
+                {
+                    return VirtualDoorLocked;
+                }
+                return doorLockedPin.Read() == GpioPinValue.High;
+            } // todo Kan vara tvärtom...
 
-        public bool IsOpen { get; set; }
-        public bool IsLocked { get; set; }
+            set { VirtualDoorLocked = value; } // todo Kan vara tvärtom...
+        }
 
         public override void InitGpio()
         {
-            throw new NotImplementedException();
+            base.InitGpio();
+            doorOpenPin = gpio.OpenPin(doorOpenPinNumber); 
+            doorFloatingPin = gpio.OpenPin(doorFloatingPinNumber); 
+            doorLockedPin = gpio.OpenPin(doorLockedPinNumber); 
         }
     }
 
