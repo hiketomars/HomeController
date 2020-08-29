@@ -141,7 +141,7 @@ namespace UnitTestProject
 
             Task.Delay(3000).Wait();
 
-            Assert.IsTrue(remoteCentralUnitProxy1A.RcuCurrentStatusMessage.AlarmStatus ==
+            Assert.IsTrue(remoteCentralUnitProxy1A.GetRcuCurrentStatusMessage.AlarmStatus ==
                           AlarmHandler.AlarmActivityStatus.EntranceOngoing);
         }
 

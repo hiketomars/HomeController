@@ -397,6 +397,8 @@ namespace UnitTestProject
         {
             throw new NotImplementedException();
         }
+
+        public bool UseVirtualIo { get; set; }
     }
 
     class TestMainView : IMainView
@@ -426,6 +428,11 @@ namespace UnitTestProject
             throw new NotImplementedException();
         }
 
+        public void SetHouseStatusText(string text)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SetLcuLoggText(string lcuName, string text)
         {
             throw new NotImplementedException();
@@ -451,7 +458,52 @@ namespace UnitTestProject
             throw new NotImplementedException();
         }
 
+        public void AddRcuAlarmStatusText(string lcuName, string rcuName, string text)
+        {
+            throw new NotImplementedException();
+        }
+
         public void ClearRcuText(string lcuName, string rcuName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EnableDoorOpenCheckbox(string lcuName, bool enable)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EnableDoorFloatingCheckbox(string lcuName, bool enable)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EnableDoorLockedCheckbox(string lcuName, bool enable)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DisableDoorOpenCheckbox(string lcuName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DisableDoorFloatingCheckbox(string lcuName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DisableDoorLockedCheckbox(string lcuName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CheckAndDisableUseVirtualIo(string lcuName, bool checkAndDisable)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CheckUncheckAllUseVirtual(string lcuName, bool check)
         {
             throw new NotImplementedException();
         }

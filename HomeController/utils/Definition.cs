@@ -36,7 +36,13 @@ namespace HomeController.utils
             Logg, // Info that change but old info should remain (ie presented in scroll area)
             SendCounter, // Static number info. "Static" meaning that only last info is displayed since the presented are is in a static place.
             ReceiveCounter,// Static number info. 
-            StaticInfo // Static text info, e.g. PortNumber for LCU.
+            StaticInfo, // Static text info, e.g. PortNumber for LCU.
+            RcuStatus // Alarm status and door status etc for an RCU.
+        }
+
+        public static bool? TryParseNullableBool(string stringValue)
+        {
+            return bool.TryParse(stringValue, out var outValue) ? (bool?)outValue : null;
         }
     }
 }

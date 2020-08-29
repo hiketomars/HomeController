@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.System.Profile;
 using HomeController.comm;
+using HomeController.utils;
 using Moq;
 
 namespace HomeController.model
@@ -29,43 +30,39 @@ namespace HomeController.model
             return HouseModel;// todo return mock here.
         }
 
-        public static IDoor GetDoor()
+        public static IDoor GetDoor(LocalCentralUnit lcu)
         {
-            if (HasGpioCapacity())
-            {
-                var mock = new Mock<IDoor>();
-                mock.SetupAllProperties();
-                return mock.Object;
-            }
+            //if (!ExecutionHandler.OsHasGpioCapacity() || lcu.UseAnyMockedDoorProperty)
+            //{
+            //    // Here goes Windows on my PC.
+            //    var mock = new Mock<IDoor>();
+            //    mock.SetupAllProperties();
+            //    return mock.Object;
+            //}
             return new Door();
         }
 
-        public static IRgbLed GetRgbLed()
+        public static IRgbLed GetRgbLed(LocalCentralUnit lcu)
         {
-            if(HasGpioCapacity())
-            {
-                var mock = new Mock<IRgbLed>();
-                mock.SetupAllProperties();
-                return mock.Object;
-            }
+            //if(!ExecutionHandler.OsHasGpioCapacity() || lcu.UseAnyMockedDoorProperty)
+            //{
+            //    var mock = new Mock<IRgbLed>();
+            //    mock.SetupAllProperties();
+            //    return mock.Object;
+            //}
             return new RgbLed();
         }
 
-        public static ISiren GetSiren()
+        public static ISiren GetSiren(LocalCentralUnit lcu)
         {
-            if(HasGpioCapacity())
-            {
-                var mock = new Mock<ISiren>();
-                mock.SetupAllProperties();
-                return mock.Object;
-            }
+            //if(!ExecutionHandler.OsHasGpioCapacity() || lcu.UseAnyMockedDoorProperty)
+            //{
+            //    var mock = new Mock<ISiren>();
+            //    mock.SetupAllProperties();
+            //    return mock.Object;
+            //}
             return new Siren();
         }
 
-        private static bool HasGpioCapacity()
-        {
-            string os = AnalyticsInfo.VersionInfo.DeviceFamily;
-            return !os.Contains("windows");
-        }
     }
 }

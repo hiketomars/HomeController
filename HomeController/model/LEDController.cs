@@ -66,15 +66,15 @@ if (timer == null)
                     255, 0, 0, 200,
                     0, 0, 0, 200,
 
-                    // Three fast green flashes.
+                    // Two fast green flashes.
                     0, 255, 0, 200,
                     0, 0, 0, 200,
 
                     0, 255, 0, 200,
                     0, 0, 0, 200,
 
-                    0, 255, 0, 200,
-                    0, 0, 0, 200,
+                    //0, 255, 0, 200,
+                    //0, 0, 0, 200,
 
                     // Three fast blue flashes.
                     0, 0, 255, 200,

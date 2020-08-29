@@ -150,6 +150,11 @@ namespace HomeController
         // ---------------------------- LCU ------------------------------------------------
         // Adds text to rcu log.
 
+        public void SetHouseStatusText(string text)
+        {
+            HouseStatusTextBox.Text = text;
+        }
+
         public void SetLcuLoggText(string lcuName, string text)
         {
             var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
@@ -164,6 +169,9 @@ namespace HomeController
 
         public void SetLcus(List<ILocalCentralUnit> lcus)
         {
+            LcuStackPanel.Children.Clear();
+            lcuUserControls.Clear();
+
             foreach(var lcu in lcus)
             {
                 var lcuUserControl = new LcuUserControl(mainPresenter);
@@ -202,11 +210,57 @@ namespace HomeController
             rcuUserControl.SetReceiveCounterText(text);
         }
 
+        public void AddRcuAlarmStatusText(string lcuName, string rcuName, string text)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
+            rcuUserControl.SetRcuAlarmStatusText(text);
+        }
+
         public void ClearRcuText(string lcuName, string rcuName)
         {
             var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
             var rcuUserControl = lcuUserControl.GetRcuUserControls().Find(e => e.RcuName == rcuName);
             rcuUserControl.ClearOutput();
+        }
+
+        public void EnableDoorOpenCheckbox(string lcuName, bool enable)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.DoorIsOpenCb.IsEnabled = enable;
+        }
+
+        public void EnableDoorFloatingCheckbox(string lcuName, bool enable)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.DoorIsFloatingCb.IsEnabled = enable;
+        }
+
+        public void EnableDoorLockedCheckbox(string lcuName, bool enable)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.DoorIsLockedCb.IsEnabled = enable;
+        }
+
+
+        public void CheckAndDisableUseVirtualIo(string lcuName, bool checkAndDisable)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+            lcuUserControl.CheckAndDisableUseVirtualIo(checkAndDisable);
+        }
+
+        public void CheckUncheckAllUseVirtual(string lcuName, bool check)
+        {
+            var lcuUserControl = lcuUserControls.Find(e => e.LcuName == lcuName);
+
+            if(check)
+            {
+                lcuUserControl.CheckAllUseVirtual();
+            }
+            else
+            {
+                lcuUserControl.UncheckAllUseVirtual();
+            }
         }
 
         // Not used right now since I'm having another method that takes RGBValue as an argument instead.

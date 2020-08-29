@@ -52,6 +52,27 @@ namespace HomeController.comm {
             set { lcuRemoteCentralUnitsController = value; }
         }
 
+        public bool UseAnyMockedDoorProperty
+        {
+            get => UseVirtualDoorOpen || UseVirtualDoorFloating || UseVirtualDoorLocked;
+            //set
+            //{
+            //    var oldValue = useAnyMockedDoorProperty;
+            //    useAnyMockedDoorProperty = value;
+            //    if (oldValue != useAnyMockedDoorProperty)
+            //    {
+            //        // Setting has changed.
+            //        Door = HouseModelFactory.GetDoor(this);
+            //    }
+            //}
+        }
+
+        public bool UseVirtualDoorOpen { get; set; }
+        public bool UseVirtualDoorFloating { get; set; }
+        public bool UseVirtualDoorLocked { get; set; }
+
+        public bool? IsSabotaged { get; }
+
         public void OnRcuReceivedMessage(IRemoteCentralUnitProxy rcu, Definition.MessageType messageType, string loggMessage)
         {
             lcuHandler.OnRcuReceivedMessage(this, rcu, messageType, loggMessage);
@@ -111,18 +132,18 @@ namespace HomeController.comm {
 
             // The HouseModelFactory is used to retrieve correct object depending on if this object is created for a normal execution or for a unit test.
             // Door
-            var door = HouseModelFactory.GetDoor();
+            var door = HouseModelFactory.GetDoor(this);
             var doorController = new DoorController();
 
             // LED
-            var doorLed = HouseModelFactory.GetRgbLed();
+            var doorLed = HouseModelFactory.GetRgbLed(this);
             var ledController = new LEDController(this, doorLed);
 
             // Remote Central Unit Controller
             LcuRemoteCentralUnitsController = new RemoteCentralUnitsController(this, configHandler.GetRemoteLcus());
 LcuRemoteCentralUnitsController.Setup(this);
             // Siren
-            var lcuSiren = HouseModelFactory.GetSiren();
+            var lcuSiren = HouseModelFactory.GetSiren(this);
             var lcuSirenController = new SirenController(this);
 
             SetupLcu(door, doorLed, ledController, LcuRemoteCentralUnitsController, lcuSiren, lcuSirenController);
@@ -233,8 +254,6 @@ LcuRemoteCentralUnitsController.Setup(this);
         //}
 
         public string Name { get; set; }
-
-        private ISiren LcuSiren { get; set; }
 
         private bool autoStatusUpdate = false;
 
@@ -426,6 +445,7 @@ Logger.Logg(this.Name, Logger.LCU_Cat, "Leaving Lcu.ActivateAlarm.");
         }
 
         private List<string> loggings = new List<string>();
+        private bool useAnyMockedDoorProperty;
         private IRgbLed DoorLed { get; set; }
         public int Id { get; set; }
 

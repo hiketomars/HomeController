@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="44"/>
             <RowDefinition Height="44"/>
+            <RowDefinition Height="164"/>
             <RowDefinition />
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
@@ -30,10 +31,26 @@
             <Button     Name="ClearAllBtn"        Grid.Row="1" Grid.Column="2"                       Content="Clear All" Click="ClearAllBtn_Click"  Margin="10,0"/>
             <Button     Name="XxBtn"        Grid.Row="1" Grid.Column="2"                       Content="Status" Click="ClearAllBtn_Click"  Margin="10,0"/>
         </StackPanel>
-        <Grid Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4">
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="4" >
+            <StackPanel Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4" Orientation="Vertical" Margin="20" VerticalAlignment="Bottom">
+                <TextBlock HorizontalAlignment="Center">DOOR</TextBlock>
+                <CheckBox Name="DoorIsOpenCb" Content="Door open" Click="DoorIsOpenCb_OnClick" x:FieldModifier="public" />
+                <CheckBox Name="DoorIsFloatingCb" Content="Door floating" Click="DoorIsFloatingCb_OnClick"
+                          x:FieldModifier="public" />
+                <CheckBox Name="DoorIsLockedCb" Content="Door locked" Click="DoorIsLockedCb_OnClick"
+                          x:FieldModifier="public" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4" Orientation="Vertical" Margin="20" VerticalAlignment="Bottom">
+                <CheckBox Name="CheckUncheckAllUseVirtualCb" Content="Check/uncheck all" Click="CheckUncheckAllUseVirtual_OnClick" />
+                <CheckBox Name="UseVirtualDoorOpenCb" Content="Use Virtual" Checked="UseVirtualDoorOpen_OnClick" Unchecked="UseVirtualDoorOpen_OnClick"/>
+                <CheckBox Name="UseVirtualDoorFloatingCb" Content="Use Virtual" Checked="UseVirtualDoorFloating_OnClick" Unchecked="UseVirtualDoorFloating_OnClick"/>
+                <CheckBox Name="UseVirtualDoorLockedCb" Content="Use Virtual" Checked="UseVirtualDoorLocked_OnClick" Unchecked="UseVirtualDoorLocked_OnClick"/>
+            </StackPanel>
+        </StackPanel>
+        <Grid Grid.Row="3" Grid.Column="0"  Grid.ColumnSpan="4">
             <StackPanel Name="RcuStackPanel"   Orientation="Horizontal"  HorizontalAlignment="Stretch"  Background="CornflowerBlue" Margin="10"/>
         </Grid>
-        <ScrollViewer Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" VerticalScrollBarVisibility="Visible">
         <!--<Grid Name="RcuStackPanel"      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Background="CornflowerBlue" Margin="10"/>-->
         <TextBlock  Name="InfoTextBlock"      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"             Height="400"          TextWrapping="Wrap" Text="..." Margin="10,0"/>
         </ScrollViewer>

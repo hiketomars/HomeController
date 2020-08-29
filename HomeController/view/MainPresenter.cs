@@ -31,7 +31,15 @@ namespace HomeController.view
             houseModel.HomeReceivedMessage += new Definition.HomeMessageReceivedEventHandler(ModelEventHandler_HomeReceivedMessage);
             houseModel.LcuRelatedMessage += new Definition.LcuRelatedMessageEventHandler(ModelEventHandler_LcuRelatedMessage);
 
-            
+            if (!ExecutionHandler.OsHasGpioCapacity())
+            {
+                var lcus = houseModel.GetLcuList();
+                mainView.SetLcus(lcus);
+                houseModel.GetLcuList().ForEach(lcu => mainView.CheckAndDisableUseVirtualIo(lcu.Name, true)); 
+                houseModel.GetLcuList().ForEach(lcu => lcu.Door.UseVirtualIoSignals()); 
+                //mainView.SetLcuInfoText(lcu.Name, "Port: " + lcu.PortNumber);
+            }
+            mainView.SetHouseStatusText("GPIO present: "+ExecutionHandler.OsHasGpioCapacity());
         }
 
         private async void ModelEventHandler_LcuRelatedMessage(ILocalCentralUnit lcu, Definition.MessageType messageType, string message)
@@ -98,6 +106,9 @@ namespace HomeController.view
                             break;
                         case Definition.MessageType.ReceiveCounter:
                             mainView.AddRcuReceiveCounterText(lcu.Name, rcu.NameOfRemoteLcu, message);
+                            break;
+                        case Definition.MessageType.RcuStatus:
+                            mainView.AddRcuAlarmStatusText(lcu.Name, rcu.NameOfRemoteLcu, message);
                             break;
                         default:
                             mainView.AddRcuLoggText(lcu.Name, rcu.NameOfRemoteLcu, message + "\r\n");
@@ -203,6 +214,76 @@ namespace HomeController.view
         public void ActionBtn_Click(string lcuName, string rcuName, string actionSelectorSelectValue)
         {
             houseModel.ActionBtn(lcuName, rcuName, actionSelectorSelectValue);
+        }
+        
+        public void DoorIsOpen_OnClick(string lcuName, bool? isChecked)
+        {
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            lcu.Door.IsOpen = (bool) isChecked;
+        }
+
+        public void DoorIsUnsealed_OnClick(string lcuName, bool? isChecked)
+        {
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            //lcu.Door.IsOpen = (bool)isChecked;
+        }
+
+        public void DoorIsLocked_OnClick(string lcuName, bool? isChecked)
+        {
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            lcu.Door.IsLocked = (bool)isChecked;
+        }
+
+        //public void UseVirtualDoor_OnClick(string lcuName, bool? isChecked)
+        //{
+        //    //var useMock = (bool) isChecked;
+        //    //var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+
+        //    //lcu.UseVirtualDoor = useMock;
+        //    ////mainView.CheckAndDisableUseVirtualIo(lcuName,true);
+        //    //mainView.DisableDoorOpenCheckbox(lcuName, );
+        //}
+
+        public void UseVirtualDoorOpen_OnClick(string lcuName, bool? isChecked)
+        {
+            var useVirtual = (bool)isChecked;
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            lcu.UseVirtualDoorOpen = useVirtual;
+            mainView.EnableDoorOpenCheckbox(lcuName, lcu.UseVirtualDoorOpen);
+        }
+
+        public void UseVirtualDoorFloating_OnClick(string lcuName, bool? isChecked)
+        {
+            var useVirtual = (bool)isChecked;
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            lcu.UseVirtualDoorFloating = useVirtual;
+            mainView.EnableDoorFloatingCheckbox(lcuName, lcu.UseVirtualDoorFloating);
+
+        }
+
+        public void UseVirtualDoorLocked_OnClick(string lcuName, bool? isChecked)
+        {
+            var useVirtual = (bool)isChecked;
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            lcu.UseVirtualDoorLocked = useVirtual;
+            mainView.EnableDoorLockedCheckbox(lcuName, lcu.UseVirtualDoorLocked);
+
+        }
+
+        private bool ToggleCheckUncheckAllUseVirtual;
+        public void CheckUncheckAllUseVirtual_OnClick(string lcuName)
+        {
+            var lcu = houseModel.GetLcuList().Find(l => l.Name == lcuName);
+            ToggleCheckUncheckAllUseVirtual = !ToggleCheckUncheckAllUseVirtual;
+            if(ToggleCheckUncheckAllUseVirtual)
+            {
+                mainView.CheckUncheckAllUseVirtual(lcuName, false);
+            }
+            else
+            {
+                mainView.CheckUncheckAllUseVirtual(lcuName, true);
+            }
+
         }
     }
 }

@@ -20,6 +20,11 @@ namespace HomeController.model
     /// </summary>
     public sealed class RgbLed : GpioConnector, IRgbLed
     {
+        public bool UseVirtualRgbLedSignal { get; set; }
+        private bool VirtualRedLedSignal { get; set; }
+        private bool VirtualGreenLedSignal { get; set; }
+        private bool VirtualBlueLedSignal { get; set; }
+
         public event Definition.LEDChangedEventHandler LEDHasChanged;
 
         private GpioPin redPin;
@@ -47,7 +52,11 @@ namespace HomeController.model
             this.greenPinNumber = greenPinNumber;
             this.bluePinNumber = bluePinNumber;
             //this.visualizeLed = visualizeLed;
-            InitGpio(); 
+
+            if (!UseVirtualRgbLedSignal && ExecutionHandler.OsHasGpioCapacity())
+            {
+                InitGpio();
+            }
 
             SetRGBValue(0);
             //visualizeLed(MainPage.LEDGraphColor.Gray, initGpioResult);
@@ -126,8 +135,10 @@ namespace HomeController.model
         }
 
 
-        private void SetHigh(GpioPin aPin) {
-            if(aPin != null)
+        private void SetHigh(GpioPin aPin)
+        {
+            SetVirtualPin(aPin, true);
+            if(aPin != null && !UseVirtualRgbLedSignal)
             {
                 aPin.Write(GpioPinValue.High);
             }
@@ -135,9 +146,30 @@ namespace HomeController.model
 
         private void SetLow(GpioPin aPin)
         {
-            if (aPin != null)
+            SetVirtualPin(aPin, false);
+
+            if(aPin != null && !UseVirtualRgbLedSignal)
             {
                 aPin.Write(GpioPinValue.Low);
+            }
+        }
+
+        private void SetVirtualPin(GpioPin aPin, bool value)
+        {
+            if (aPin == redPin)
+            {
+                VirtualRedLedSignal = value;
+            }else if (aPin == greenPin)
+            {
+                VirtualGreenLedSignal = value;
+            }
+            else if (aPin == bluePin)
+            {
+                VirtualBlueLedSignal = value;
+            }
+            else
+            {
+                throw new Exception("Unknown pin");
             }
         }
 

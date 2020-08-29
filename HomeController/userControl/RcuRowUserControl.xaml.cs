@@ -79,6 +79,11 @@ namespace HomeController.userControl
             RcuReceiveCounterTextBlock.Text = text;
         }
 
+        public void SetRcuAlarmStatusText(string text)
+        {
+            RcuAlarmStatus.Text = text;
+        }
+
         private void ConnectBtn_Click(object sender, RoutedEventArgs e)
         {
             mainPresenter.ConnectBtn_Click(LcuName, RcuName);

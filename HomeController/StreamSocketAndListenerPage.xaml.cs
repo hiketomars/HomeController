@@ -26,9 +26,18 @@ namespace HomeController
             get => "FakeLcu";
         }
 
+        public IDoor Door { get; }
+
         public string PortNumber { get; }
         public IAlarmHandler LcuAlarmHandler { get; }
         public IRemoteCentralUnitsController LcuRemoteCentralUnitsController { get; }
+        public bool UseAnyMockedDoorProperty { get; set; }
+        public bool UseVirtualDoorOpen { get; set; }
+        public bool UseVirtualDoorFloating { get; set; }
+        public bool UseVirtualDoorLocked { get; set; }
+
+        public bool? IsSabotaged { get; }
+
         public void OnRcuReceivedMessage(IRemoteCentralUnitProxy rcu, Definition.MessageType messageType,
             string loggMessage)
         {

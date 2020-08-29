@@ -182,6 +182,7 @@
       <DependentUpon>RcuRowUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="utils\Definition.cs" />
+    <Compile Include="utils\ExecutionHandler.cs" />
     <Compile Include="utils\Logger.cs" />
     <Compile Include="utils\RGBValue.cs" />
     <Compile Include="view\IMainView.cs" />

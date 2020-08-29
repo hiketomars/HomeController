@@ -73,6 +73,34 @@ namespace HomeController.userControl
             InfoTextBlock.Text += text;
         }
 
+        // Check and disable all UseVirtualxxx-controls. 
+        // This will force use of virtual properties. Typically used when no read world values are available.
+        public void CheckAndDisableUseVirtualIo(bool checkAndDisable)
+        {
+            if(checkAndDisable)
+            {
+                UseVirtualDoorOpenCb.IsChecked = true;
+                UseVirtualDoorFloatingCb.IsChecked = true;
+                UseVirtualDoorLockedCb.IsChecked = true;
+
+                UseVirtualDoorOpenCb.IsEnabled = false;
+                UseVirtualDoorFloatingCb.IsEnabled = false;
+                UseVirtualDoorLockedCb.IsEnabled = false;
+
+            }
+            else
+            {
+                UseVirtualDoorOpenCb.IsChecked = false;
+                UseVirtualDoorFloatingCb.IsChecked = false;
+                UseVirtualDoorLockedCb.IsChecked = false;
+
+                UseVirtualDoorOpenCb.IsEnabled = true;
+                UseVirtualDoorFloatingCb.IsEnabled = true;
+                UseVirtualDoorLockedCb.IsEnabled = true;
+            }
+        }
+
+
         private void ListenAllBtn_Click(object sender, RoutedEventArgs e)
         {
             InfoTextBlock.Text += "";
@@ -89,6 +117,65 @@ namespace HomeController.userControl
         {
             InfoTextBlock.Text += "";
             mainPresenter.ClearAllBtn_Click(LcuName);
+        }
+
+        private void DoorIsOpenCb_OnClick(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.DoorIsOpen_OnClick(LcuName, DoorIsOpenCb.IsChecked);
+        }
+
+        private void DoorIsFloatingCb_OnClick(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.DoorIsUnsealed_OnClick(LcuName, DoorIsFloatingCb.IsChecked);
+        }
+
+        private void DoorIsLockedCb_OnClick(object sender, RoutedEventArgs e)
+        {
+            mainPresenter.DoorIsLocked_OnClick(LcuName, DoorIsLockedCb.IsChecked);
+        }
+
+        private void UseVirtualDoor_OnClick(object sender, RoutedEventArgs e)
+        {
+            //mainPresenter.UseVirtualDoor_OnClick(LcuName, UseVirtualDoorCb.IsChecked);
+            UseVirtualDoorOpenCb.IsChecked = !UseVirtualDoorOpenCb.IsChecked;
+            UseVirtualDoorFloatingCb.IsChecked = UseVirtualDoorOpenCb.IsChecked;
+            UseVirtualDoorLockedCb.IsChecked = UseVirtualDoorOpenCb.IsChecked;
+        }
+
+        private void UseVirtualDoorOpen_OnClick(object sender, RoutedEventArgs e)
+        {
+            mainPresenter?.UseVirtualDoorOpen_OnClick(LcuName, UseVirtualDoorOpenCb.IsChecked);
+        }
+
+        private void UseVirtualDoorFloating_OnClick(object sender, RoutedEventArgs e)
+        {
+            mainPresenter?.UseVirtualDoorFloating_OnClick(LcuName, UseVirtualDoorFloatingCb.IsChecked);
+        }
+
+        // todo Nedanstådende tre eventhanterare anterar Checked/Unchecked event så namnet borde bytas till ..._Checked resp ..._Unchecked.
+        private void UseVirtualDoorLocked_OnClick(object sender, RoutedEventArgs e)
+        {
+            mainPresenter?.UseVirtualDoorLocked_OnClick(LcuName, UseVirtualDoorLockedCb.IsChecked);
+        }
+
+        private void CheckUncheckAllUseVirtual_OnClick(object sender, RoutedEventArgs e)
+        {
+            CheckUncheckAllUseVirtualCb.IsChecked = false;
+            mainPresenter?.CheckUncheckAllUseVirtual_OnClick(LcuName);
+        }
+
+        public void CheckAllUseVirtual()
+        {
+            UseVirtualDoorOpenCb.IsChecked = true;
+            UseVirtualDoorFloatingCb.IsChecked = true;
+            UseVirtualDoorLockedCb.IsChecked = true;
+        }
+
+        public void UncheckAllUseVirtual()
+        {
+            UseVirtualDoorOpenCb.IsChecked = false;
+            UseVirtualDoorFloatingCb.IsChecked = false;
+            UseVirtualDoorLockedCb.IsChecked = false;
         }
     }
 }

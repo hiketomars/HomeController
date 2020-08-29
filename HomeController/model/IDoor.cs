@@ -10,5 +10,11 @@ namespace HomeController.model
     {
         bool IsOpen { get; set; }
         bool IsLocked { get; set; }
+        bool? IsFloating { get; }
+
+        bool UseVirtualDoorClosedSignal { get; set; }
+        bool UseVirtualDoorFloatingSignal { get; set; }
+        bool UseVirtualDoorLockedSignal { get; set; }
+        void UseVirtualIoSignals();
     }
 }
