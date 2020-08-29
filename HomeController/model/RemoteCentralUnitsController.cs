@@ -343,9 +343,9 @@ namespace HomeController.model
             var compoundStatus = new CompoundStatus();
             foreach(var configuredRemoteCentralUnit in remoteCentralUnitProxies)
             {
-                compoundStatus.LcuStatuses.Add(configuredRemoteCentralUnit.RcuCurrentStatusMessage);
+                compoundStatus.LcuStatuses.Add(configuredRemoteCentralUnit.GetRcuCurrentStatusMessage);
 
-                if (configuredRemoteCentralUnit.RcuCurrentStatusMessage.StatusTime > mostRecentChangedLcu.RcuCurrentStatusMessage.StatusTime)
+                if (configuredRemoteCentralUnit.GetRcuCurrentStatusMessage.StatusTime > mostRecentChangedLcu.GetRcuCurrentStatusMessage.StatusTime)
                 {
                     mostRecentChangedLcu = configuredRemoteCentralUnit;
                 }

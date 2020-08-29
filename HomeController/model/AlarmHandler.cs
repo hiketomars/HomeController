@@ -14,6 +14,7 @@ namespace HomeController.model
 {
     public class AlarmHandler : IAlarmHandler
     {
+        // makl Denna kommentaren skrev jag in 200829 13.23 för att testa github.
         private readonly LocalCentralUnit lcu;
         public const int EntranceDelayDefaultMs = 6000;
         public const int SirenDuranceDefaultMs = 5 * 60 * 1000;
@@ -225,7 +226,7 @@ namespace HomeController.model
             //todo Kanske inte bästa sättet att göra detta på; Ovan sätter jag i vissa situationer statusen till
             // ett nytt värde men nedan kommer jag kanske direkt sätta om det igen pga att en remote lcu har ett nyare status...
 
-            var mostRecentRcuStatus = lcu.LatestCompoundStatus.MostRecentChangedLcu.RcuCurrentStatusMessage.ReceivedOverallAlarmState;
+            var mostRecentRcuStatus = lcu.LatestCompoundStatus.MostRecentChangedLcu.GetRcuCurrentStatusMessage.ReceivedOverallAlarmState;
             switch (mostRecentRcuStatus)
             {
                 case OverallAlarmState.AlarmDeactivated:
