@@ -12,7 +12,7 @@ using HomeController.utils;
 namespace HomeController.view
 {
     /// <summary>
-    /// This is a presenter in the MVP-architecture.
+    /// This is a presenter in the MVP-architecture. //200907 21:26, 200908 19.18
     /// </summary>
     public class MainPresenter
     {

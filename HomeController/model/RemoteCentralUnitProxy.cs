@@ -80,6 +80,10 @@ namespace HomeController.model
 
         }
 
+        public RemoteCentralUnitProxy()
+        {
+        }
+
         /// <summary>
         /// Starts listener listen for commands from the RCU and also starts requesting status message from the RCU regularly.
         /// </summary>
@@ -142,6 +146,7 @@ namespace HomeController.model
             get => remoteLcuStatusHasChanged;
             set => remoteLcuStatusHasChanged = value;
         }
+        public CurrentStatusMessage GetRcuCurrentStatusMessage { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         // For debug purpose.
         public void ConnectToRcu()
